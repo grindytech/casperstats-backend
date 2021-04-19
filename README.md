@@ -47,54 +47,45 @@ $ npm run dev
 ```
 url: /api/block
 
-example: localhost:3000/api/block
+example: localhost:3000/api/block?id=13&b=69
 
 method: GET
 
-request: 
-{
-    
-}
+params: 
+id: JSON-RPC identifier, applied to the request and returned in the response. If not provided, a random integer will be assigned
+b: Hex-encoded block hash or height of the block. If not given, the last block added to the chain as known at the given node will be used
 
 successResponse:
 {
-    {
-    "id": -6025693843983172000,
+    "id": 13,
     "jsonrpc": "2.0",
     "result": {
         "api_version": "1.0.0",
         "block": {
             "body": {
-                "deploy_hashes": [],
-                "proposer": "0189da179d3ae3fc8f0975da77851d11226bfda3327ef17e343d9112aa71426cb6",
+                "deploy_hashes": [
+                    "a57ac2f4e443f69e3dd6e5f9d6a0113e5b3578f68e348a2527ef6d22cfc11bbf",
+                    "d3332cfabae9bf4333916565df47da89c3cd6b833ca76a55a8fc4a5ed32ea46a"
+                ],
+                "proposer": "0106ca7c39cd272dbf21a86eeb3b36b7c26e2e9b94af64292419f7862936bca2ca",
                 "transfer_hashes": []
             },
-            "hash": "e6a6fcc0a3dda646085bb20736d9fdd25e498fb654d12a279c9a453f42e088d3",
+            "hash": "8eec00f58216737005c26b4fab8b362ad494501c0f5301f66d47a080b8fd98bf",
             "header": {
-                "accumulated_seed": "5931ca3b180325bf3bcede27dcd3d1decf97b9521ebc0ebaf75629dbc8723dae",
-                "body_hash": "e9c15df4d693cd5d3502a6028858e59d2443e672066c4abab88936ad9e328e4a",
+                "accumulated_seed": "6f16aaa68284b0768df31a4a6d84a02496f4534d26d78294bf0898c4e9406b0a",
+                "body_hash": "3b087fa06d5760c24ea6a37d4b31147f679dab8066e8a3183bf1528127fdba9c",
                 "era_end": null,
-                "era_id": 126,
-                "height": 9017,
-                "parent_hash": "f0303c65ba35b7549e734f3ba34b439b43181d577485973c01e4fbec771869a7",
+                "era_id": 0,
+                "height": 69,
+                "parent_hash": "f30a5a049db647d768690ba80a75d190f2a53f2aabbe33c63dc7016773b22620",
                 "protocol_version": "1.0.0",
-                "random_bit": true,
-                "state_root_hash": "ba3ea6afd5f82330432b758a30435f67b51e9bf71d13db1a94974ae1f4b1713b",
-                "timestamp": "2021-04-19T08:26:32.320Z"
+                "random_bit": false,
+                "state_root_hash": "5b404d23913e8b57ee94e71a3ab41308187f67b9f33d47888db97d6b783b8850",
+                "timestamp": "2021-04-08T18:16:18.688Z"
             },
-            "proofs": [
-                {
-                    "public_key": "010268bb35bd370a499ba775877aaadef1ba87bff64ca527ae55f88cd8af9791de",
-                    "signature": "130 chars"
-                },
-                {
-                    "public_key": "0105220d6629f6ef4484e2da5f58b6222832af8cabba4fbd7f1ad55e84a06ab319",
-                    "signature": "130 chars"
-                }
-            ]
+            "proofs": []
         }
     }
-}
 }
 ```
 
