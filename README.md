@@ -9,7 +9,7 @@ This project provide the REST api to interact with Casper blockchain
   - [Reference](#reference)
   - [Installation](#installation)
 - [API](#API)
-  - [new_address](#new_address)
+  - [get_block](#get_block)
 
 ## Quick Start
 
