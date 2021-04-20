@@ -5,21 +5,15 @@ const { Execute } = require('../utils/utils');
 require('dotenv').config();
 
 module.exports = {
-  GetLatestBlock: function (req, res) {
-    // console.log(process.env.NETWORK_RPC_API);
 
-    // let service = new CasperServiceByJsonRPC(process.env.NETWORK_RPC_API);
+  // Retrieves all transfers for a block from the network
+  GetBlockTx: function (req, res) {
 
-    // service.getLatestBlockInfo().then(value => {
-    //   console.log("Value: ", value);
-    // }).catch(err => {
-    //   console.log("Err: ", err);
-    // })
 
     let id = req.query.id; // JSON-RPC identifier, applied to the request and returned in the response. If not provided, a random integer will be assigned
     let b = req.query.b; // Hex-encoded block hash or height of the block. If not given, the last block added to the chain as known at the given node will be used
 
-    let command = `./casper-client get-block --node-address ${process.env.NETWORK_RPC_API}`;
+    let command = `./casper-client get-block-transfers --node-address ${process.env.NETWORK_RPC_API}`;
 
     if (id) {
       command = command + ` --id ${id}`;
@@ -36,6 +30,5 @@ module.exports = {
       res.status(500);
       res.json(err)
     })
-
   }
 };
