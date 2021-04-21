@@ -7,7 +7,7 @@ module.exports = {
         let id = req.query.id; // JSON-RPC identifier, applied to the request and returned in the response. If not provided, a random integer will be assigned
         let b = req.query.b; // Hex-encoded block hash or height of the block. If not given, the last block added to the chain as known at the given node will be used
 
-        let command = `./casper-client get-state-root-hash --node-address ${process.env.NETWORK_RPC_API}`;
+        let command = `${process.env.CASPER_CLIENT} get-state-root-hash --node-address ${process.env.NETWORK_RPC_API}`;
 
         if (id) {
             command = command + ` --id ${id}`;
@@ -39,7 +39,7 @@ module.exports = {
         // transfer-0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20    # Key::Transfer
         // deploy-0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20      # Key::DeployInfo
 
-        let command = `./casper-client query-state --node-address ${process.env.NETWORK_RPC_API} -k ${k}`;
+        let command = `${process.env.CASPER_CLIENT} query-state --node-address ${process.env.NETWORK_RPC_API} -k ${k}`;
 
         if (id) {
             command = command + ` --id ${id}`;
@@ -67,7 +67,7 @@ module.exports = {
         let s = req.query.s;
         let p = req.query.p;
 
-        let command = `./casper-client get-balance --node-address ${process.env.NETWORK_RPC_API} -p ${p}`;
+        let command = `${process.env.CASPER_CLIENT} get-balance --node-address ${process.env.NETWORK_RPC_API} -p ${p}`;
 
         if (id) {
             command = command + ` --id ${id}`;
