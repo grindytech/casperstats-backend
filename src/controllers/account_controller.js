@@ -1,5 +1,7 @@
 const { EventService, CasperServiceByJsonRPC } = require('casper-client-sdk');
-const { Execute } = require('../utils/utils');
+const { Execute, RequestRPC } = require('../utils/utils');
+const { RpcApiName } = require('../utils/constant');
+
 require('dotenv').config();
 
 module.exports = {
@@ -7,17 +9,16 @@ module.exports = {
         let id = req.query.id; // JSON-RPC identifier, applied to the request and returned in the response. If not provided, a random integer will be assigned
         let b = req.query.b; // Hex-encoded block hash or height of the block. If not given, the last block added to the chain as known at the given node will be used
 
-        let command = `${process.env.CASPER_CLIENT} get-state-root-hash --node-address ${process.env.NETWORK_RPC_API}`;
+        let params;
 
-        if (id) {
-            command = command + ` --id ${id}`;
+        // check b is a number or string to change the params
+        if (isNaN(b)) {
+            params = [{ "Hash": b }]
+        } else {
+            params = [{ "Height": b }]
         }
 
-        if (b) {
-            command = command + ` -b ${b}`;
-        }
-
-        Execute(command).then(value => {
+        RequestRPC(id, RpcApiName.get_state_root_hash, params).then(value => {
             res.status(200);
             res.json(value);
         }).catch(err => {
@@ -64,30 +65,18 @@ module.exports = {
     GetBalance: function (req, res) {
 
         let id = req.query.id;
-        let s = req.query.s;
-        let p = req.query.p;
+        let s = req.query.s; //Hex-encoded hash of the state root
+        let p = req.query.p; //The URef under which the purse is stored. This must be a properly formatted URef "uref-<HEX STRING>-<THREE DIGIT INTEGER>"
 
-        let command = `${process.env.CASPER_CLIENT} get-balance --node-address ${process.env.NETWORK_RPC_API} -p ${p}`;
+        let params = [s, p];
 
-        if (id) {
-            command = command + ` --id ${id}`;
-        }
-
-        if (s) {
-            command = command + ` -s ${s}`;
-        } else {
-            // will be take the latest state root hash
-
-        }
-
-        Execute(command).then(value => {
+        RequestRPC(id, RpcApiName.get_balance, params).then(value => {
             res.status(200);
             res.json(value);
         }).catch(err => {
             res.status(500);
             res.json(err)
         })
-        
     }
 
 };

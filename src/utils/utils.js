@@ -1,6 +1,7 @@
 
 const dotenv = require("dotenv");
 dotenv.config();
+const request = require('request');
 
 const { exec } = require("child_process");
 
@@ -21,6 +22,33 @@ const Execute = async (command) => {
     })
 }
 
+const RequestRPC = async (id, method, params) => {
+
+    return new Promise((resolve, reject) => {
+        let options = {
+            url: process.env.NETWORK_RPC_API + "/rpc",
+            method: "post",
+            headers:
+            {
+                "content-type": "application/json"
+            },
+            body: JSON.stringify({ "jsonrpc": "2.0", "id": id, "method": method, "params": params })
+        };
+
+        console.log("Option: ", options )
+
+        request(options, (error, response, body) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(JSON.parse(body));
+            }
+        });
+
+    })
+}
 
 
-module.exports = { Execute }
+
+
+module.exports = { Execute, RequestRPC }

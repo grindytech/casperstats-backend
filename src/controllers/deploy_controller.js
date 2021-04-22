@@ -1,7 +1,10 @@
 const { EventService, CasperServiceByJsonRPC } = require('casper-client-sdk');
 const { exec } = require("child_process");
 
-const { Execute } = require('../utils/utils');
+const { RequestRPC } = require('../utils/utils');
+const {Execute} = require('../utils/utils');
+
+const { RpcApiName } = require('../utils/constant');
 
 require('dotenv').config();
 
@@ -10,19 +13,16 @@ module.exports = {
         let id = req.query.id; // JSON-RPC identifier, applied to the request and returned in the response. If not provided, a random integer will be assigned
         let hex = req.query.hex; // Hex-encoded deploy hash
 
-        let command = `${process.env.CASPER_CLIENT} get-deploy ${hex} --node-address ${process.env.NETWORK_RPC_API}`;
+        let params = [ hex ];
 
-        if (id) {
-            command = command + ` --id ${id}`;
-        }
-
-        Execute(command).then(value => {
+        RequestRPC(id, RpcApiName.get_deploy, params).then(value => {
             res.status(200);
             res.json(value);
         }).catch(err => {
             res.status(500);
             res.json(err)
         })
+
     },
 
     GetDeployBlock: function (req, res) {
