@@ -1,4 +1,4 @@
-const { RequestRPC, Execute, GetLatestStateRootHash, GetURef} = require('../utils/utils');
+const { RequestRPC, Execute, GetLatestStateRootHash, QueryState} = require('../utils/utils');
 const { RpcApiName } = require('../utils/constant');
 
 require('dotenv').config();
@@ -26,7 +26,7 @@ module.exports = {
         let address = req.params.address;
 
         let s = await GetLatestStateRootHash(); // get latest root hash
-        let URef = await GetURef(address, s); // URef for address
+        let URef = await QueryState(address, s); // URef for address
         let main_purse = URef.result.stored_value.Account.main_purse;
 
         let params = [s, main_purse];
@@ -54,25 +54,14 @@ module.exports = {
         // transfer-0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20    # Key::Transfer
         // deploy-0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20      # Key::DeployInfo
 
-        let command = `${process.env.CASPER_CLIENT} query-state --node-address ${process.env.NETWORK_RPC_API} -k ${k}`;
-
-        if (id) {
-            command = command + ` --id ${id}`;
-        }
-
-        if (s) {
-            command = command + ` -s ${s}`;
-        } else {
-            // will be take the latest state root hash
-
-        }
-
-        Execute(command).then(value => {
+        QueryState(k, s, id).then(value => {
             res.status(200);
             res.json(value);
         }).catch(err => {
             res.status(500);
-            res.json(err)
+            res.json(err);
         })
+
+
     },
 };

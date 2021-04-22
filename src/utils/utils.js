@@ -84,7 +84,7 @@ const GetLatestStateRootHash = async () => {
  * @param {number} id optional
  * @return {object}.
  */
-const GetURef = async (key, state = "", id = undefined) => {
+const QueryState = async (key, state, id = undefined) => {
 
     return new Promise((resolve, reject) => {
 
@@ -99,10 +99,9 @@ const GetURef = async (key, state = "", id = undefined) => {
         }).catch(err => {
             reject(err);
         })
-
     })
 
 }
 
 
-module.exports = { Execute, RequestRPC, GetLatestStateRootHash, GetURef }
+module.exports = { Execute, RequestRPC, GetLatestStateRootHash, QueryState }
