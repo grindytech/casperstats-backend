@@ -67,7 +67,7 @@ $ npm run dev
   ```
 url: /chain/get-block?id=&b=
 
-example: ocalhost:3030/chain/get-block?id=13&b=69
+example: http://18.197.228.151:3030/chain/get-block?id=13&b=69
 
 method: GET
 
@@ -121,7 +121,7 @@ successResponse:
 ```
 url: /chain/get-block-tranfers?id=&b=
 
-example: localhost:3030/chain/get-block-tranfers?id=13&b=888583776321623143121e6fc1209f4ed01601696a6ba857fc5fbdbe41a3a3d2
+example: http://18.197.228.151:3030/chain/get-block-tranfers?id=13&b=888583776321623143121e6fc1209f4ed01601696a6ba857fc5fbdbe41a3a3d2
 
 method: GET
 
@@ -165,7 +165,7 @@ successResponse:
 ```
 url: /chain/get-state-root-hash?id=&b=
 
-example: localhost:3030/chain/get-state-root-hash?id=12&b=
+example: http://18.197.228.151:3030/chain/get-state-root-hash?id=12&b=
 
 method: GET
 
@@ -198,7 +198,7 @@ successResponse:
 ```
 url: /info/get-deploy?id=&hex=
 
-example: localhost:3030/info/get-deploy?id=13&hex=c51ce21e9d124bb6a9944ef4855ff42790297386c14632d8146c5ab0ee88a8ed
+example: http://18.197.228.151:3030/info/get-deploy?id=13&hex=c51ce21e9d124bb6a9944ef4855ff42790297386c14632d8146c5ab0ee88a8ed
 
 method: GET
 
@@ -451,7 +451,7 @@ successResponse:
 ```
 url: /info/get-list-deploys?id=&b=
 
-example: localhost:3030/info/get-list-deploys?id=13&b=3207ff3e5d94984a6ab8de908764f8a2c8b4acbcc1ed5970b26728ac2b2b4490
+example: http://18.197.228.151:3030/info/get-list-deploys?id=13&b=3207ff3e5d94984a6ab8de908764f8a2c8b4acbcc1ed5970b26728ac2b2b4490
 
 method: GET
 
@@ -483,7 +483,7 @@ successResponse:
 ```
 url: /sate/query-state?id=&s=&k=
 
-example: localhost:3030/state/query-state?id=12&s=97d55e7074133c9bf7ff1d7b1c9c6f5f84bff888bf0087f16d139356d334170f&k=01aea113d82a9d562563a2802b1abee7ac1ea40b6c100ddeda8e9be5666e1319dc
+example: http://18.197.228.151:3030/state/query-state?id=12&s=97d55e7074133c9bf7ff1d7b1c9c6f5f84bff888bf0087f16d139356d334170f&k=01aea113d82a9d562563a2802b1abee7ac1ea40b6c100ddeda8e9be5666e1319dc
 
 method: GET
 
@@ -537,7 +537,7 @@ successResponse:
 ```
 url: /state/get-balance?id=&s=&p=
 
-example: localhost:3030/state/get-balance?id=12&s=97d55e7074133c9bf7ff1d7b1c9c6f5f84bff888bf0087f16d139356d334170f&p=uref-52d2021cafe721b5b114c3e45852178541e32ea1a904f904761a66d3dc804da0-007
+example: http://18.197.228.151:3030/state/get-balance?id=12&s=97d55e7074133c9bf7ff1d7b1c9c6f5f84bff888bf0087f16d139356d334170f&p=uref-52d2021cafe721b5b114c3e45852178541e32ea1a904f904761a66d3dc804da0-007
 
 method: GET
 
