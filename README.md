@@ -9,13 +9,20 @@ This project provide the REST api to interact with Casper blockchain
   - [Reference](#reference)
   - [Installation](#installation)
 - [API](#API)
-  - [get_block](#get_block)
-  - [get_tx_block](#get_tx_block)
-  - [get_deploy](#get_deploy)
-  - [get_deploy_block](#get_deploy_block)
-  - [get_state_root_hash](#get_state_root_hash)
-  - [query_state](#query_state)
-  - [get_balance](#get_balance)
+  - [Account](#Account)
+  
+  - [Chain](#Chain)
+    - [get-block](#get-block)
+    - [get-block-tranfers](#get-block-tranfers)
+    - [get-state-root-hash](#get-state-root-hash)
+
+  - [Info](#Info)
+    - [get-deploy](#get-deploy)
+    - [get-list-deploys](#get-list-deploys)
+
+  - [State](#State)
+    - [query-state](#query-state)
+    - [get-balance](#get-balance)
 
 ## Quick Start
 
@@ -50,9 +57,13 @@ $ npm run dev
 
 ## API
 
-### get_block
+### Account
 
-```
+### Chain
+
+  #### get-block
+  
+  ```
 url: /api/block
 
 example: http://18.197.228.151:3030/api/block?id=13&b=69
@@ -103,6 +114,24 @@ successResponse:
 | ------------- | ------------- | ------------- |
 |  |  |  |
 |  |  |  |
+
+#### get-block-tranfers
+
+#### get-state-root-hash
+
+### Info
+
+#### get-deploy
+
+#### get-list-deploys
+
+### State
+
+#### get-balance
+
+#### query-state
+
+
 
 ### get_tx_block
 
