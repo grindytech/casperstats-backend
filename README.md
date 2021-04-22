@@ -28,6 +28,8 @@ Development environment: NodeJs
 
 ### Reference
 - [casper-client](https://crates.io/crates/casper-client)
+- [casper-rpc-api](http://casper-rpc-docs.s3-website-us-east-1.amazonaws.com/)
+- [casper-list-rpcs](https://github.com/cryptoviet/casper-document/blob/main/list-rpcs.json)
 
 
 ### Installation
