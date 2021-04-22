@@ -18,7 +18,7 @@ module.exports = {
       params = [{ "Height": parseInt(b)}]
     }
 
-    RequestRPC(id, RpcApiName.get_block, params).then(value => {
+    RequestRPC(RpcApiName.get_block, params, id).then(value => {
       res.status(200);
       res.json(value);
     }).catch(err => {
@@ -38,7 +38,7 @@ module.exports = {
       params = [{ "Height": parseInt(b)}]
     }
 
-    RequestRPC(id, RpcApiName.get_block_transfers, params).then(value => {
+    RequestRPC(RpcApiName.get_block_transfers, params, id).then(value => {
       res.status(200);
       res.json(value);
     }).catch(err => {
@@ -57,10 +57,10 @@ module.exports = {
     if (isNaN(b)) {
         params = [{ "Hash": b }]
     } else {
-        params = [{ "Height": b }]
+      params = [{ "Height": parseInt(b)}]
     }
 
-    RequestRPC(id, RpcApiName.get_state_root_hash, params).then(value => {
+    RequestRPC(RpcApiName.get_state_root_hash, params).then(value => {
         res.status(200);
         res.json(value);
     }).catch(err => {

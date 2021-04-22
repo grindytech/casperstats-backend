@@ -1,4 +1,4 @@
-const { RequestRPC, Execute} = require('../utils/utils');
+const { RequestRPC, Execute, GetLatestStateRootHash, GetURef} = require('../utils/utils');
 const { RpcApiName } = require('../utils/constant');
 
 require('dotenv').config();
@@ -13,13 +13,32 @@ module.exports = {
 
         let params = [s, p];
 
-        RequestRPC(id, RpcApiName.get_balance, params).then(value => {
+        RequestRPC(RpcApiName.get_balance, params, id).then(value => {
             res.status(200);
             res.json(value);
         }).catch(err => {
             res.status(500);
             res.json(err)
         })
+    },
+
+    GetBalanceV2: async function (req, res) {
+        let address = req.params.address;
+
+        let s = await GetLatestStateRootHash(); // get latest root hash
+        let URef = await GetURef(address, s); // URef for address
+        let main_purse = URef.result.stored_value.Account.main_purse;
+
+        let params = [s, main_purse];
+
+        RequestRPC(RpcApiName.get_balance, params).then(value => {
+            res.status(200);
+            res.json(value);
+        }).catch(err => {
+            res.status(500);
+            res.json(err)
+        })
+
     },
 
     QueryState: function (req, res) {

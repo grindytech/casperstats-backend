@@ -12,7 +12,7 @@ module.exports = {
 
         let params = [ hex ];
 
-        RequestRPC(id, RpcApiName.get_deploy, params).then(value => {
+        RequestRPC(RpcApiName.get_deploy, params, id).then(value => {
             res.status(200);
             res.json(value);
         }).catch(err => {
