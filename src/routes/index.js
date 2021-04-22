@@ -1,16 +1,16 @@
 const router = require("express").Router();
 const path = require("path");
 
-const block_route = require('./block_route');
-const tx_route = require('./tx_route');
-const deploy_route = require('./deploy_route');
 const account_route = require('./account_route');
+const chain_route = require('./chain_route');
+const info_route = require('./info_route');
+const state_route = require('./state_route');
 
 // API routes
-router.use("/api/block", block_route); // route for the action relative to block
-router.use("/api/tx", tx_route); // route for transaction
-router.use("/api/deploy", deploy_route);
-router.use("/api/account", account_route);
+router.use("/account", account_route);
+router.use("/chain", chain_route);
+router.use("/info", info_route);
+router.use("/state", state_route);
 
 // If no API routes are hit, send the React app
 router.get("*", (req, res) => {
