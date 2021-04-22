@@ -15,7 +15,7 @@ module.exports = {
     if (isNaN(b)) {
       params = [{ "Hash": b }]
     } else {
-      params = [{ "Height": b }]
+      params = [{ "Height": parseInt(b)}]
     }
 
     RequestRPC(id, RpcApiName.get_block, params).then(value => {
@@ -35,7 +35,7 @@ module.exports = {
     if (isNaN(b)) {
       params = [{ "Hash": b }]
     } else {
-      params = [{ "Height": b }]
+      params = [{ "Height": parseInt(b)}]
     }
 
     RequestRPC(id, RpcApiName.get_block_transfers, params).then(value => {
