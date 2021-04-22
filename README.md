@@ -535,6 +535,14 @@ successResponse:
 #### get-balance
 
 ```
+1.
+url: /state/get-balance/:address
+
+example: http://18.197.228.151:3030/state/get-balance/01aea113d82a9d562563a2802b1abee7ac1ea40b6c100ddeda8e9be5666e1319dc
+
+method: GET
+
+2.
 url: /state/get-balance?id=&s=&p=
 
 example: http://18.197.228.151:3030/state/get-balance?id=12&s=97d55e7074133c9bf7ff1d7b1c9c6f5f84bff888bf0087f16d139356d334170f&p=uref-52d2021cafe721b5b114c3e45852178541e32ea1a904f904761a66d3dc804da0-007
