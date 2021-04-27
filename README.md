@@ -15,7 +15,7 @@ This project provide the REST api to interact with Casper blockchain
     - [get-block](#get-block)
     - [get-block-tranfers](#get-block-tranfers)
     - [get-state-root-hash](#get-state-root-hash)
-    - [get-latest-block](#get-latest-block)
+    - [get-latest-blocks](#get-latest-blocks)
     - [get-transactions](#get-transactions)
 
   - [Info](#Info)
@@ -194,12 +194,12 @@ successResponse:
 |  |  |  |
 
 
-#### get-latest-block
+#### get-latest-blocks
 
 ```
-url: /chain/get-latest-block?id=
+url: /chain/get-latest-block?num=
 
-example: http://18.197.228.151:3030/chain/get-latest-block
+example: http://18.197.228.151:3030/chain/get-latest-blocks?num=3
 
 method: GET
 
@@ -211,7 +211,8 @@ successResponse: block data
 
 | Params  | Type | Description | Required |
 | ------------- | ------------- | ------------- |------------- |
-| id | number | JSON-RPC identifier, applied to the request and returned in the response. If not provided, a random integer will be assigned | Optional |
+| num | number | Number of last block you wanna get | Yes |
+
 
 | ResponseField  | Type | Description |
 | ------------- | ------------- | ------------- |
@@ -230,30 +231,55 @@ method: GET
 des: get the information data by block
 
 successResponse:
-{
 [
     {
-        "amount": "98000000000",
-        "deploy_hash": "f121d85da45d3e2adb57b235b0016a87e00428b62b9203ca532f085fb252deb8",
-        "from": "account-hash-519f5a3516902da1b9e253337f15cc299fe8ad643f1c6d24ef6107782f764f60",
-        "gas": "0",
-        "id": null,
-        "source": "uref-cf46c061bcab28c046b39721e6a8f6fd6444e0025f65ed2898eefebb3372040c-007",
-        "target": "uref-e81b4fffcd8fd5ff94bf22fb80667522504b23ec8e0a3d8db1ca0515b43b554f-004",
-        "to": "account-hash-edb9b5d9590bb1d48bd13d178dc7cf3b385f10986754865441e0e957be20eaed"
+        "deploy_hash": "db5f69c51ddacaeab0bee5c7e5665313489d99ffbbadd9208ff45092ee85476f",
+        "from": "account-hash-5861c4bbab2992d44f035c6db5ffff925c40e50c10df564f0c896435807dac9f",
+        "gas": "10000",
+        "source": "uref-01eb60dabf2d4cf399561e874ed24c1556332ed0ae9b1064c125aa284aad5f39-007",
+        "transfers": [
+            "transfer-7e2a9dac4a8109f9ef6e766d2aa353474442e341dc79507dbf672030cd9492d6"
+        ],
+        "type": "deploy",
+        "deploy": "deploy-8b2eb887456926d4d7fff0f633f44bedb58c728654b0577ed9397a1d2a353d6e"
     },
     {
         "amount": "98000000000",
-        "deploy_hash": "34c23da9e172029cf57e52f21758422371d080e96972916ddb67171ee2d3c443",
-        "from": "account-hash-d1fc6c1d372cc2e390d63964c47f99dd6556f4b322c540d6eeed73aaf012e882",
+        "deploy_hash": "db5f69c51ddacaeab0bee5c7e5665313489d99ffbbadd9208ff45092ee85476f",
+        "from": "account-hash-5861c4bbab2992d44f035c6db5ffff925c40e50c10df564f0c896435807dac9f",
         "gas": "0",
         "id": null,
-        "source": "uref-9382f1299d508d62dba7187d0965d41c486782786657160079e567c4dce71b8e-007",
+        "source": "uref-01eb60dabf2d4cf399561e874ed24c1556332ed0ae9b1064c125aa284aad5f39-007",
         "target": "uref-e81b4fffcd8fd5ff94bf22fb80667522504b23ec8e0a3d8db1ca0515b43b554f-004",
-        "to": "account-hash-edb9b5d9590bb1d48bd13d178dc7cf3b385f10986754865441e0e957be20eaed"
+        "to": "account-hash-edb9b5d9590bb1d48bd13d178dc7cf3b385f10986754865441e0e957be20eaed",
+        "type": "transfer",
+        "transfer": "transfer-7e2a9dac4a8109f9ef6e766d2aa353474442e341dc79507dbf672030cd9492d6"
+    },
+    {
+        "amount": "98000000000",
+        "deploy_hash": "4af6e98ae14f91e121ef925eb89e21719e80ca00e3bab255132f6a69e15ebd60",
+        "from": "account-hash-6a9b128359f8429cb63d11a99862382bc7ef43ae5c550168f557e75a151f9e05",
+        "gas": "0",
+        "id": null,
+        "source": "uref-b8f2e9b3fbd1dbd20c1e95b4566d5810c95de8faf387c34099f8413dc23e0f7a-007",
+        "target": "uref-e81b4fffcd8fd5ff94bf22fb80667522504b23ec8e0a3d8db1ca0515b43b554f-004",
+        "to": "account-hash-edb9b5d9590bb1d48bd13d178dc7cf3b385f10986754865441e0e957be20eaed",
+        "type": "transfer",
+        "transfer": "transfer-672de8c20fa08d239aa4a9bc2543bf56d2d59a3838456fa2c73253edfb5be55a"
+    },
+    {
+        "amount": "98000000000",
+        "deploy_hash": "18c5e7600669d0d141c082fac26a0fe6ef197bc7476d88198143f215fcd48db2",
+        "from": "account-hash-036a53c38dd3eaa082b8f17c049e2092b0b9d8c75301f198409533c4a62cbe4f",
+        "gas": "0",
+        "id": null,
+        "source": "uref-7d87c7e2677eec2414260e8d31d5302ee1ab0beef623e39b3cf3f00cb75c9265-007",
+        "target": "uref-e81b4fffcd8fd5ff94bf22fb80667522504b23ec8e0a3d8db1ca0515b43b554f-004",
+        "to": "account-hash-edb9b5d9590bb1d48bd13d178dc7cf3b385f10986754865441e0e957be20eaed",
+        "type": "transfer",
+        "transfer": "transfer-1ec316dae6e27bc942137210354e9f23dd8667ead4f66750796ee327fb2502f6"
     }
 ]
-}
 
 ```
 
