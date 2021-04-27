@@ -2,7 +2,7 @@
 const dotenv = require("dotenv");
 dotenv.config();
 const request = require('request');
-const {RpcApiName} = require('./constant');
+const { RpcApiName } = require('./constant');
 const { exec } = require("child_process");
 
 const Execute = async (command) => {
@@ -27,7 +27,7 @@ const RequestRPC = async (method, params, id = undefined) => {
     return new Promise((resolve, reject) => {
 
         let body = "";
-        if(id == undefined) {
+        if (id == undefined) {
             let unique = new Date().getTime();
             body = JSON.stringify({ "jsonrpc": "2.0", "id": unique, "method": method, "params": params });
         } else {
@@ -84,7 +84,11 @@ const GetLatestStateRootHash = async () => {
  * @param {number} id optional
  * @return {object}.
  */
-const QueryState = async (key, state, id = undefined) => {
+const QueryState = async (key, state = "", id = undefined) => {
+
+    if (state == "") {
+        state = await GetLatestStateRootHash();
+    }
 
     return new Promise((resolve, reject) => {
 
@@ -103,5 +107,40 @@ const QueryState = async (key, state, id = undefined) => {
 
 }
 
+const GetTransactionInBlock = async (b, id) => {
 
-module.exports = { Execute, RequestRPC, GetLatestStateRootHash, QueryState }
+    let txs = [];
+    {
+        let params;
+        // check b is a number or string to change the params
+        if (isNaN(b)) {
+            params = [{ "Hash": b }]
+        } else {
+            params = [{ "Height": parseInt(b) }]
+        }
+        let block_data = await RequestRPC(RpcApiName.get_block, params, id);
+        txs = block_data.result.block.body.transfer_hashes;
+    }
+
+    let transaction_keys = [];
+    {
+        for (let i = 0; i < txs.length; i++) {
+            let deploy_value = await QueryState("deploy-"+ txs[i]);
+            transaction_keys.push(...deploy_value.result.stored_value.DeployInfo.transfers);
+        }
+    }
+
+    let transaction_datas = [];
+    {
+        for(let i =0 ; i< transaction_keys.length; i++) {
+
+            let tx_value = await QueryState(transaction_keys[i]);
+            transaction_datas.push(tx_value.result.stored_value.Transfer);
+        }
+    }
+
+    return transaction_datas;
+}
+
+
+module.exports = { Execute, RequestRPC, GetLatestStateRootHash, QueryState, GetTransactionInBlock }
