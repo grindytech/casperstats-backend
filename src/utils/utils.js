@@ -135,7 +135,10 @@ const GetTransactionInBlock = async (b, id) => {
         for(let i =0 ; i< transaction_keys.length; i++) {
 
             let tx_value = await QueryState(transaction_keys[i]);
-            transaction_datas.push(tx_value.result.stored_value.Transfer);
+            let data = tx_value.result.stored_value.Transfer;
+            data.type = "transfer"
+            data.transfer = transaction_keys[i];
+            transaction_datas.push(data);
         }
     }
 
