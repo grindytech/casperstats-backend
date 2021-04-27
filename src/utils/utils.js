@@ -109,7 +109,8 @@ const QueryState = async (key, state = "", id = undefined) => {
 
 const GetTransactionInBlock = async (b, id) => {
 
-    let txs = [];
+    let transfer_hashes = [];
+    let deploy_hashes = [];
     {
         let params;
         // check b is a number or string to change the params
@@ -119,19 +120,31 @@ const GetTransactionInBlock = async (b, id) => {
             params = [{ "Height": parseInt(b) }]
         }
         let block_data = await RequestRPC(RpcApiName.get_block, params, id);
-        txs = block_data.result.block.body.transfer_hashes;
+        transfer_hashes = block_data.result.block.body.transfer_hashes;
+        deploy_hashes = block_data.result.block.body.deploy_hashes;
     }
 
     let transaction_keys = [];
     {
-        for (let i = 0; i < txs.length; i++) {
-            let deploy_value = await QueryState("deploy-"+ txs[i]);
+        for (let i = 0; i < transfer_hashes.length; i++) {
+            let deploy_value = await QueryState("deploy-"+ transfer_hashes[i]);
             transaction_keys.push(...deploy_value.result.stored_value.DeployInfo.transfers);
         }
     }
 
     let transaction_datas = [];
     {
+        // Get deploy data
+        for(let i =0; i< deploy_hashes.length; i++) {
+            let deploy_value = await QueryState("deploy-"+ transfer_hashes[i]);
+            let data = deploy_value.result.stored_value.DeployInfo;
+            data.type = "deploy"
+            data.deploy = 'deploy-' + deploy_hashes[i];
+            transaction_datas.push(data);
+        }
+
+
+        // Get transfer data
         for(let i =0 ; i< transaction_keys.length; i++) {
 
             let tx_value = await QueryState(transaction_keys[i]);
