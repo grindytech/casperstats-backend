@@ -15,6 +15,8 @@ This project provide the REST api to interact with Casper blockchain
     - [get-block](#get-block)
     - [get-block-tranfers](#get-block-tranfers)
     - [get-state-root-hash](#get-state-root-hash)
+    - [get-latest-block](#get-latest-block)
+    - [get-transactions](#get-transactions)
 
   - [Info](#Info)
     - [get-deploy](#get-deploy)
@@ -190,6 +192,82 @@ successResponse:
 | ------------- | ------------- | ------------- |
 |  |  |  |
 |  |  |  |
+
+
+#### get-latest-block
+
+```
+url: /chain/get-latest-block?id=
+
+example: http://18.197.228.151:3030/chain/get-latest-block
+
+method: GET
+
+des: Get data of the latest block
+
+successResponse: block data
+
+```
+
+| Params  | Type | Description | Required |
+| ------------- | ------------- | ------------- |------------- |
+| id | number | JSON-RPC identifier, applied to the request and returned in the response. If not provided, a random integer will be assigned | Optional |
+
+| ResponseField  | Type | Description |
+| ------------- | ------------- | ------------- |
+|  |  |  |
+|  |  |  |
+
+#### get-transactions
+
+```
+url: /chain/get-transactions?id=&b=
+
+example: http://18.197.228.151:3030/chain/get-transactions?b=11660
+
+method: GET
+
+des: get the information data by block
+
+successResponse:
+{
+[
+    {
+        "amount": "98000000000",
+        "deploy_hash": "f121d85da45d3e2adb57b235b0016a87e00428b62b9203ca532f085fb252deb8",
+        "from": "account-hash-519f5a3516902da1b9e253337f15cc299fe8ad643f1c6d24ef6107782f764f60",
+        "gas": "0",
+        "id": null,
+        "source": "uref-cf46c061bcab28c046b39721e6a8f6fd6444e0025f65ed2898eefebb3372040c-007",
+        "target": "uref-e81b4fffcd8fd5ff94bf22fb80667522504b23ec8e0a3d8db1ca0515b43b554f-004",
+        "to": "account-hash-edb9b5d9590bb1d48bd13d178dc7cf3b385f10986754865441e0e957be20eaed"
+    },
+    {
+        "amount": "98000000000",
+        "deploy_hash": "34c23da9e172029cf57e52f21758422371d080e96972916ddb67171ee2d3c443",
+        "from": "account-hash-d1fc6c1d372cc2e390d63964c47f99dd6556f4b322c540d6eeed73aaf012e882",
+        "gas": "0",
+        "id": null,
+        "source": "uref-9382f1299d508d62dba7187d0965d41c486782786657160079e567c4dce71b8e-007",
+        "target": "uref-e81b4fffcd8fd5ff94bf22fb80667522504b23ec8e0a3d8db1ca0515b43b554f-004",
+        "to": "account-hash-edb9b5d9590bb1d48bd13d178dc7cf3b385f10986754865441e0e957be20eaed"
+    }
+]
+}
+
+```
+
+| Params  | Type | Description | Required |
+| ------------- | ------------- | ------------- |------------- |
+| id | number | JSON-RPC identifier, applied to the request and returned in the response. If not provided, a random integer will be assigned | Optional |
+| b | string, number |  Hex-encoded block hash or height of the block. If not given, the last block added to the chain as known at the given node will be used | Optional |
+
+| ResponseField  | Type | Description |
+| ------------- | ------------- | ------------- |
+|  |  |  |
+|  |  |  |
+
+
 
 ### Info
 
