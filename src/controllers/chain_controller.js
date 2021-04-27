@@ -1,4 +1,4 @@
-const { RequestRPC, GetTransactionInBlock } = require('../utils/utils');
+const { RequestRPC, GetTransactionInBlock, GetHeight } = require('../utils/utils');
 const { RpcApiName } = require('../utils/constant');
 
 require('dotenv').config();
@@ -75,18 +75,21 @@ module.exports = {
     })
   },
 
-  GetLatestBlock: async function (req, res) {
-    let id = req.query.id; // JSON-RPC identifier, applied to the request and returned in the response. If not provided, a random integer will be assigned
-
-    let params = [{}];
+  GetLatestBlocks: async function (req, res) {
+    let num = req.query.num; // Number of block
 
     try {
-      let block_data = await RequestRPC(RpcApiName.get_block, params, id);
+      let height = await GetHeight();
+      let datas = [];
+      for (let i = height; i > height - num; i--) {
+        let params = [{ "Height": parseInt(num) }];
 
-      // let txs = block_data.result.block.body.transfer_hashes;
-      // console.log("block_data: ", txs);
+        let block_data = await RequestRPC(RpcApiName.get_block, params);
+        datas.push(block_data.result.block);
+      }
+
       res.status(200);
-      res.json(block_data);
+      res.json(datas);
 
     } catch (err) {
       res.status(500);

@@ -127,7 +127,7 @@ const GetTransactionInBlock = async (b, id) => {
     let transaction_keys = [];
     {
         for (let i = 0; i < transfer_hashes.length; i++) {
-            let deploy_value = await QueryState("deploy-"+ transfer_hashes[i]);
+            let deploy_value = await QueryState("deploy-" + transfer_hashes[i]);
             transaction_keys.push(...deploy_value.result.stored_value.DeployInfo.transfers);
         }
     }
@@ -135,8 +135,8 @@ const GetTransactionInBlock = async (b, id) => {
     let transaction_datas = [];
     {
         // Get deploy data
-        for(let i =0; i< deploy_hashes.length; i++) {
-            let deploy_value = await QueryState("deploy-"+ transfer_hashes[i]);
+        for (let i = 0; i < deploy_hashes.length; i++) {
+            let deploy_value = await QueryState("deploy-" + transfer_hashes[i]);
             let data = deploy_value.result.stored_value.DeployInfo;
             data.type = "deploy"
             data.deploy = 'deploy-' + deploy_hashes[i];
@@ -145,7 +145,7 @@ const GetTransactionInBlock = async (b, id) => {
 
 
         // Get transfer data
-        for(let i =0 ; i< transaction_keys.length; i++) {
+        for (let i = 0; i < transaction_keys.length; i++) {
 
             let tx_value = await QueryState(transaction_keys[i]);
             let data = tx_value.result.stored_value.Transfer;
@@ -158,5 +158,13 @@ const GetTransactionInBlock = async (b, id) => {
     return transaction_datas;
 }
 
+const GetHeight = async () => {
+    let params = [{}];
 
-module.exports = { Execute, RequestRPC, GetLatestStateRootHash, QueryState, GetTransactionInBlock }
+    let block_data = await RequestRPC(RpcApiName.get_block, params);
+    let height = block_data.result.block.header.height;
+    return height;
+}
+
+
+module.exports = { Execute, RequestRPC, GetLatestStateRootHash, QueryState, GetTransactionInBlock, GetHeight}
