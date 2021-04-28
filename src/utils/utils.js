@@ -124,6 +124,7 @@ const GetTransactionInBlock = async (b, id) => {
         deploy_hashes = block_data.result.block.body.deploy_hashes;
     }
 
+
     let transaction_keys = [];
     {
         for (let i = 0; i < transfer_hashes.length; i++) {
@@ -136,19 +137,37 @@ const GetTransactionInBlock = async (b, id) => {
     {
         // Get deploy data
         for (let i = 0; i < deploy_hashes.length; i++) {
-            let deploy_value = await QueryState("deploy-" + transfer_hashes[i]);
-            let data = deploy_value.result.stored_value.DeployInfo;
+
+            // check if deplou succeed
+            const succeed = await IsTxSucceed(deploy_hashes[i]);
+            let data;
+            if (!succeed) {
+                let params = [deploy_hashes[i]];
+                let value = await RequestRPC(RpcApiName.get_deploy, params);
+                data = value.result;
+
+            } else {
+                let deploy_value = await QueryState("deploy-" + deploy_hashes[i]);
+                data = deploy_value.result.stored_value.DeployInfo;
+            }
             data.type = "deploy"
             data.deploy = 'deploy-' + deploy_hashes[i];
-            transaction_datas.push(data);
-        }
 
+            console.log("Data: ", data);
+
+
+            transaction_datas.push(data);
+
+        }
 
         // Get transfer data
         for (let i = 0; i < transaction_keys.length; i++) {
 
+            let data;
+
             let tx_value = await QueryState(transaction_keys[i]);
-            let data = tx_value.result.stored_value.Transfer;
+            data = tx_value.result.stored_value.Transfer;
+
             data.type = "transfer"
             data.transfer = transaction_keys[i];
             transaction_datas.push(data);
@@ -156,6 +175,21 @@ const GetTransactionInBlock = async (b, id) => {
     }
 
     return transaction_datas;
+}
+
+const IsTxSucceed = async (hash) => {
+    let params = [hash];
+
+    let value = await RequestRPC(RpcApiName.get_deploy, params);
+    const result = value.result.execution_results;
+    console.log("result: ", result);
+    for (let i = 0; i < result.length; i++) {
+        if (result[i].result.Failure === undefined) {
+            return false;
+        }
+    }
+    return true;
+
 }
 
 const GetHeight = async () => {
@@ -167,4 +201,4 @@ const GetHeight = async () => {
 }
 
 
-module.exports = { Execute, RequestRPC, GetLatestStateRootHash, QueryState, GetTransactionInBlock, GetHeight}
+module.exports = { Execute, RequestRPC, GetLatestStateRootHash, QueryState, GetTransactionInBlock, GetHeight, IsTxSucceed }
