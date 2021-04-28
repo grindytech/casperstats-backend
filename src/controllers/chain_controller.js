@@ -82,7 +82,7 @@ module.exports = {
       let height = await GetHeight();
       let datas = [];
       for (let i = height; i > height - num; i--) {
-        let params = [{ "Height": parseInt(num) }];
+        let params = [{ "Height": parseInt(i) }];
 
         let block_data = await RequestRPC(RpcApiName.get_block, params);
         datas.push(block_data.result.block);
