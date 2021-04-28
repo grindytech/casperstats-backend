@@ -184,7 +184,7 @@ const IsTxSucceed = async (hash) => {
     const result = value.result.execution_results;
     console.log("result: ", result);
     for (let i = 0; i < result.length; i++) {
-        if (result[i].result.Failure === undefined) {
+        if (result[i].result.Failure != undefined) {
             return false;
         }
     }
