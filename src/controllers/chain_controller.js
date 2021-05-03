@@ -46,7 +46,7 @@ module.exports = {
 
     RequestRPC(RpcApiName.get_block_transfers, params, id).then(value => {
       res.status(200);
-      res.json(value);
+      res.json(value.result);
     }).catch(err => {
       res.status(500);
       res.json(err)
