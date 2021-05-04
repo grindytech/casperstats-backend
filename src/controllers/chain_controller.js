@@ -53,7 +53,7 @@ module.exports = {
       res.json(value.result);
     }).catch(err => {
       res.status(500);
-      res.json(err)
+      res.json(err.message)
     })
   },
 
@@ -75,7 +75,7 @@ module.exports = {
       res.json(value);
     }).catch(err => {
       res.status(500);
-      res.json(err)
+      res.json(err.message)
     })
   },
 
@@ -97,7 +97,7 @@ module.exports = {
 
     } catch (err) {
       res.status(500);
-      res.json(err);
+      res.json(err.message);
     }
   },
 
@@ -111,8 +111,30 @@ module.exports = {
 
     }).catch(err => {
       res.status(500);
-      res.json(err);
+      res.json(err.message);
 
     })
+  },
+
+  GetRangeBlock: async function (req, res) {
+    let start = req.query.start;
+    let end = req.query.end;
+
+    try {
+      let height = await GetHeight();
+      let data = {};
+      data["current_height"] = height;
+      data["result"] = [];
+      for (let i = start; i <= end; i++) {
+        let params = [{ "Height": parseInt(i) }];
+        let block_data = await RequestRPC(RpcApiName.get_block, params);
+        data.result.push(block_data.result.block);
+      }
+      res.status(200);
+      res.json(data);
+    } catch (err) {
+      res.status(500);
+      res.send(err.message);
+    }
   }
 };
