@@ -73,6 +73,7 @@ example: http://18.157.183.184:3030/chain/get-block?id=13&b=69
 
 method: GET
 
+des:  Retrieves a block from the network
 
 successResponse:
 {
@@ -127,6 +128,7 @@ example: http://18.157.183.184:3030/chain/get-block-tranfers?id=13&b=88858377632
 
 method: GET
 
+des: Retrieves all transfers for a block from the network
 
 successResponse:
 {
@@ -171,6 +173,7 @@ example: http://18.157.183.184:3030/chain/get-state-root-hash?id=12&b=
 
 method: GET
 
+des: Retrieves a state root hash at a given block
 
 successResponse:
 {
@@ -306,6 +309,7 @@ example: http://18.157.183.184:3030/info/get-deploy?id=13&hex=c51ce21e9d124bb6a9
 
 method: GET
 
+des: Retrieves a deploy from the network
 
 successResponse:
 {
@@ -559,6 +563,7 @@ example: http://18.157.183.184:3030/info/get-list-deploys?id=13&b=3207ff3e5d9498
 
 method: GET
 
+des:  Retrieves the list of all deploy hashes in a given block
 
 successResponse:
 {
@@ -590,6 +595,8 @@ url: /sate/query-state?id=&s=&k=
 example: http://18.157.183.184:3030/state/query-state?id=12&s=97d55e7074133c9bf7ff1d7b1c9c6f5f84bff888bf0087f16d139356d334170f&k=01aea113d82a9d562563a2802b1abee7ac1ea40b6c100ddeda8e9be5666e1319dc
 
 method: GET
+
+des: etrieves a stored value from the network
 
 successResponse:
 {
@@ -645,6 +652,8 @@ url: /state/get-balance/:address
 example: http://18.157.183.184:3030/state/get-balance/01aea113d82a9d562563a2802b1abee7ac1ea40b6c100ddeda8e9be5666e1319dc
 
 method: GET
+
+des: Retrieves a purse's balance from the network
 
 2.
 url: /state/get-balance?id=&s=&p=
