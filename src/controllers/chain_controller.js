@@ -21,14 +21,18 @@ module.exports = {
     try {
       let block_data = await RequestRPC(RpcApiName.get_block, params, id);
 
-      // let txs = block_data.result.block.body.transfer_hashes;
-      // console.log("block_data: ", txs);
+      // add current_height to getblock
+      const height = await GetHeight();
+
+      console.log(block_data.result);
+      block_data.result["current_height"] = height;
+
       res.status(200);
       res.json(block_data);
 
     } catch (err) {
       res.status(500);
-      res.json(err);
+      res.json(err.message);
     }
   },
 

@@ -153,9 +153,6 @@ const GetTransactionInBlock = async (b, id) => {
             data.type = "deploy"
             data.deploy = 'deploy-' + deploy_hashes[i];
 
-            console.log("Data: ", data);
-
-
             transaction_datas.push(data);
 
         }
@@ -182,7 +179,6 @@ const IsTxSucceed = async (hash) => {
 
     let value = await RequestRPC(RpcApiName.get_deploy, params);
     const result = value.result.execution_results;
-    console.log("result: ", result);
     for (let i = 0; i < result.length; i++) {
         if (result[i].result.Failure != undefined) {
             return false;
