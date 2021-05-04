@@ -17,6 +17,7 @@ This project provide the REST api to interact with Casper blockchain
     - [get-state-root-hash](#get-state-root-hash)
     - [get-latest-blocks](#get-latest-blocks)
     - [get-transactions](#get-transactions)
+    - [get-range-block](#get-range-block)
 
   - [Info](#Info)
     - [get-deploy](#get-deploy)
@@ -296,6 +297,163 @@ successResponse:
 |  |  |  |
 |  |  |  |
 
+
+
+#### get-range-block
+
+```
+url: /chain/get-range-block?start=&end=
+
+example: http://18.157.183.184:3030/chain/get-range-block?start=1000&end=1005
+
+method: GET
+
+des: get blocks from the param 'start' to param 'end'. start and end included
+
+successResponse:
+{
+    "current_height": 23062,
+    "result": [
+        {
+            "hash": "d565bebe182e54e5d5efb5be247d64cd2c12bf9393948b85827c0a7a220a7f07",
+            "header": {
+                "parent_hash": "61b6f6cb0afcb6ff20ad7dca007e90eccc31717943c5fe1451a620c16985721f",
+                "state_root_hash": "a11fbc52f7ace34fb3b84af0756462691af64f6e8ecf562171b8a61281dc1f00",
+                "body_hash": "34eb0b689accd4867e88c765e623da2f63265dbbb99f16e3f369b5ae92c29ebd",
+                "random_bit": false,
+                "accumulated_seed": "c2912f64fd5212ee49117862239814d4f3bb3a7d2dee67a22413d565b45e92b6",
+                "era_end": null,
+                "timestamp": "2021-04-09T14:53:50.976Z",
+                "era_id": 10,
+                "height": 1000,
+                "protocol_version": "1.0.0"
+            },
+            "body": {
+                "proposer": "016adc82d5f8368829c9cd6088fdd39b46960dbf5a7f4fc18f498f5bc8637ec656",
+                "deploy_hashes": [],
+                "transfer_hashes": []
+            },
+            "proofs": []
+        },
+        {
+            "hash": "4826178402f2bef782dcde494e075c46e5208643d497d28401520a395e293153",
+            "header": {
+                "parent_hash": "d565bebe182e54e5d5efb5be247d64cd2c12bf9393948b85827c0a7a220a7f07",
+                "state_root_hash": "a11fbc52f7ace34fb3b84af0756462691af64f6e8ecf562171b8a61281dc1f00",
+                "body_hash": "d39ebbfd8c20216acdf35b0c5954891578c1171e0e050abf68c1f3bded4ab6b7",
+                "random_bit": true,
+                "accumulated_seed": "f16a99903312a0d9c1f9a34d376b1090175927e908922bfdaed99539a7794286",
+                "era_end": null,
+                "timestamp": "2021-04-09T14:54:56.512Z",
+                "era_id": 10,
+                "height": 1001,
+                "protocol_version": "1.0.0"
+            },
+            "body": {
+                "proposer": "017d96b9a63abcb61c870a4f55187a0a7ac24096bdb5fc585c12a686a4d892009e",
+                "deploy_hashes": [],
+                "transfer_hashes": []
+            },
+            "proofs": []
+        },
+        {
+            "hash": "afd17161bd6d4f33df51d7d8ac53fe54ba2abb140f87ff5a6a7d5010ee139fd2",
+            "header": {
+                "parent_hash": "4826178402f2bef782dcde494e075c46e5208643d497d28401520a395e293153",
+                "state_root_hash": "a11fbc52f7ace34fb3b84af0756462691af64f6e8ecf562171b8a61281dc1f00",
+                "body_hash": "aca3479f7a62d5707c1996264decc06d531f4cc1922f6fab2a2a52ff2add74c3",
+                "random_bit": false,
+                "accumulated_seed": "6d9769bd2267a5eae44e27fc894babbb4edfbde556eedd26546cfc46b4ae6d5e",
+                "era_end": null,
+                "timestamp": "2021-04-09T14:56:02.048Z",
+                "era_id": 10,
+                "height": 1002,
+                "protocol_version": "1.0.0"
+            },
+            "body": {
+                "proposer": "01b1e495b07045f098d04d729947d8efb6a471c7b5ba69b461c980a276f56957c1",
+                "deploy_hashes": [],
+                "transfer_hashes": []
+            },
+            "proofs": []
+        },
+        {
+            "hash": "eb691fffae78ea72a1ec6fe7d3099e14463bd1b85f30e181c056ab67fe3c9ace",
+            "header": {
+                "parent_hash": "afd17161bd6d4f33df51d7d8ac53fe54ba2abb140f87ff5a6a7d5010ee139fd2",
+                "state_root_hash": "a11fbc52f7ace34fb3b84af0756462691af64f6e8ecf562171b8a61281dc1f00",
+                "body_hash": "bb9b255dc11611a00adffc7cf86b67cf443771f6036aff5660d8ead9f629266b",
+                "random_bit": true,
+                "accumulated_seed": "87ba53d0a0e5a826dd43c8373b283d18f59e5bbe6221df6df9de34d6ee92d835",
+                "era_end": null,
+                "timestamp": "2021-04-09T14:57:07.584Z",
+                "era_id": 10,
+                "height": 1003,
+                "protocol_version": "1.0.0"
+            },
+            "body": {
+                "proposer": "0124aa3964bcd0ba9911594322a534e18e36e0c2e149b148e615505316733599af",
+                "deploy_hashes": [],
+                "transfer_hashes": []
+            },
+            "proofs": []
+        },
+        {
+            "hash": "dc74bfa062d52f04f9b0053a30f138753ed9070e0f6d1cb7aead7166980dd28b",
+            "header": {
+                "parent_hash": "eb691fffae78ea72a1ec6fe7d3099e14463bd1b85f30e181c056ab67fe3c9ace",
+                "state_root_hash": "a11fbc52f7ace34fb3b84af0756462691af64f6e8ecf562171b8a61281dc1f00",
+                "body_hash": "1086c5c5f3d04e3729fd9832e646a053d81b207ae9202af57a4f1d6a55c9303a",
+                "random_bit": false,
+                "accumulated_seed": "68a7bda3a32501e0e7371dbb6fa734b5ea52e02dac88302aee23f331bc857782",
+                "era_end": null,
+                "timestamp": "2021-04-09T14:58:13.120Z",
+                "era_id": 10,
+                "height": 1004,
+                "protocol_version": "1.0.0"
+            },
+            "body": {
+                "proposer": "0152b2b3cc1de020e0cfb5887d0fda5d99da5decaf98af90f13144e97d0e35eeaa",
+                "deploy_hashes": [],
+                "transfer_hashes": []
+            },
+            "proofs": []
+        },
+        {
+            "hash": "ec47b54efdea57808bc20330191928e51e094da0f9460a35957f3ecd9894a081",
+            "header": {
+                "parent_hash": "dc74bfa062d52f04f9b0053a30f138753ed9070e0f6d1cb7aead7166980dd28b",
+                "state_root_hash": "a11fbc52f7ace34fb3b84af0756462691af64f6e8ecf562171b8a61281dc1f00",
+                "body_hash": "aca3479f7a62d5707c1996264decc06d531f4cc1922f6fab2a2a52ff2add74c3",
+                "random_bit": false,
+                "accumulated_seed": "b03942e0de46b649254e789b59b3ec8465e461b169412401290f2100ccf7ed75",
+                "era_end": null,
+                "timestamp": "2021-04-09T14:59:18.656Z",
+                "era_id": 10,
+                "height": 1005,
+                "protocol_version": "1.0.0"
+            },
+            "body": {
+                "proposer": "01b1e495b07045f098d04d729947d8efb6a471c7b5ba69b461c980a276f56957c1",
+                "deploy_hashes": [],
+                "transfer_hashes": []
+            },
+            "proofs": []
+        }
+    ]
+}
+
+```
+
+| Params  | Type | Description | Required |
+| ------------- | ------------- | ------------- |------------- |
+| start | number | start | Yes |
+| end | number, number |  end | Yes |
+
+| ResponseField  | Type | Description |
+| ------------- | ------------- | ------------- |
+|  |  |  |
+|  |  |  |
 
 
 ### Info
