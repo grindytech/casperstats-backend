@@ -234,7 +234,12 @@ const GetDeploy = async (deployhash) => {
     return new Promise((resolve, reject) => {
         let params = [deployhash];
         RequestRPC(RpcApiName.get_deploy, params).then(value => {
-            resolve(value.result);
+
+            let result = value.result;
+
+            delete result.deploy.session;
+
+            resolve(result);
         }).catch(err => {
             reject(err);
         })
