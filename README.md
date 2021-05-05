@@ -27,6 +27,7 @@ This project provide the REST api to interact with Casper blockchain
   - [State](#State)
     - [query-state](#query-state)
     - [get-balance](#get-balance)
+    - [get-auction-info](#get-auction-info)
 
 ## Quick Start
 
@@ -851,3 +852,45 @@ successResponse:
 | ------------- | ------------- | ------------- |
 |  |  |  |
 |  |  |  |
+
+
+#### get-auction-info
+
+```
+url: /state/get-auction-info
+
+example: http://18.157.183.184:3030/state/get-auction-info
+
+method: GET
+
+des: Retrieves the bids and validators as of the most recently added block
+
+
+successResponse:
+
+{
+    "api_version": string,
+    "auction_state": {
+        "state_root_hash": string,
+        "block_height": number,
+        "era_validators": [ ],
+        "bids": []
+    }
+}
+
+```
+
+| Params  | Type | Description |
+| ------------- | ------------- | ------------- |
+|  |  |  |
+|  |  |  |
+
+
+| ResponseField  | Type | Description |
+| ------------- | ------------- | ------------- |
+|  |  |  |
+|  |  |  |
+
+
+
+
