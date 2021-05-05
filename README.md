@@ -16,7 +16,8 @@ This project provide the REST api to interact with Casper blockchain
     - [get-block-tranfers](#get-block-tranfers)
     - [get-state-root-hash](#get-state-root-hash)
     - [get-latest-blocks](#get-latest-blocks)
-    - [get-transactions](#get-transactions)
+    - [get-block-transfer](#get-block-transfer)
+    - [get-block-deploy](#get-block-deploy)
     - [get-range-block](#get-range-block)
 
   - [Info](#Info)
@@ -223,30 +224,19 @@ successResponse: block data
 |  |  |  |
 |  |  |  |
 
-#### get-transactions
+#### get-block-transfer
 
 ```
-url: /chain/get-transactions?id=&b=
+url: /chain/get-block-transfer/:block
 
-example: http://18.157.183.184:3030/chain/get-transactions?b=11660
+example: http://18.157.183.184:3030/chain/get-block-transfer/11661
 
 method: GET
 
-des: get the information data by block
+des: get the information the transfer on the block
 
 successResponse:
 [
-    {
-        "deploy_hash": "db5f69c51ddacaeab0bee5c7e5665313489d99ffbbadd9208ff45092ee85476f",
-        "from": "account-hash-5861c4bbab2992d44f035c6db5ffff925c40e50c10df564f0c896435807dac9f",
-        "gas": "10000",
-        "source": "uref-01eb60dabf2d4cf399561e874ed24c1556332ed0ae9b1064c125aa284aad5f39-007",
-        "transfers": [
-            "transfer-7e2a9dac4a8109f9ef6e766d2aa353474442e341dc79507dbf672030cd9492d6"
-        ],
-        "type": "deploy",
-        "deploy": "deploy-8b2eb887456926d4d7fff0f633f44bedb58c728654b0577ed9397a1d2a353d6e"
-    },
     {
         "amount": "98000000000",
         "deploy_hash": "db5f69c51ddacaeab0bee5c7e5665313489d99ffbbadd9208ff45092ee85476f",
@@ -255,9 +245,7 @@ successResponse:
         "id": null,
         "source": "uref-01eb60dabf2d4cf399561e874ed24c1556332ed0ae9b1064c125aa284aad5f39-007",
         "target": "uref-e81b4fffcd8fd5ff94bf22fb80667522504b23ec8e0a3d8db1ca0515b43b554f-004",
-        "to": "account-hash-edb9b5d9590bb1d48bd13d178dc7cf3b385f10986754865441e0e957be20eaed",
-        "type": "transfer",
-        "transfer": "transfer-7e2a9dac4a8109f9ef6e766d2aa353474442e341dc79507dbf672030cd9492d6"
+        "to": "account-hash-edb9b5d9590bb1d48bd13d178dc7cf3b385f10986754865441e0e957be20eaed"
     },
     {
         "amount": "98000000000",
@@ -267,9 +255,7 @@ successResponse:
         "id": null,
         "source": "uref-b8f2e9b3fbd1dbd20c1e95b4566d5810c95de8faf387c34099f8413dc23e0f7a-007",
         "target": "uref-e81b4fffcd8fd5ff94bf22fb80667522504b23ec8e0a3d8db1ca0515b43b554f-004",
-        "to": "account-hash-edb9b5d9590bb1d48bd13d178dc7cf3b385f10986754865441e0e957be20eaed",
-        "type": "transfer",
-        "transfer": "transfer-672de8c20fa08d239aa4a9bc2543bf56d2d59a3838456fa2c73253edfb5be55a"
+        "to": "account-hash-edb9b5d9590bb1d48bd13d178dc7cf3b385f10986754865441e0e957be20eaed"
     },
     {
         "amount": "98000000000",
@@ -279,9 +265,7 @@ successResponse:
         "id": null,
         "source": "uref-7d87c7e2677eec2414260e8d31d5302ee1ab0beef623e39b3cf3f00cb75c9265-007",
         "target": "uref-e81b4fffcd8fd5ff94bf22fb80667522504b23ec8e0a3d8db1ca0515b43b554f-004",
-        "to": "account-hash-edb9b5d9590bb1d48bd13d178dc7cf3b385f10986754865441e0e957be20eaed",
-        "type": "transfer",
-        "transfer": "transfer-1ec316dae6e27bc942137210354e9f23dd8667ead4f66750796ee327fb2502f6"
+        "to": "account-hash-edb9b5d9590bb1d48bd13d178dc7cf3b385f10986754865441e0e957be20eaed"
     }
 ]
 
@@ -289,7 +273,6 @@ successResponse:
 
 | Params  | Type | Description | Required |
 | ------------- | ------------- | ------------- |------------- |
-| id | number | JSON-RPC identifier, applied to the request and returned in the response. If not provided, a random integer will be assigned | Optional |
 | b | string, number |  Hex-encoded block hash or height of the block. If not given, the last block added to the chain as known at the given node will be used | Optional |
 
 | ResponseField  | Type | Description |
@@ -297,6 +280,31 @@ successResponse:
 |  |  |  |
 |  |  |  |
 
+
+#### get-block-deploy
+
+```
+url: /chain/get-block-deploy/:block
+
+example: http://18.157.183.184:3030/chain/get-block-deploy/11661
+
+method: GET
+
+des: get the information the deploy on the block
+
+successResponse:
+localhost:3031/chain/get-block-deploy/11661
+
+```
+
+| Params  | Type | Description | Required |
+| ------------- | ------------- | ------------- |------------- |
+| b | string, number |  Hex-encoded block hash or height of the block. If not given, the last block added to the chain as known at the given node will be used | Optional |
+
+| ResponseField  | Type | Description |
+| ------------- | ------------- | ------------- |
+|  |  |  |
+|  |  |  |
 
 
 #### get-range-block
