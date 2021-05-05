@@ -62,4 +62,14 @@ module.exports = {
             res.json(err.message);
         })
     },
+
+    GetAuctionInfo: async function  (req, res) {
+        RequestRPC(RpcApiName.get_auction_info, []).then(value => {
+            res.status(200);
+            res.json(value.result);
+        }).catch(err => {
+            res.status(500);
+            res.json(err.message)
+        })
+    }
 };
