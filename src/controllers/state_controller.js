@@ -61,7 +61,5 @@ module.exports = {
             res.status(500);
             res.json(err.message);
         })
-
-
     },
 };

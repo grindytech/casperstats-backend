@@ -1,4 +1,4 @@
-const { RequestRPC, GetTransactionInBlock, GetHeight } = require('../utils/utils');
+const { RequestRPC, GetHeight, GetTxhashes, GetDeployhashes, GetDeploy, DoesDeploySuccess, GetTransfersFromDeploy, GetTransferDetail } = require('../utils/utils');
 const { RpcApiName } = require('../utils/constant');
 
 require('dotenv').config();
@@ -101,21 +101,6 @@ module.exports = {
     }
   },
 
-  GetTxBlock: async function (req, res) {
-    let id = req.query.id; // JSON-RPC identifier, applied to the request and returned in the response. If not provided, a random integer will be assigned
-    let b = req.query.b; // Hex-encoded block hash or height of the block. If not given, the last block added to the chain as known at the given node will be used
-
-    GetTransactionInBlock(b, id).then(value => {
-      res.status(200);
-      res.json(value);
-
-    }).catch(err => {
-      res.status(500);
-      res.json(err.message);
-
-    })
-  },
-
   GetRangeBlock: async function (req, res) {
     let start = req.query.start;
     let end = req.query.end;
@@ -135,6 +120,49 @@ module.exports = {
     } catch (err) {
       res.status(500);
       res.send(err.message);
+    }
+  },
+
+  GetBlockTransferTx: async function (req, res) {
+    let b = req.params.block;
+    try {
+      let txhashes = await GetTxhashes(b);
+      let data = [];
+      for (let i = 0; i < txhashes.length; i++) {
+          let pass = await DoesDeploySuccess(txhashes[i]);
+          if(pass) {
+            let transfers = await GetTransfersFromDeploy("deploy-" + txhashes[i]);
+            for ( let j =0; j<transfers.length; j++ ) {
+              let transfer_detail = await GetTransferDetail(transfers[j]);
+              data.push(transfer_detail);
+            }
+          } else {
+            let deploy_detail = await GetDeploy(txhashes[i]);
+            data.push(deploy_detail);
+          }
+      }
+      res.status(200);
+      res.json(data);
+    } catch (err) {
+      res.status(500);
+      res.json(err.message);
+    }
+  },
+
+  GetBlockDeployTx: async function (req, res) {
+    let b = req.params.block;
+    try {
+      let deploy_hashes = await GetDeployhashes(b);
+      let data = [];
+      for (let i = 0; i < deploy_hashes.length; i++) {
+        let deploy_data = await GetDeploy(deploy_hashes[i]);
+        data.push(deploy_data);
+      }
+      res.status(200);
+      res.json(data);
+    } catch (err) {
+      res.status(500);
+      res.json(err.message);
     }
   }
 };

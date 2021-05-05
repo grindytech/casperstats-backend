@@ -1,4 +1,3 @@
-
 const dotenv = require("dotenv");
 dotenv.config();
 const request = require('request');
@@ -23,9 +22,7 @@ const Execute = async (command) => {
 }
 
 const RequestRPC = async (method, params, id = undefined) => {
-
     return new Promise((resolve, reject) => {
-
         let body = "";
         if (id == undefined) {
             let unique = new Date().getTime();
@@ -107,74 +104,144 @@ const QueryState = async (key, state = "", id = undefined) => {
 
 }
 
-const GetTransactionInBlock = async (b, id) => {
+// const GetTransactionInBlock = async (b, id) => {
 
-    let transfer_hashes = [];
-    let deploy_hashes = [];
-    {
-        let params;
-        // check b is a number or string to change the params
-        if (isNaN(b)) {
-            params = [{ "Hash": b }]
-        } else {
-            params = [{ "Height": parseInt(b) }]
-        }
-        let block_data = await RequestRPC(RpcApiName.get_block, params, id);
-        transfer_hashes = block_data.result.block.body.transfer_hashes;
-        deploy_hashes = block_data.result.block.body.deploy_hashes;
-    }
+//     let transfer_hashes = [];
+//     let deploy_hashes = [];
+//     {
+//         let params;
+//         // check b is a number or string to change the params
+//         if (isNaN(b)) {
+//             params = [{ "Hash": b }]
+//         } else {
+//             params = [{ "Height": parseInt(b) }]
+//         }
+//         let block_data = await RequestRPC(RpcApiName.get_block, params, id);
+//         transfer_hashes = block_data.result.block.body.transfer_hashes;
+//         deploy_hashes = block_data.result.block.body.deploy_hashes;
+//     }
 
 
-    let transaction_keys = [];
-    {
-        for (let i = 0; i < transfer_hashes.length; i++) {
-            let deploy_value = await QueryState("deploy-" + transfer_hashes[i]);
-            transaction_keys.push(...deploy_value.result.stored_value.DeployInfo.transfers);
-        }
-    }
+//     let transaction_keys = [];
+//     {
+//         for (let i = 0; i < transfer_hashes.length; i++) {
+//             let deploy_value = await QueryState("deploy-" + transfer_hashes[i]);
+//             transaction_keys.push(...deploy_value.result.stored_value.DeployInfo.transfers);
+//         }
+//     }
 
-    let transaction_datas = [];
-    {
-        // Get deploy data
-        for (let i = 0; i < deploy_hashes.length; i++) {
+//     let transaction_datas = [];
+//     {
+//         // Get deploy data
+//         for (let i = 0; i < deploy_hashes.length; i++) {
 
-            // check if deplou succeed
-            const succeed = await IsTxSucceed(deploy_hashes[i]);
-            let data;
-            if (!succeed) {
-                let params = [deploy_hashes[i]];
-                let value = await RequestRPC(RpcApiName.get_deploy, params);
-                data = value.result;
+//             // check if deplou succeed
+//             const succeed = await IsTxSucceed(deploy_hashes[i]);
+//             let data;
+//             if (!succeed) {
+//                 let params = [deploy_hashes[i]];
+//                 let value = await RequestRPC(RpcApiName.get_deploy, params);
+//                 data = value.result;
 
-            } else {
-                let deploy_value = await QueryState("deploy-" + deploy_hashes[i]);
-                data = deploy_value.result.stored_value.DeployInfo;
-            }
-            data.type = "deploy"
-            data.deploy = 'deploy-' + deploy_hashes[i];
+//             } else {
+//                 let deploy_value = await QueryState("deploy-" + deploy_hashes[i]);
+//                 data = deploy_value.result.stored_value.DeployInfo;
+//             }
+//             data.type = "deploy"
+//             data.deploy = 'deploy-' + deploy_hashes[i];
 
-            transaction_datas.push(data);
+//             transaction_datas.push(data);
 
-        }
+//         }
 
-        // Get transfer data
-        for (let i = 0; i < transaction_keys.length; i++) {
+//         // Get transfer data
+//         for (let i = 0; i < transaction_keys.length; i++) {
 
-            let data;
+//             let data;
 
-            let tx_value = await QueryState(transaction_keys[i]);
-            data = tx_value.result.stored_value.Transfer;
+//             let tx_value = await QueryState(transaction_keys[i]);
+//             data = tx_value.result.stored_value.Transfer;
 
-            data.type = "transfer"
-            data.transfer = transaction_keys[i];
-            transaction_datas.push(data);
-        }
-    }
+//             data.type = "transfer"
+//             data.transfer = transaction_keys[i];
+//             transaction_datas.push(data);
+//         }
+//     }
 
-    return transaction_datas;
+//     return transaction_datas;
+// }
+
+// const IsTxSucceed = async (hash) => {
+//     let params = [hash];
+
+//     let value = await RequestRPC(RpcApiName.get_deploy, params);
+//     const result = value.result.execution_results;
+//     for (let i = 0; i < result.length; i++) {
+//         if (result[i].result.Failure != undefined) {
+//             return false;
+//         }
+//     }
+//     return true;
+
+// }
+
+const GetHeight = async () => {
+    let params = [{}];
+
+    let block_data = await RequestRPC(RpcApiName.get_block, params);
+    let height = block_data.result.block.header.height;
+    return height;
 }
 
-const IsTxSucceed = async (hash) => {
+const GetTxhashes = async (block) => {
+    return new Promise((resolve, reject) => {
+        let params;
+        // check b is a number or string to change the params
+        if (isNaN(block)) {
+            params = [{ "Hash": block }]
+        } else {
+            params = [{ "Height": parseInt(block) }]
+        }
+        RequestRPC(RpcApiName.get_block, params).then(value => {
+            resolve(value.result.block.body.transfer_hashes);
+        }).catch(err => {
+            reject(err);
+        })
+    })
+}
+
+const GetDeployhashes = async (block) => {
+    return new Promise((resolve, reject) => {
+        let params;
+        // check b is a number or string to change the params
+        if (isNaN(block)) {
+            params = [{ "Hash": block }]
+        } else {
+            params = [{ "Height": parseInt(block) }]
+        }
+        RequestRPC(RpcApiName.get_block, params).then(value => {
+            resolve(value.result.block.body.deploy_hashes);
+        }).catch(err => {
+            reject(err);
+        })
+    })
+}
+
+const GetTransaction = async (txhash) => {
+}
+
+const GetDeploy = async (deployhash) => {
+    return new Promise((resolve, reject) => {
+        let params = [deployhash];
+        RequestRPC(RpcApiName.get_deploy, params).then(value => {
+            resolve(value.result);
+        }).catch(err => {
+            reject(err);
+        })
+    })
+}
+
+const DoesDeploySuccess = async (hash) => {
     let params = [hash];
 
     let value = await RequestRPC(RpcApiName.get_deploy, params);
@@ -185,16 +252,33 @@ const IsTxSucceed = async (hash) => {
         }
     }
     return true;
-
 }
 
-const GetHeight = async () => {
-    let params = [{}];
-
-    let block_data = await RequestRPC(RpcApiName.get_block, params);
-    let height = block_data.result.block.header.height;
-    return height;
+const GetTransfersFromDeploy = async (deploy_hash) => {
+    return new Promise((resolve, reject) => {
+        QueryState(deploy_hash).then(value => {
+            const transfers = value.result.stored_value.DeployInfo.transfers;
+            resolve(transfers);
+        }).catch(err => {
+            reject(err);
+        })
+    })
 }
 
+const GetTransferDetail = async (transfer_hex) => {
+    return new Promise((resolve, reject) => {
+        QueryState(transfer_hex).then(value => {
+            const data = value.result.stored_value.Transfer;
+            resolve(data);
+        }).catch(err => {
+            reject(err);
+        })
+    })
+}
 
-module.exports = { Execute, RequestRPC, GetLatestStateRootHash, QueryState, GetTransactionInBlock, GetHeight, IsTxSucceed }
+module.exports = {
+    Execute, RequestRPC, GetLatestStateRootHash,
+    QueryState, GetHeight, GetTxhashes, GetDeployhashes,
+    GetTransaction, GetDeploy, DoesDeploySuccess, GetTransfersFromDeploy,
+    GetTransferDetail
+}
