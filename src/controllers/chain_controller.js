@@ -158,7 +158,7 @@ module.exports = {
       res.json(data);
     } catch (err) {
       res.status(500);
-      res.json(err.message);
+      res.json(err);
     }
   }
 };
