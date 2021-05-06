@@ -44,8 +44,9 @@ const RequestRPC = async (method, params, id = undefined) => {
         console.log("Option: ", options)
 
         request(options, (error, response, body) => {
-            if (error) {
-                reject(error);
+            const result = JSON.parse(body);
+            if (result.error) {
+                reject(result.error);
             } else {
                 resolve(JSON.parse(body));
             }
@@ -231,7 +232,7 @@ const GetDeployhashes = async (block) => {
 const GetDeploy = async (deployhash) => {
 
     let params = [deployhash];
-    let deploy_data = await RequestRPC(RpcApiName.get_deploy, params)
+    let deploy_data = await RequestRPC(RpcApiName.get_deploy, params);
 
     if(deploy_data.error) {
         throw deploy_data.error;
@@ -246,7 +247,16 @@ const GetDeploy = async (deployhash) => {
         }
     }
 
-    delete result.deploy.session;
+    // 
+    // delete result.deploy.session;
+
+    if(result.deploy.session) {
+        delete result.deploy.session;
+        result.deploy.header["type"] = "deploy";
+    } else {
+        result.deploy.header["type"] = "transfer";
+    }
+
     return result;
 }
 

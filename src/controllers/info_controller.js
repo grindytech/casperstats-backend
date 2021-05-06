@@ -15,7 +15,7 @@ module.exports = {
             res.json(value);
         }).catch(err => {
             res.status(500);
-            res.json(err.message);
+            res.json(err);
         })
 
 
@@ -40,7 +40,7 @@ module.exports = {
             res.json(value);
         }).catch(err => {
             res.status(500);
-            res.json(err.message)
+            res.json(err)
         })
     }
 };

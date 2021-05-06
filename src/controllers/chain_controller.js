@@ -20,18 +20,15 @@ module.exports = {
 
     try {
       let block_data = await RequestRPC(RpcApiName.get_block, params, id);
-
       // add current_height to getblock
       const height = await GetHeight();
-
       block_data.result["current_height"] = height;
-
       res.status(200);
       res.json(block_data);
 
     } catch (err) {
       res.status(500);
-      res.json(err.message);
+      res.json(err);
     }
   },
 
@@ -52,7 +49,7 @@ module.exports = {
       res.json(value.result);
     }).catch(err => {
       res.status(500);
-      res.json(err.message)
+      res.json(err)
     })
   },
 
@@ -74,7 +71,7 @@ module.exports = {
       res.json(value);
     }).catch(err => {
       res.status(500);
-      res.json(err.message)
+      res.json(err)
     })
   },
 
@@ -96,7 +93,7 @@ module.exports = {
 
     } catch (err) {
       res.status(500);
-      res.json(err.message);
+      res.json(err);
     }
   },
 
@@ -118,7 +115,7 @@ module.exports = {
       res.json(data);
     } catch (err) {
       res.status(500);
-      res.send(err.message);
+      res.send(err);
     }
   },
 
@@ -144,7 +141,7 @@ module.exports = {
       res.json(data);
     } catch (err) {
       res.status(500);
-      res.json(err.message);
+      res.json(err);
     }
   },
 
