@@ -24,7 +24,6 @@ module.exports = {
       // add current_height to getblock
       const height = await GetHeight();
 
-      console.log(block_data.result);
       block_data.result["current_height"] = height;
 
       res.status(200);

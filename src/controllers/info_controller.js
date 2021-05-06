@@ -1,4 +1,4 @@
-const { RequestRPC } = require('../utils/utils');
+const { RequestRPC, GetDeploy} = require('../utils/utils');
 const {Execute} = require('../utils/utils');
 
 const { RpcApiName } = require('../utils/constant');
@@ -10,15 +10,14 @@ module.exports = {
         let id = req.query.id; // JSON-RPC identifier, applied to the request and returned in the response. If not provided, a random integer will be assigned
         let hex = req.query.hex; // Hex-encoded deploy hash
 
-        let params = [ hex ];
-
-        RequestRPC(RpcApiName.get_deploy, params, id).then(value => {
+        GetDeploy(hex).then(value => {
             res.status(200);
             res.json(value);
         }).catch(err => {
             res.status(500);
-            res.json(err.message)
+            res.json(err.message);
         })
+
 
     },
 

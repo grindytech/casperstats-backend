@@ -227,23 +227,20 @@ const GetDeployhashes = async (block) => {
     })
 }
 
-const GetTransaction = async (txhash) => {
-}
 
 const GetDeploy = async (deployhash) => {
-    return new Promise((resolve, reject) => {
-        let params = [deployhash];
-        RequestRPC(RpcApiName.get_deploy, params).then(value => {
 
-            let result = value.result;
+    let params = [deployhash];
+    let deploy_data = await RequestRPC(RpcApiName.get_deploy, params);
+    let result = deploy_data.result;
 
-            delete result.deploy.session;
+    for(let i = 0; i< result.execution_results.length; i++) {
+        const block_height = await GetBlockHeightByBlock(result.execution_results[i].block_hash);
+        result.execution_results[i]["block_height"] = block_height;
+    }
 
-            resolve(result);
-        }).catch(err => {
-            reject(err);
-        })
-    })
+    delete result.deploy.session;
+    return result;
 }
 
 const DoesDeploySuccess = async (hash) => {
@@ -281,9 +278,17 @@ const GetTransferDetail = async (transfer_hex) => {
     })
 }
 
+const GetBlockHeightByBlock = async (blockhash) => {
+    let params;
+    params = [{ "Hash": blockhash }]
+    let block_data = await RequestRPC(RpcApiName.get_block, params);
+    const height = block_data.result.block.header.height;
+    return height;
+}
+
 module.exports = {
     Execute, RequestRPC, GetLatestStateRootHash,
     QueryState, GetHeight, GetTxhashes, GetDeployhashes,
-    GetTransaction, GetDeploy, DoesDeploySuccess, GetTransfersFromDeploy,
+    GetDeploy, DoesDeploySuccess, GetTransfersFromDeploy,
     GetTransferDetail
 }
