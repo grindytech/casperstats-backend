@@ -231,12 +231,19 @@ const GetDeployhashes = async (block) => {
 const GetDeploy = async (deployhash) => {
 
     let params = [deployhash];
-    let deploy_data = await RequestRPC(RpcApiName.get_deploy, params);
-    let result = deploy_data.result;
+    let deploy_data = await RequestRPC(RpcApiName.get_deploy, params)
 
-    for(let i = 0; i< result.execution_results.length; i++) {
-        const block_height = await GetBlockHeightByBlock(result.execution_results[i].block_hash);
-        result.execution_results[i]["block_height"] = block_height;
+    if(deploy_data.error) {
+        throw deploy_data.error;
+    }
+
+    let result = deploy_data.result;
+    const succeed = await DoesDeploySuccess(deployhash);
+    if (succeed) {
+        for (let i = 0; i < result.execution_results.length; i++) {
+            const block_height = await GetBlockHeightByBlock(result.execution_results[i].block_hash);
+            result.execution_results[i]["block_height"] = block_height;
+        }
     }
 
     delete result.deploy.session;
