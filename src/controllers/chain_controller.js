@@ -6,7 +6,7 @@ require('dotenv').config();
 module.exports = {
   GetBlock: async function (req, res) {
 
-    let b = req.query.b; // Hex-encoded block hash or height of the block. If not given, the last block added to the chain as known at the given node will be used
+    let b = req.params.block; // Hex-encoded block hash or height of the block. If not given, the last block added to the chain as known at the given node will be used
 
     GetBlock(b).then(value => {
       res.status(200);
@@ -19,8 +19,7 @@ module.exports = {
   },
 
   GetBlockTx: async function (req, res) {
-    let id = req.query.id; // JSON-RPC identifier, applied to the request and returned in the response. If not provided, a random integer will be assigned
-    let b = req.query.b; // Hex-encoded block hash or height of the block. If not given, the last block added to the chain as known at the given node will be used
+    let b = req.params.block; // Hex-encoded block hash or height of the block. If not given, the last block added to the chain as known at the given node will be used
 
     let params;
     // check b is a number or string to change the params
@@ -30,7 +29,7 @@ module.exports = {
       params = [{ "Height": parseInt(b) }]
     }
 
-    RequestRPC(RpcApiName.get_block_transfers, params, id).then(value => {
+    RequestRPC(RpcApiName.get_block_transfers, params).then(value => {
       res.status(200);
       res.json(value.result);
     }).catch(err => {
@@ -40,8 +39,7 @@ module.exports = {
   },
 
   GetStateRootHash: async function (req, res) {
-    let id = req.query.id; // JSON-RPC identifier, applied to the request and returned in the response. If not provided, a random integer will be assigned
-    let b = req.query.b; // Hex-encoded block hash or height of the block. If not given, the last block added to the chain as known at the given node will be used
+    let b = req.params.block; // Hex-encoded block hash or height of the block. If not given, the last block added to the chain as known at the given node will be used
 
     let params;
 
@@ -62,13 +60,13 @@ module.exports = {
   },
 
   GetLatestBlocks: async function (req, res) {
-    let num = req.query.num; // Number of block
+    let num = req.params.number; // Number of block
 
     try {
       let height = await GetHeight();
       let datas = [];
       for (let i = height; i > height - num; i--) {
-        let block_data = await GetBlock(height);
+        let block_data = await GetBlock(i);
         datas.push(block_data.result.block);
       }
 
@@ -82,8 +80,8 @@ module.exports = {
   },
 
   GetRangeBlock: async function (req, res) {
-    let start = req.query.start;
-    let end = req.query.end;
+    let start = Number(req.query.start);
+    let end = Number(req.query.end);
 
     try {
       let height = await GetHeight();
@@ -98,7 +96,7 @@ module.exports = {
       res.json(data);
     } catch (err) {
       res.status(500);
-      res.send(err);
+      res.json(err);
     }
   },
 

@@ -7,8 +7,7 @@ require('dotenv').config();
 
 module.exports = {
     GetDeploy: async function (req, res) {
-        let id = req.query.id; // JSON-RPC identifier, applied to the request and returned in the response. If not provided, a random integer will be assigned
-        let hex = req.query.hex; // Hex-encoded deploy hash
+        let hex = req.params.hex; // Hex-encoded deploy hash
 
         GetDeploy(hex).then(value => {
             res.status(200);
