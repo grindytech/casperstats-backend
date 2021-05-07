@@ -239,12 +239,14 @@ const GetDeploy = async (deployhash) => {
     }
 
     let result = deploy_data.result;
+    for (let i = 0; i < result.execution_results.length; i++) {
+        const block_height = await GetBlockHeightByBlock(result.execution_results[i].block_hash);
+        result.execution_results[i]["block_height"] = block_height;
+    }
     const succeed = await DoesDeploySuccess(deployhash);
     if (succeed) {
-        for (let i = 0; i < result.execution_results.length; i++) {
-            const block_height = await GetBlockHeightByBlock(result.execution_results[i].block_hash);
-            result.execution_results[i]["block_height"] = block_height;
-        }
+    } else {
+
     }
 
     // 
