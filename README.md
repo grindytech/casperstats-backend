@@ -70,9 +70,9 @@ $ npm run dev
    #### get-block
   
   ```
-url: /chain/get-block?id=&b=
+url: /chain/get-block/:block
 
-example: http://18.157.183.184:3030/chain/get-block?id=13&b=69
+example: http://18.157.183.184:3030/chain/get-block/69
 
 method: GET
 
@@ -125,9 +125,9 @@ successResponse:
 #### get-block-tranfers
 
 ```
-url: /chain/get-block-tranfers?id=&b=
+url: /chain/get-block-tranfers
 
-example: http://18.157.183.184:3030/chain/get-block-tranfers?id=13&b=888583776321623143121e6fc1209f4ed01601696a6ba857fc5fbdbe41a3a3d2
+example: http://18.157.183.184:3030/chain/get-block-tranfers/69
 
 method: GET
 
@@ -135,24 +135,20 @@ des: Retrieves all transfers for a block from the network
 
 successResponse:
 {
-    "id": 13,
-    "jsonrpc": "2.0",
-    "result": {
-        "api_version": "1.0.0",
-        "block_hash": "8eec00f58216737005c26b4fab8b362ad494501c0f5301f66d47a080b8fd98bf",
-        "transfers": [
-            {
-                "amount": "999000000000",
-                "deploy_hash": "d3332cfabae9bf4333916565df47da89c3cd6b833ca76a55a8fc4a5ed32ea46a",
-                "from": "account-hash-b6bb3f6a2ce576d9f571785976b8bbbd981f08a7ea59afd70cf0482685ffc1ea",
-                "gas": "0",
-                "id": null,
-                "source": "uref-8f1be39ceb3fe9460d85cb1e477053710be6c6d847071f94b7b5653adb2a4498-007",
-                "target": "uref-39f00d08b5a409ef5f2e8d04023f9433894975df46da548d50b866a1460d2960-007",
-                "to": null
-            }
-        ]
-    }
+    "api_version": "1.1.0",
+    "block_hash": "8eec00f58216737005c26b4fab8b362ad494501c0f5301f66d47a080b8fd98bf",
+    "transfers": [
+        {
+            "deploy_hash": "d3332cfabae9bf4333916565df47da89c3cd6b833ca76a55a8fc4a5ed32ea46a",
+            "from": "account-hash-b6bb3f6a2ce576d9f571785976b8bbbd981f08a7ea59afd70cf0482685ffc1ea",
+            "to": null,
+            "source": "uref-8f1be39ceb3fe9460d85cb1e477053710be6c6d847071f94b7b5653adb2a4498-007",
+            "target": "uref-39f00d08b5a409ef5f2e8d04023f9433894975df46da548d50b866a1460d2960-007",
+            "amount": "999000000000",
+            "gas": "0",
+            "id": null
+        }
+    ]
 }
 ```
 
@@ -170,9 +166,9 @@ successResponse:
 #### get-state-root-hash
 
 ```
-url: /chain/get-state-root-hash?id=&b=
+url: /chain/get-state-root-hash/:block
 
-example: http://18.157.183.184:3030/chain/get-state-root-hash?id=12&b=
+example: http://18.157.183.184:3030/chain/get-state-root-hash/69
 
 method: GET
 
@@ -180,11 +176,11 @@ des: Retrieves a state root hash at a given block
 
 successResponse:
 {
-    "id": 12,
     "jsonrpc": "2.0",
+    "id": 1620380971698,
     "result": {
-        "api_version": "1.0.0",
-        "state_root_hash": "58b64aca9e35a2985b094d451674d1f4c00836abfea8886fb9939b83eb8c8674"
+        "api_version": "1.1.0",
+        "state_root_hash": "5b404d23913e8b57ee94e71a3ab41308187f67b9f33d47888db97d6b783b8850"
     }
 }
 ```
@@ -203,13 +199,13 @@ successResponse:
 #### get-latest-blocks
 
 ```
-url: /chain/get-latest-block?num=
+url: /chain/get-latest-block/:number
 
-example: http://18.157.183.184:3030/chain/get-latest-blocks?num=3
+example: http://18.157.183.184:3030/chain/get-latest-blocks/3
 
 method: GET
 
-des: Get data of the latest block
+des: Get number of the latest block
 
 successResponse: block data
 
@@ -470,9 +466,9 @@ successResponse:
 #### get-deploy
 
 ```
-url: /info/get-deploy?id=&hex=
+url: /info/get-deploy/:hex
 
-example: http://18.157.183.184:3030/info/get-deploy?id=13&hex=c51ce21e9d124bb6a9944ef4855ff42790297386c14632d8146c5ab0ee88a8ed
+example: http://18.157.183.184:3030/info/get-deploy/c51ce21e9d124bb6a9944ef4855ff42790297386c14632d8146c5ab0ee88a8ed
 
 method: GET
 
