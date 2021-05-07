@@ -1,4 +1,4 @@
-const { RequestRPC, GetHeight, GetTxhashes, GetDeployhashes, GetDeploy, DoesDeploySuccess, GetTransfersFromDeploy, GetTransferDetail } = require('../utils/utils');
+const { RequestRPC, GetHeight, GetTxhashes, GetDeployhashes, GetDeploy, DoesDeploySuccess, GetTransfersFromDeploy, GetTransferDetail, GetBlock } = require('../utils/utils');
 const { RpcApiName } = require('../utils/constant');
 
 require('dotenv').config();
@@ -6,33 +6,19 @@ require('dotenv').config();
 module.exports = {
   GetBlock: async function (req, res) {
 
-    let id = req.query.id; // JSON-RPC identifier, applied to the request and returned in the response. If not provided, a random integer will be assigned
     let b = req.query.b; // Hex-encoded block hash or height of the block. If not given, the last block added to the chain as known at the given node will be used
 
-    let params;
-
-    // check b is a number or string to change the params
-    if (isNaN(b)) {
-      params = [{ "Hash": b }]
-    } else {
-      params = [{ "Height": parseInt(b) }]
-    }
-
-    try {
-      let block_data = await RequestRPC(RpcApiName.get_block, params, id);
-      // add current_height to getblock
-      const height = await GetHeight();
-      block_data.result["current_height"] = height;
+    GetBlock(b).then(value => {
       res.status(200);
-      res.json(block_data);
-
-    } catch (err) {
+      res.json(value);
+    }).catch(err => {
       res.status(500);
-      res.json(err);
-    }
+      res.json(err.message);
+    })
+    
   },
 
-  GetBlockTx: function (req, res) {
+  GetBlockTx: async function (req, res) {
     let id = req.query.id; // JSON-RPC identifier, applied to the request and returned in the response. If not provided, a random integer will be assigned
     let b = req.query.b; // Hex-encoded block hash or height of the block. If not given, the last block added to the chain as known at the given node will be used
 
@@ -53,7 +39,7 @@ module.exports = {
     })
   },
 
-  GetStateRootHash: function (req, res) {
+  GetStateRootHash: async function (req, res) {
     let id = req.query.id; // JSON-RPC identifier, applied to the request and returned in the response. If not provided, a random integer will be assigned
     let b = req.query.b; // Hex-encoded block hash or height of the block. If not given, the last block added to the chain as known at the given node will be used
 
@@ -82,9 +68,7 @@ module.exports = {
       let height = await GetHeight();
       let datas = [];
       for (let i = height; i > height - num; i--) {
-        let params = [{ "Height": parseInt(i) }];
-
-        let block_data = await RequestRPC(RpcApiName.get_block, params);
+        let block_data = await GetBlock(height);
         datas.push(block_data.result.block);
       }
 
@@ -106,9 +90,8 @@ module.exports = {
       let data = {};
       data["current_height"] = height;
       data["result"] = [];
-      for (let i = start; i <= end; i++) {
-        let params = [{ "Height": parseInt(i) }];
-        let block_data = await RequestRPC(RpcApiName.get_block, params);
+      for (let i = end; i >= start; i--) {
+        let block_data = await GetBlock(i);
         data.result.push(block_data.result.block);
       }
       res.status(200);

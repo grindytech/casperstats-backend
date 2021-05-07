@@ -234,7 +234,7 @@ const GetDeploy = async (deployhash) => {
     let params = [deployhash];
     let deploy_data = await RequestRPC(RpcApiName.get_deploy, params);
 
-    if(deploy_data.error) {
+    if (deploy_data.error) {
         throw deploy_data.error;
     }
 
@@ -248,7 +248,7 @@ const GetDeploy = async (deployhash) => {
     }
 
     // 
-    if(result.deploy.session.Transfer) {
+    if (result.deploy.session.Transfer) {
         result.deploy.header["type"] = "transfer";
     } else {
         delete result.deploy.session;
@@ -301,9 +301,31 @@ const GetBlockHeightByBlock = async (blockhash) => {
     return height;
 }
 
+const GetBlock = async (block) => {
+    const height = await GetHeight();
+    return new Promise((resolve, reject) => {
+        let params;
+        // check b is a number or string to change the params
+        if (isNaN(block)) {
+            params = [{ "Hash": block }]
+        } else {
+            params = [{ "Height": parseInt(block) }]
+        }
+
+        RequestRPC(RpcApiName.get_block, params).then(value => {
+            // add current_height to getblock
+            value.result["current_height"] = height;
+            delete value.result.block.proofs;
+            resolve(value);
+        }).catch(err => {
+            reject(err);
+        })
+    })
+}
+
 module.exports = {
     Execute, RequestRPC, GetLatestStateRootHash,
     QueryState, GetHeight, GetTxhashes, GetDeployhashes,
     GetDeploy, DoesDeploySuccess, GetTransfersFromDeploy,
-    GetTransferDetail
+    GetTransferDetail, GetBlock
 }

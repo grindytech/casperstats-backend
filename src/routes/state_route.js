@@ -7,4 +7,6 @@ router.route("/get-balance/:address").get(state_controller.GetBalanceV2);
 router.route("/query-state").get(state_controller.QueryState);
 router.route("/get-auction-info").get(state_controller.GetAuctionInfo);
 
+router.route("/get-validators/:number").get(state_controller.GetValidators);
+
 module.exports = router;

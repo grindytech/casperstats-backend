@@ -1,11 +1,12 @@
 const { RequestRPC, Execute, GetLatestStateRootHash, QueryState} = require('../utils/utils');
+const { GetValidator } = require('../utils/validator');
 const { RpcApiName } = require('../utils/constant');
 
 require('dotenv').config();
 
 module.exports = {
    
-    GetBalance: function (req, res) {
+    GetBalance: async function (req, res) {
 
         let id = req.query.id;
         let s = req.query.s; //Hex-encoded hash of the state root
@@ -41,7 +42,7 @@ module.exports = {
 
     },
 
-    QueryState: function (req, res) {
+    QueryState: async function (req, res) {
         let id = req.query.id; // JSON-RPC identifier, applied to the request and returned in the response. If not provided, a random integer will be assigned
         let s = req.query.s; // Hex-encoded hash of the state root
 
@@ -71,5 +72,18 @@ module.exports = {
             res.status(500);
             res.json(err)
         })
+    },
+
+    GetValidators: async function (req, res) {
+        const number = req.params.number;
+       try{
+           const validators = await GetValidator(number);
+           res.status(200);
+           res.json(validators);
+           
+       }catch(err) {
+           res.status(500);
+           res.json(err);
+       }
     }
 };
