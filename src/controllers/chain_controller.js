@@ -7,15 +7,25 @@ module.exports = {
   GetBlock: async function (req, res) {
 
     let b = req.params.block; // Hex-encoded block hash or height of the block. If not given, the last block added to the chain as known at the given node will be used
+    const height = await GetHeight();
+    let params;
+    // check b is a number or string to change the params
+    if (isNaN(b)) {
+      params = [{ "Hash": b }]
+    } else {
+      params = [{ "Height": parseInt(b) }]
+    }
 
-    GetBlock(b).then(value => {
+    RequestRPC(RpcApiName.get_block, params).then(value => {
+      // add current_height to getblock
+      value.result["current_height"] = height;
       res.status(200);
       res.json(value);
     }).catch(err => {
       res.status(500);
-      res.json(err.message);
+      res.json(err)
     })
-    
+
   },
 
   GetBlockTx: async function (req, res) {
@@ -106,17 +116,17 @@ module.exports = {
       let txhashes = await GetTxhashes(b);
       let data = [];
       for (let i = 0; i < txhashes.length; i++) {
-          let pass = await DoesDeploySuccess(txhashes[i]);
-          if(pass) {
-            let transfers = await GetTransfersFromDeploy("deploy-" + txhashes[i]);
-            for ( let j =0; j<transfers.length; j++ ) {
-              let transfer_detail = await GetTransferDetail(transfers[j]);
-              data.push(transfer_detail);
-            }
-          } else {
-            let deploy_detail = await GetDeploy(txhashes[i]);
-            data.push(deploy_detail);
+        let pass = await DoesDeploySuccess(txhashes[i]);
+        if (pass) {
+          let transfers = await GetTransfersFromDeploy("deploy-" + txhashes[i]);
+          for (let j = 0; j < transfers.length; j++) {
+            let transfer_detail = await GetTransferDetail(transfers[j]);
+            data.push(transfer_detail);
           }
+        } else {
+          let deploy_detail = await GetDeploy(txhashes[i]);
+          data.push(deploy_detail);
+        }
       }
       res.status(200);
       res.json(data);
