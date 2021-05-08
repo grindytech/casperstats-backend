@@ -90,7 +90,7 @@ const GetValidator = async (number_of_validator) => {
         let total_stake = 0;
         total_stake = await GetTotalStake(auction_state, 0);
 
-        result.total_stake = total_stake;
+        result.total_stake = total_stake.toString();
         result.total_active_validators = auction_state.era_validators[0].validator_weights.length;
         result.total_bid_validators = auction_state.bids.length;
 

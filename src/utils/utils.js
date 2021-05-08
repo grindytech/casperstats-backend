@@ -105,87 +105,6 @@ const QueryState = async (key, state = "", id = undefined) => {
 
 }
 
-// const GetTransactionInBlock = async (b, id) => {
-
-//     let transfer_hashes = [];
-//     let deploy_hashes = [];
-//     {
-//         let params;
-//         // check b is a number or string to change the params
-//         if (isNaN(b)) {
-//             params = [{ "Hash": b }]
-//         } else {
-//             params = [{ "Height": parseInt(b) }]
-//         }
-//         let block_data = await RequestRPC(RpcApiName.get_block, params, id);
-//         transfer_hashes = block_data.result.block.body.transfer_hashes;
-//         deploy_hashes = block_data.result.block.body.deploy_hashes;
-//     }
-
-
-//     let transaction_keys = [];
-//     {
-//         for (let i = 0; i < transfer_hashes.length; i++) {
-//             let deploy_value = await QueryState("deploy-" + transfer_hashes[i]);
-//             transaction_keys.push(...deploy_value.result.stored_value.DeployInfo.transfers);
-//         }
-//     }
-
-//     let transaction_datas = [];
-//     {
-//         // Get deploy data
-//         for (let i = 0; i < deploy_hashes.length; i++) {
-
-//             // check if deplou succeed
-//             const succeed = await IsTxSucceed(deploy_hashes[i]);
-//             let data;
-//             if (!succeed) {
-//                 let params = [deploy_hashes[i]];
-//                 let value = await RequestRPC(RpcApiName.get_deploy, params);
-//                 data = value.result;
-
-//             } else {
-//                 let deploy_value = await QueryState("deploy-" + deploy_hashes[i]);
-//                 data = deploy_value.result.stored_value.DeployInfo;
-//             }
-//             data.type = "deploy"
-//             data.deploy = 'deploy-' + deploy_hashes[i];
-
-//             transaction_datas.push(data);
-
-//         }
-
-//         // Get transfer data
-//         for (let i = 0; i < transaction_keys.length; i++) {
-
-//             let data;
-
-//             let tx_value = await QueryState(transaction_keys[i]);
-//             data = tx_value.result.stored_value.Transfer;
-
-//             data.type = "transfer"
-//             data.transfer = transaction_keys[i];
-//             transaction_datas.push(data);
-//         }
-//     }
-
-//     return transaction_datas;
-// }
-
-// const IsTxSucceed = async (hash) => {
-//     let params = [hash];
-
-//     let value = await RequestRPC(RpcApiName.get_deploy, params);
-//     const result = value.result.execution_results;
-//     for (let i = 0; i < result.length; i++) {
-//         if (result[i].result.Failure != undefined) {
-//             return false;
-//         }
-//     }
-//     return true;
-
-// }
-
 const GetHeight = async () => {
     let params = [{}];
 
@@ -228,28 +147,44 @@ const GetDeployhashes = async (block) => {
     })
 }
 
+const GetTotalDeployCost = async (execution_results) => {
+
+    let total_cost = 0;
+    for(let i = 0; i< execution_results.length; i++) {
+        let cost = 0;
+        if(execution_results[i].result.Success) {
+            cost = Number(execution_results[i].result.Success.cost);
+        } else if(execution_results[i].result.Failure) {
+            cost = Number(execution_results[i].result.Failure.cost);
+        }
+        total_cost += cost;
+    }
+    return total_cost;
+}
 
 const GetDeploy = async (deployhash) => {
 
     let params = [deployhash];
     let deploy_data = await RequestRPC(RpcApiName.get_deploy, params);
-
     if (deploy_data.error) {
         throw deploy_data.error;
     }
-
-    let result = deploy_data.result;
-    for (let i = 0; i < result.execution_results.length; i++) {
-        const block_height = await GetBlockHeightByBlock(result.execution_results[i].block_hash);
-        result.execution_results[i]["block_height"] = block_height;
+    const result = deploy_data.result;
+    
+    // add more common information to header
+    {
+        let first_block_hash = result.execution_results[0].block_hash;
+        const first_block_height = await GetBlockHeightByBlock(first_block_hash);
+        let total_cost = await GetTotalDeployCost(result.execution_results);
+        let to = "unknown";
+        
+        result.deploy.header["block_hash"] = first_block_hash;
+        result.deploy.header["block_height"] = first_block_height;
+        result.deploy.header["to"] = to;
+        result.deploy.header["cost"] = total_cost.toString();
     }
-    const succeed = await DoesDeploySuccess(deployhash);
-    if (succeed) {
-    } else {
 
-    }
-
-    // 
+    // add type
     if (result.deploy.session.Transfer) {
         result.deploy.header["type"] = "transfer";
     } else {
