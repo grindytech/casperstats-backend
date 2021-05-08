@@ -28,6 +28,7 @@ This project provide the REST api to interact with Casper blockchain
     - [query-state](#query-state)
     - [get-balance](#get-balance)
     - [get-auction-info](#get-auction-info)
+    - [get-validators](#get-validators)
 
 ## Quick Start
 
@@ -887,6 +888,94 @@ successResponse:
 |  |  |  |
 |  |  |  |
 
+
+#### get-validators
+
+```
+url: /state/get-validators/:number
+
+example: http://18.157.183.184:3030/stateget-validators/3
+
+method: GET
+
+des: Return the number of top validator by total stake
+
+
+successResponse:
+
+{
+    "block_height": 26868,
+    "total_active_validators": 100,
+    "total_bid_validators": 793,
+    "total_stake": 1448369395576771,
+    "era_validators": [
+        {
+            "era_id": 347,
+            "validators": [
+                {
+                    "public_key": "017d96b9a63abcb61c870a4f55187a0a7ac24096bdb5fc585c12a686a4d892009e",
+                    "bid": {
+                        "staked_amount": "84233389535392",
+                        "delegation_rate": 10
+                    }
+                },
+                {
+                    "public_key": "0106ca7c39cd272dbf21a86eeb3b36b7c26e2e9b94af64292419f7862936bca2ca",
+                    "bid": {
+                        "staked_amount": "84233126725902",
+                        "delegation_rate": 10
+                    }
+                },
+                {
+                    "public_key": "01a854ee50171a515aa9b0214fbc8b3438ff9100e8b1411a8dce432aa68ea5f73a",
+                    "bid": {
+                        "staked_amount": "1447726537285",
+                        "delegation_rate": 10
+                    }
+                }
+            ]
+        },
+        {
+            "era_id": 348,
+            "validators": [
+                {
+                    "public_key": "017d96b9a63abcb61c870a4f55187a0a7ac24096bdb5fc585c12a686a4d892009e",
+                    "bid": {
+                        "staked_amount": "84233389535392",
+                        "delegation_rate": 10
+                    }
+                },
+                {
+                    "public_key": "0106ca7c39cd272dbf21a86eeb3b36b7c26e2e9b94af64292419f7862936bca2ca",
+                    "bid": {
+                        "staked_amount": "84233126725902",
+                        "delegation_rate": 10
+                    }
+                },
+                {
+                    "public_key": "01a854ee50171a515aa9b0214fbc8b3438ff9100e8b1411a8dce432aa68ea5f73a",
+                    "bid": {
+                        "staked_amount": "1447726537285",
+                        "delegation_rate": 10
+                    }
+                }
+            ]
+        }
+    ]
+}
+
+```
+
+| Params  | Type | Description |
+| ------------- | ------------- | ------------- |
+|  |  |  |
+|  |  |  |
+
+
+| ResponseField  | Type | Description |
+| ------------- | ------------- | ------------- |
+|  |  |  |
+|  |  |  |
 
 
 
