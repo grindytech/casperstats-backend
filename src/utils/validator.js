@@ -38,13 +38,13 @@ async function GetTopValidators(auction_state, era_index, number_of_validator) {
             let element = bids.find(el => el.public_key == top_weights[i].public_key);
             
             // Add number of delegatee
-            // let number_delegators = 0;
-            // if (element.bid.delegators !== undefined) {
-            //     number_delegators = element.bid.delegators.length;
-            // }
+            let number_delegators = 0;
+            if (element.bid.delegators !== undefined) {
+                number_delegators = element.bid.delegators.length;
+            }
             
             delete element.bid["bonding_purse"];
-            delete element.bid["delegators"];
+            element.bid["delegators"] = number_delegators;
             delete element.bid["inactive"];
             top_validators.push(element);
         }
@@ -75,7 +75,7 @@ const GetValidator = async (number_of_validator) => {
         total_active_validators: 0,
         total_bid_validators: 0,
         total_stake: "",
-        era_validators: []
+        era_validators: {}
     }
 
     const auction_info = await RequestRPC(RpcApiName.get_auction_info, []);
@@ -97,11 +97,7 @@ const GetValidator = async (number_of_validator) => {
         // get top 10 validators with height
         //    current era
         const top_validators = await GetTopValidators(auction_state, 0, number_of_validator);
-        result.era_validators.push(top_validators);
-
-        // next era
-        const next_top_validators = await GetTopValidators(auction_state, 1, number_of_validator);
-        result.era_validators.push(next_top_validators);
+        result.era_validators = top_validators;
     } catch (err) {
         throw err.message;
     }

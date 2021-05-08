@@ -151,5 +151,9 @@ module.exports = {
       res.status(500);
       res.json(err);
     }
-  }
+  },
+
+  GetTotalNumberTx: async function (req, res) {
+    
+  },
 };
