@@ -150,11 +150,11 @@ const GetDeployhashes = async (block) => {
 const GetTotalDeployCost = async (execution_results) => {
 
     let total_cost = 0;
-    for(let i = 0; i< execution_results.length; i++) {
+    for (let i = 0; i < execution_results.length; i++) {
         let cost = 0;
-        if(execution_results[i].result.Success) {
+        if (execution_results[i].result.Success) {
             cost = Number(execution_results[i].result.Success.cost);
-        } else if(execution_results[i].result.Failure) {
+        } else if (execution_results[i].result.Failure) {
             cost = Number(execution_results[i].result.Failure.cost);
         }
         total_cost += cost;
@@ -170,14 +170,14 @@ const GetDeploy = async (deployhash) => {
         throw deploy_data.error;
     }
     const result = deploy_data.result;
-    
+
     // add more common information to header
     {
         let first_block_hash = result.execution_results[0].block_hash;
         const first_block_height = await GetBlockHeightByBlock(first_block_hash);
         let total_cost = await GetTotalDeployCost(result.execution_results);
         let to = "unknown";
-        
+
         result.deploy.header["block_hash"] = first_block_hash;
         result.deploy.header["block_height"] = first_block_height;
         result.deploy.header["to"] = to;
@@ -260,9 +260,48 @@ const GetBlock = async (block) => {
     })
 }
 
+const GetTransfersInBlock = async (block) => {
+    return new Promise((resolve, reject) => {
+        let params;
+        // check block is a number or string to change the params
+        if (isNaN(block)) {
+            params = [{ "Hash": block }]
+        } else {
+            params = [{ "Height": parseInt(block) }]
+        }
+
+        RequestRPC(RpcApiName.get_block_transfers, params).then(value => {
+            resolve(value.result);
+        }).catch(err => {
+            reject(err);
+        })
+    })
+}
+
+const GetLatestTx = async (number_of_tx) => {
+
+    // get current block_height
+    const block_height = await GetHeight();
+
+    let result = [];
+    // get list txhash
+    let i = block_height;
+    while(true) {
+        let transfer = await GetTransfersInBlock(i);
+        result.push(...transfer.transfers);
+
+        if(result.length >= number_of_tx) {
+            break;
+        }
+        i--;
+    }
+    // query tx information
+    return result;
+}
+
 module.exports = {
     Execute, RequestRPC, GetLatestStateRootHash,
     QueryState, GetHeight, GetTxhashes, GetDeployhashes,
     GetDeploy, DoesDeploySuccess, GetTransfersFromDeploy,
-    GetTransferDetail, GetBlock
+    GetTransferDetail, GetBlock, GetLatestTx, GetTransfersInBlock
 }

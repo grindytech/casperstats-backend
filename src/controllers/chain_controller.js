@@ -1,31 +1,26 @@
-const { RequestRPC, GetHeight, GetTxhashes, GetDeployhashes, GetDeploy, DoesDeploySuccess, GetTransfersFromDeploy, GetTransferDetail, GetBlock } = require('../utils/utils');
+const { RequestRPC, GetHeight, GetTxhashes,
+  GetDeployhashes, GetDeploy, DoesDeploySuccess,
+  GetTransfersFromDeploy, GetTransferDetail, GetBlock,
+  GetLatestTx, 
+  GetTransfersInBlock} = require('../utils/utils');
 const { RpcApiName } = require('../utils/constant');
 
 require('dotenv').config();
 
 module.exports = {
   GetBlock: async function (req, res) {
-
     let b = req.params.block; // Hex-encoded block hash or height of the block. If not given, the last block added to the chain as known at the given node will be used
+    
     const height = await GetHeight();
-    let params;
-    // check b is a number or string to change the params
-    if (isNaN(b)) {
-      params = [{ "Hash": b }]
-    } else {
-      params = [{ "Height": parseInt(b) }]
-    }
-
-    RequestRPC(RpcApiName.get_block, params).then(value => {
-      // add current_height to getblock
+    GetTransfersInBlock(b).then(value => {
       value.result["current_height"] = height;
       res.status(200);
       res.json(value);
+
     }).catch(err => {
       res.status(500);
       res.json(err)
     })
-
   },
 
   GetBlockTx: async function (req, res) {
@@ -154,6 +149,21 @@ module.exports = {
   },
 
   GetTotalNumberTx: async function (req, res) {
-    
+
   },
+
+  GetLatestTx: async function (req, res) {
+
+    try {
+      const num = req.params.number;
+      const result = await GetLatestTx(num);
+
+      res.status(200);
+      res.json(result);
+    } catch (err) {
+      res.status(500);
+      console.log(err);
+      res.json(err.message);
+    }
+  }
 };
