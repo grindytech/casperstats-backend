@@ -19,6 +19,7 @@ This project provide the REST api to interact with Casper blockchain
     - [get-block-transfer](#get-block-transfer)
     - [get-block-deploy](#get-block-deploy)
     - [get-range-block](#get-range-block)
+    - [get-latest-tx](#get-latest-tx)
 
   - [Info](#Info)
     - [get-deploy](#get-deploy)
@@ -461,6 +462,63 @@ successResponse:
 |  |  |  |
 |  |  |  |
 
+
+#### get-range-block
+
+```
+url: /chain/get-latest-tx/:number
+
+example: http://18.157.183.184:3030/chain/get-latest-txs/3
+
+method: GET
+
+des: get number of latest transaction
+
+successResponse:
+[
+    {
+        "deploy_hash": "4b7709a04a1d8bb379ff702f1d19b561f70d0faa42916ca46f5ec9e4a9a4301d",
+        "from": "account-hash-302fbd5a2013148e55fe0483229568e94af57828768db37206120387f791cd1c",
+        "to": null,
+        "source": "uref-200fbbacbeb80e515fa810f0e9c6d2962832e9ae08da673af572fc5d89c6058b-007",
+        "target": "uref-6fec657027fe0e6235fccc9ee5836bec081321fc009854a0ea7b79de080b6b07-007",
+        "amount": "900000000000",
+        "gas": "0",
+        "id": null
+    },
+    {
+        "deploy_hash": "5de8cba264a82ede4623d0c07415a9c71c5bdab9fc3f43fcb551427666a700ca",
+        "from": "account-hash-9a0822e9005889874fd36362db5ddaf4815d55e44c9cf1edf6c8be8971570c8b",
+        "to": null,
+        "source": "uref-c2c8f3387dccc28f070063b94b65ee6cb2983783ce564a6b8a5acf702de14571-007",
+        "target": "uref-acc88de13a74724d2ebafb3abacd4f3c6ffc723dd258208822c181ead02be1ed-007",
+        "amount": "900000000000",
+        "gas": "0",
+        "id": null
+    },
+    {
+        "deploy_hash": "762619ae4746bbc347d65951ae02590688dbce53b02e0c1b173fdb7cf4d8d16e",
+        "from": "account-hash-b383c7cc23d18bc1b42406a1b2d29fc8dba86425197b6f553d7fd61375b5e446",
+        "to": "account-hash-302fbd5a2013148e55fe0483229568e94af57828768db37206120387f791cd1c",
+        "source": "uref-b06a1ab0cfb52b5d4f9a08b68a5dbe78e999de0b0484c03e64f5c03897cf637b-007",
+        "target": "uref-200fbbacbeb80e515fa810f0e9c6d2962832e9ae08da673af572fc5d89c6058b-004",
+        "amount": "1000000000000",
+        "gas": "0",
+        "id": null
+    }
+]
+
+```
+
+| Params  | Type | Description | Required |
+| ------------- | ------------- | ------------- |------------- |
+| start | number | start | Yes |
+| end | number, number |  end | Yes |
+
+| ResponseField  | Type | Description |
+| ------------- | ------------- | ------------- |
+|  |  |  |
+|  |  |  |
 
 ### Info
 
