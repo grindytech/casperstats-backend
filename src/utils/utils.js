@@ -1,7 +1,7 @@
 const dotenv = require("dotenv");
 dotenv.config();
 const request = require('request');
-const { RpcApiName } = require('./constant');
+const { RpcApiName, ELEMENT_TYPE } = require('./constant');
 const { exec } = require("child_process");
 
 const Execute = async (command) => {
@@ -286,11 +286,11 @@ const GetLatestTx = async (number_of_tx) => {
     let result = [];
     // get list txhash
     let i = block_height;
-    while(true) {
+    while (true) {
         let transfer = await GetTransfersInBlock(i);
         result.push(...transfer.transfers);
 
-        if(result.length >= number_of_tx) {
+        if (result.length >= number_of_tx) {
             break;
         }
         i--;
@@ -299,9 +299,83 @@ const GetLatestTx = async (number_of_tx) => {
     return result;
 }
 
+const GetBalance = async (address) => {
+    let s = await GetLatestStateRootHash(); // get latest root hash
+    try {
+        let URef = await QueryState(address, s); // URef for address
+        let main_purse = URef.result.stored_value.Account.main_purse;
+
+        let params = [s, main_purse];
+
+        let result = await RequestRPC(RpcApiName.get_balance, params);
+        return result;
+    } catch (err) {
+        throw ({
+            "code": -32001,
+            "message": "address not known",
+            "data": null
+        });
+    }
+}
+
+const GetType = async (param) => {
+    if (param.length == 66) { // public_key hex
+        await GetBalance(param)
+        return {
+            value: param,
+            type: ELEMENT_TYPE.PUBLIC_KEY_HEX,
+        };
+
+    } else if (!isNaN(param)) { //block height
+        let params = [{ "Height": parseInt(param) }]
+
+        await RequestRPC(RpcApiName.get_block, params);
+
+        return {
+            value: param,
+            type: ELEMENT_TYPE.BLOCK_HEIGHT,
+        };
+    } else if (param.length == 64) {  //block hash | deploy hex | transfer hex
+
+        // check block hash
+        try {
+            let params = [{ "Hash": param }]
+
+            await RequestRPC(RpcApiName.get_block, params);
+
+            return {
+                value: param,
+                type: ELEMENT_TYPE.BLOCK_HASH,
+            };
+        } catch (err) {
+
+        }
+
+        let deploy_info = await GetDeploy(param);
+        if(deploy_info.deploy.header.type == "deploy") {
+            return {
+                value: param,
+                type: ELEMENT_TYPE.DEPLOY_HEX,
+            };
+        } else if (deploy_info.deploy.header.type == "transfer") {
+            return {
+                value: param,
+                type: ELEMENT_TYPE.TRANSFER_HEX,
+            };
+        }
+
+    } else {
+        return {
+            value: param,
+            type: ELEMENT_TYPE.UNKNOWN,
+        }
+    }
+}
+
 module.exports = {
     Execute, RequestRPC, GetLatestStateRootHash,
     QueryState, GetHeight, GetTxhashes, GetDeployhashes,
     GetDeploy, DoesDeploySuccess, GetTransfersFromDeploy,
-    GetTransferDetail, GetBlock, GetLatestTx, GetTransfersInBlock
+    GetTransferDetail, GetBlock, GetLatestTx, GetTransfersInBlock,
+    GetBalance, GetType
 }

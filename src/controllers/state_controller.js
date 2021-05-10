@@ -1,4 +1,4 @@
-const { RequestRPC, Execute, GetLatestStateRootHash, QueryState } = require('../utils/utils');
+const { RequestRPC, GetBalance, QueryState } = require('../utils/utils');
 const { GetValidator, GetEraValidators, GetBids } = require('../utils/validator');
 const { RpcApiName } = require('../utils/constant');
 
@@ -26,19 +26,15 @@ module.exports = {
     GetBalanceV2: async function (req, res) {
         let address = req.params.address;
 
-        let s = await GetLatestStateRootHash(); // get latest root hash
-        let URef = await QueryState(address, s); // URef for address
-        let main_purse = URef.result.stored_value.Account.main_purse;
-
-        let params = [s, main_purse];
-
-        RequestRPC(RpcApiName.get_balance, params).then(value => {
+        try {  
+            const balance = await GetBalance(address);
             res.status(200);
-            res.json(value);
-        }).catch(err => {
+            res.json(balance);
+        }catch(err) {
             res.status(500);
-            res.json(err)
-        })
+            res.json(err);
+        }
+
 
     },
 

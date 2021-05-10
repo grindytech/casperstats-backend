@@ -1,7 +1,7 @@
-const { RequestRPC, GetDeploy} = require('../utils/utils');
-const {Execute} = require('../utils/utils');
+const { GetDeploy, GetType } = require('../utils/utils');
+const { Execute } = require('../utils/utils');
 
-const { RpcApiName } = require('../utils/constant');
+const { RpcApiName, ELEMENT_TYPE } = require('../utils/constant');
 
 require('dotenv').config();
 
@@ -41,5 +41,18 @@ module.exports = {
             res.status(500);
             res.json(err)
         })
+    },
+
+    GetType: async function (req, res) {
+        const param = req.params.param;
+        try {
+            const type = await GetType(param);
+            res.status(200);
+            res.json(type);
+        }catch(err) {
+            res.status(500);
+            res.json(err);
+        }
+
     }
 };

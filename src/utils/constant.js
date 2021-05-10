@@ -8,4 +8,13 @@ const RpcApiName = {
     get_auction_info: "state_get_auction_info",
 }
 
-module.exports = {RpcApiName}
+const ELEMENT_TYPE = {
+    PUBLIC_KEY_HEX: "PUBLIC_KEY_HEX", //account address
+    BLOCK_HEIGHT: "BLOCK_HEIGHT",
+    BLOCK_HASH: "BLOCK_HASH",
+    DEPLOY_HEX: "DEPLOY_HEX",
+    TRANSFER_HEX: "TRANSFER_HEX",
+    UNKNOWN: "UNKNOWN",
+}
+
+module.exports = {RpcApiName, ELEMENT_TYPE}
