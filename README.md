@@ -24,6 +24,7 @@ This project provide the REST api to interact with Casper blockchain
   - [Info](#Info)
     - [get-deploy](#get-deploy)
     - [get-list-deploys](#get-list-deploys)
+    - [get-type](#get-type)
 
   - [State](#State)
     - [query-state](#query-state)
@@ -808,6 +809,38 @@ successResponse:
 | ------------- | ------------- | ------------- |
 |  |  |  |
 |  |  |  |
+
+
+#### get-type
+
+```
+url: /info/get-type/:param
+
+example: http://18.157.183.184:3030/info/get-type/db5f69c51ddacaeab0bee5c7e5665313489d99ffbbadd9208ff45092ee85476f
+
+method: GET
+
+des:  Get type of input
+
+successResponse:
+{
+    "value": "db5f69c51ddacaeab0bee5c7e5665313489d99ffbbadd9208ff45092ee85476f",
+    "type": "TRANSFER_HEX"
+}
+```
+
+| TypeName  | Type | Description |
+| ------------- | ------------- | ------------- |
+|  PUBLIC_KEY_HEX | string | account address |
+|  BLOCK_HEIGHT| number | block height |
+|  BLOCK_HASH| string |  |
+|  DEPLOY_HEX| string |  |
+|  TRANSFER_HEX| string |  |
+|  UNKNOWN| string | can not search the data |
+
+
+
+
 
 ### State
 
