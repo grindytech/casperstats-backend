@@ -30,6 +30,8 @@ This project provide the REST api to interact with Casper blockchain
     - [get-balance](#get-balance)
     - [get-auction-info](#get-auction-info)
     - [get-validators](#get-validators)
+    - [get-era-validatos](#get-era-validatos)
+    - [get-bids](#get-bids)
 
 ## Quick Start
 
@@ -1024,16 +1026,38 @@ successResponse:
 
 ```
 
-| Params  | Type | Description |
-| ------------- | ------------- | ------------- |
-|  |  |  |
-|  |  |  |
 
 
-| ResponseField  | Type | Description |
-| ------------- | ------------- | ------------- |
-|  |  |  |
-|  |  |  |
+#### get-validators
+
+```
+url: /state/get-era-validators
+
+example: http://18.157.183.184:3030/state/get-era-validators
+
+method: GET
+
+des: Return the information of validatos
 
 
+successResponse: validators information
+
+
+```
+
+#### get-bids
+
+```
+url: /state/get-era-validators
+
+example: http://18.157.183.184:3030/state/get-bids
+
+method: GET
+
+des: Return inforamtion of bids
+
+successResponse: bids information
+
+
+```
 
