@@ -30,7 +30,7 @@ This project provide the REST api to interact with Casper blockchain
     - [get-balance](#get-balance)
     - [get-auction-info](#get-auction-info)
     - [get-validators](#get-validators)
-    - [get-era-validatos](#get-era-validatos)
+    - [get-era-validators](#get-era-validators)
     - [get-bids](#get-bids)
 
 ## Quick Start
