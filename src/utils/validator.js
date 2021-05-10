@@ -2,7 +2,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 const { RpcApiName } = require('./constant');
 const { RequestRPC } = require('./utils')
-
+const  math = require('mathjs');
 
 /**
  * Returns x raised to the n-th power.
@@ -106,7 +106,49 @@ const GetValidator = async (number_of_validator) => {
     return result;
 }
 
+
+const GetEraValidators = async () => {
+    const auction_info = (await RequestRPC(RpcApiName.get_auction_info, [])).result;
+
+    // get total stake
+    const total_stake_current_era = await GetTotalStake(auction_info.auction_state, 0);
+    const total_stake_next_era = await GetTotalStake(auction_info.auction_state, 1);
+    
+    auction_info.auction_state.era_validators[0]["total_stake"] = total_stake_current_era.toString();
+    auction_info.auction_state.era_validators[1]["total_stake"] = total_stake_next_era.toString();
+
+    //remove bids
+    delete auction_info.auction_state.bids;
+    
+    return auction_info;
+}
+
+const GetBids = async () => {
+    const auction_info = (await RequestRPC(RpcApiName.get_auction_info, [])).result;
+
+    // get total bid
+    let bids = auction_info.auction_state.bids;
+
+    for( let i=0 ;i < bids.length ; i++) {
+        let self_bid =  math.bignumber(bids[i].bid.staked_amount);
+
+        let total_token_delegated = math.bignumber("0");
+        let delegators = bids[i].bid.delegators;
+        for ( let j = 0; j < delegators.length; j++) {
+            const delegated_amount = math.bignumber(delegators[j].staked_amount);
+            total_token_delegated = math.add(total_token_delegated, delegated_amount);
+        }
+
+        bids[i]["total_bid"] = math.add(self_bid, total_token_delegated).toString();
+        bids[i]["total_delegated"] = total_token_delegated.toString();
+    }
+
+    //remove bids
+    delete auction_info.auction_state.era_validators;
+    return auction_info;
+}
+
 module.exports = {
-    GetValidator
+    GetValidator, GetEraValidators, GetBids
 }
 

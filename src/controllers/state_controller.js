@@ -1,11 +1,11 @@
-const { RequestRPC, Execute, GetLatestStateRootHash, QueryState} = require('../utils/utils');
-const { GetValidator } = require('../utils/validator');
+const { RequestRPC, Execute, GetLatestStateRootHash, QueryState } = require('../utils/utils');
+const { GetValidator, GetEraValidators, GetBids } = require('../utils/validator');
 const { RpcApiName } = require('../utils/constant');
 
 require('dotenv').config();
 
 module.exports = {
-   
+
     GetBalance: async function (req, res) {
 
         let id = req.query.id;
@@ -64,7 +64,7 @@ module.exports = {
         })
     },
 
-    GetAuctionInfo: async function  (req, res) {
+    GetAuctionInfo: async function (req, res) {
         RequestRPC(RpcApiName.get_auction_info, []).then(value => {
             res.status(200);
             res.json(value.result);
@@ -76,14 +76,40 @@ module.exports = {
 
     GetValidators: async function (req, res) {
         const number = req.params.number;
-       try{
-           const validators = await GetValidator(number);
-           res.status(200);
-           res.json(validators);
-           
-       }catch(err) {
-           res.status(500);
-           res.json(err);
-       }
+        try {
+            const validators = await GetValidator(number);
+            res.status(200);
+            res.json(validators);
+
+        } catch (err) {
+            res.status(500);
+            res.json(err);
+        }
+    },
+
+    GetEraValidators: async function (req, res) {
+
+        try {
+            const era_validators = await GetEraValidators();
+            res.status(200);
+            res.json(era_validators);
+
+        } catch (err) {
+            res.status(500);
+            res.json(err);
+        }
+
+    },
+
+    GetBids: async function (req, res) {
+        try {
+            const bids = await GetBids();
+            res.status(200);
+            res.json(bids);
+
+        } catch (err) {
+            res.status(500);
+            res.json(err);
+        }
     }
 };
