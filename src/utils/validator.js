@@ -108,7 +108,7 @@ const GetValidator = async (number_of_validator) => {
 
 
 const GetEraValidators = async () => {
-    const auction_info = (await RequestRPC(RpcApiName.get_auction_info, [])).result;
+    let auction_info = (await RequestRPC(RpcApiName.get_auction_info, [])).result;
 
     // get total stake
     const total_stake_current_era = await GetTotalStake(auction_info.auction_state, 0);
@@ -120,6 +120,28 @@ const GetEraValidators = async () => {
     //remove bids
     delete auction_info.auction_state.bids;
     
+    // sort validators by weight
+
+    auction_info.auction_state.era_validators[0].validator_weights.sort((first, second) => {
+        if (first.weight > second.weight) {
+            return -1;
+        }
+        if (first.weight < second.weight) {
+            return 1;
+        }
+        return 0;
+    })
+
+    auction_info.auction_state.era_validators[1].validator_weights.sort((first, second) => {
+        if (first.weight > second.weight) {
+            return -1;
+        }
+        if (first.weight < second.weight) {
+            return 1;
+        }
+        return 0;
+    })
+
     return auction_info;
 }
 
@@ -145,6 +167,18 @@ const GetBids = async () => {
 
     //remove bids
     delete auction_info.auction_state.era_validators;
+
+
+    // sort bids by total_bid
+    auction_info.auction_state.bids.sort((first, second) => {
+        if (first.total_bid > second.total_bid) {
+            return -1;
+        }
+        if (first.total_bid < second.total_bid) {
+            return 1;
+        }
+        return 0;
+    })
     return auction_info;
 }
 
