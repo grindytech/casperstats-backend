@@ -12,7 +12,13 @@ module.exports = {
     let b = req.params.block; // Hex-encoded block hash or height of the block. If not given, the last block added to the chain as known at the given node will be used
     
     const height = await GetHeight();
-    GetTransfersInBlock(b).then(value => {
+    if (isNaN(b)) {
+      params = [{ "Hash": b }]
+    } else {
+      params = [{ "Height": parseInt(b) }]
+    }
+
+    RequestRPC(RpcApiName.get_block, params).then(value => {
       value.result["current_height"] = height;
       res.status(200);
       res.json(value);
