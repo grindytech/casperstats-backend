@@ -1028,7 +1028,7 @@ successResponse:
 
 
 
-#### get-validators
+#### get-era-validators
 
 ```
 url: /state/get-era-validators
