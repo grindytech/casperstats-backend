@@ -138,16 +138,7 @@ const GetEraValidators = async () => {
     // sort validators by weight
     for(let era_index =0 ; era_index < 2; era_index++) {
         auction_info.auction_state.era_validators[era_index].validator_weights.sort((first, second) => {
-            const first_weight = math.bignumber(first.weight);
-            const second_weight = math.bignumber(second.weight);
-
-            if (first_weight > second_weight) {
-                return -1;
-            }
-            if (first_weight < second_weight) {
-                return 1;
-            }
-            return 0;
+            return math.compare(second.weight, first.weight);
         })
     }
 
@@ -179,16 +170,7 @@ const GetBids = async () => {
 
     // sort bids by total_bid
     auction_info.auction_state.bids.sort((first, second) => {
-        const first_weight = math.bignumber(first.total_bid);
-        const second_weight = math.bignumber(second.total_bid);
-
-        if (first_weight > second_weight) {
-            return -1;
-        }
-        if (first_weight < second_weight) {
-            return 1;
-        }
-        return 0;
+       return math.compare(second.total_bid, first.total_bid);
     })
     return auction_info;
 }
