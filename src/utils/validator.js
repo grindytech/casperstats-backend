@@ -125,7 +125,6 @@ const GetEraValidators = async () => {
                 let public_key = validator_weights[i].public_key;
                 
                 let element = bids.find(el => el.public_key == public_key);
-                console.log("Element: ", element);
 
                 const num_of_delegators = element.bid.delegators.length;
                 validator_weights[i]["delegators"] = num_of_delegators;
@@ -139,10 +138,13 @@ const GetEraValidators = async () => {
     // sort validators by weight
     for(let era_index =0 ; era_index < 2; era_index++) {
         auction_info.auction_state.era_validators[era_index].validator_weights.sort((first, second) => {
-            if (first.weight > second.weight) {
+            const first_weight = math.bignumber(first.weight);
+            const second_weight = math.bignumber(second.weight);
+
+            if (first_weight > second_weight) {
                 return -1;
             }
-            if (first.weight < second.weight) {
+            if (first_weight < second_weight) {
                 return 1;
             }
             return 0;
@@ -177,10 +179,13 @@ const GetBids = async () => {
 
     // sort bids by total_bid
     auction_info.auction_state.bids.sort((first, second) => {
-        if (first.total_bid > second.total_bid) {
+        const first_weight = math.bignumber(first.total_bid);
+        const second_weight = math.bignumber(second.total_bid);
+
+        if (first_weight > second_weight) {
             return -1;
         }
-        if (first.total_bid < second.total_bid) {
+        if (first_weight < second_weight) {
             return 1;
         }
         return 0;
