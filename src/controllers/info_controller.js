@@ -16,8 +16,6 @@ module.exports = {
             res.status(500);
             res.json(err);
         })
-
-
     },
 
     GetListDeploys: async function (req, res) {
@@ -50,7 +48,7 @@ module.exports = {
             res.status(200);
             res.json(type);
         }catch(err) {
-            res.status(404);
+            res.status(500);
             res.json({
                 value: param,
                 type: ELEMENT_TYPE.UNKNOWN,
