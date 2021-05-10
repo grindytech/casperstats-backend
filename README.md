@@ -463,7 +463,7 @@ successResponse:
 |  |  |  |
 
 
-#### get-range-block
+#### get-latest-tx
 
 ```
 url: /chain/get-latest-tx/:number
