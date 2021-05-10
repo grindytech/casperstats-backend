@@ -101,8 +101,6 @@ const GetValidator = async (number_of_validator) => {
     } catch (err) {
         throw err.message;
     }
-
-
     return result;
 }
 
@@ -117,30 +115,39 @@ const GetEraValidators = async () => {
     auction_info.auction_state.era_validators[0]["total_stake"] = total_stake_current_era.toString();
     auction_info.auction_state.era_validators[1]["total_stake"] = total_stake_next_era.toString();
 
+    
+    // Add number of delegators
+    {
+        const bids  = auction_info.auction_state.bids;
+        for(let era_index = 0 ; era_index < 2; era_index++) {
+            const validator_weights = auction_info.auction_state.era_validators[era_index].validator_weights;
+            for(let i = 0; i< validator_weights.length; i++) {
+                let public_key = validator_weights[i].public_key;
+                
+                let element = bids.find(el => el.public_key == public_key);
+                console.log("Element: ", element);
+
+                const num_of_delegators = element.bid.delegators.length;
+                validator_weights[i]["delegators"] = num_of_delegators;
+            }
+        }
+    }
+ 
     //remove bids
     delete auction_info.auction_state.bids;
     
     // sort validators by weight
-
-    auction_info.auction_state.era_validators[0].validator_weights.sort((first, second) => {
-        if (first.weight > second.weight) {
-            return -1;
-        }
-        if (first.weight < second.weight) {
-            return 1;
-        }
-        return 0;
-    })
-
-    auction_info.auction_state.era_validators[1].validator_weights.sort((first, second) => {
-        if (first.weight > second.weight) {
-            return -1;
-        }
-        if (first.weight < second.weight) {
-            return 1;
-        }
-        return 0;
-    })
+    for(let era_index =0 ; era_index < 2; era_index++) {
+        auction_info.auction_state.era_validators[era_index].validator_weights.sort((first, second) => {
+            if (first.weight > second.weight) {
+                return -1;
+            }
+            if (first.weight < second.weight) {
+                return 1;
+            }
+            return 0;
+        })
+    }
 
     return auction_info;
 }
@@ -167,7 +174,6 @@ const GetBids = async () => {
 
     //remove bids
     delete auction_info.auction_state.era_validators;
-
 
     // sort bids by total_bid
     auction_info.auction_state.bids.sort((first, second) => {
