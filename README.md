@@ -836,6 +836,7 @@ successResponse:
 |  BLOCK_HASH| string |  |
 |  DEPLOY_HEX| string |  |
 |  TRANSFER_HEX| string |  |
+|  VALIDATOR| string |  |
 |  UNKNOWN| string | can not search the data |
 
 
