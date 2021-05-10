@@ -50,8 +50,11 @@ module.exports = {
             res.status(200);
             res.json(type);
         }catch(err) {
-            res.status(500);
-            res.json(err);
+            res.status(404);
+            res.json({
+                value: param,
+                type: ELEMENT_TYPE.UNKNOWN,
+            });
         }
 
     }
