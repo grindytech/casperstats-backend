@@ -48,7 +48,6 @@ module.exports = {
             res.status(200);
             res.json(type);
         }catch(err) {
-            res.status(500);
             res.json({
                 value: param,
                 type: ELEMENT_TYPE.UNKNOWN,
