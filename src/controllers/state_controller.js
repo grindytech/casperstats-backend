@@ -31,7 +31,7 @@ module.exports = {
             res.status(200);
             res.json(balance);
         }catch(err) {
-            // res.status(500);
+            res.status(500);
             res.json(err);
         }
 
