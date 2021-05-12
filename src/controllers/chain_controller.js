@@ -1,8 +1,7 @@
 const { RequestRPC, GetHeight, GetTxhashes,
   GetDeployhashes, GetDeploy, DoesDeploySuccess,
   GetTransfersFromDeploy, GetTransferDetail, GetBlock,
-  GetLatestTx,
-  GetTransfersInBlock } = require('../utils/utils');
+  GetLatestTx } = require('../utils/utils');
 const { RpcApiName } = require('../utils/constant');
 
 require('dotenv').config();
@@ -12,7 +11,19 @@ module.exports = {
     let b = req.params.block; // Hex-encoded block hash or height of the block. If not given, the last block added to the chain as known at the given node will be used
 
     const height = await GetHeight();
+
+    // Check valid block input
     if (isNaN(b)) {
+
+      if (b.length != 64) {
+        res.send({
+          "code": -32001,
+          "message": "block not known",
+          "data": null
+        });
+        return;
+      }
+
       params = [{ "Hash": b }]
     } else {
       if (parseInt(b) < 0 || parseInt(b) > height) {
@@ -21,7 +32,6 @@ module.exports = {
           "message": "block not known",
           "data": null
         });
-
         return;
       }
       params = [{ "Height": parseInt(b) }]
@@ -169,9 +179,7 @@ module.exports = {
       res.status(200);
       res.json(result);
     } catch (err) {
-      res.status(500);
-      console.log(err);
-      res.json(err.message);
+      res.send(err);
     }
   }
 };
