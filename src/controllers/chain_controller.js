@@ -16,12 +16,12 @@ module.exports = {
       params = [{ "Hash": b }]
     } else {
       if (parseInt(b) < 0 || parseInt(b) > height) {
-        res.send(500, {
+        res.send({
           "code": -32001,
           "message": "block not known",
           "data": null
         });
-        
+
         return;
       }
       params = [{ "Height": parseInt(b) }]
@@ -33,8 +33,7 @@ module.exports = {
       res.json(value);
 
     }).catch(err => {
-      res.status(500);
-      res.json(err)
+      res.send(err);
     })
   },
 
@@ -53,8 +52,7 @@ module.exports = {
       res.status(200);
       res.json(value.result);
     }).catch(err => {
-      res.status(500);
-      res.json(err)
+      res.send(err);
     })
   },
 
@@ -74,8 +72,7 @@ module.exports = {
       res.status(200);
       res.json(value);
     }).catch(err => {
-      res.status(500);
-      res.json(err)
+      res.send(err)
     })
   },
 
@@ -94,8 +91,7 @@ module.exports = {
       res.json(datas);
 
     } catch (err) {
-      res.status(500);
-      res.json(err);
+      res.send(err)
     }
   },
 
@@ -115,8 +111,7 @@ module.exports = {
       res.status(200);
       res.json(data);
     } catch (err) {
-      res.status(500);
-      res.json(err);
+      res.send(err)
     }
   },
 
@@ -141,8 +136,7 @@ module.exports = {
       res.status(200);
       res.json(data);
     } catch (err) {
-      res.status(500);
-      res.json(err);
+      res.send(err)
     }
   },
 
@@ -158,8 +152,7 @@ module.exports = {
       res.status(200);
       res.json(data);
     } catch (err) {
-      res.status(500);
-      res.json(err);
+      res.send(err)
     }
   },
 
