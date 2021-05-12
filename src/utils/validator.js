@@ -4,6 +4,21 @@ const { RpcApiName } = require('./constant');
 const { RequestRPC } = require('./utils')
 const  math = require('mathjs');
 
+
+function GetTotalBid(bids, address) {
+    // get total bid
+    let element = bids.find(el => el.public_key == address);
+    let self_bid =  math.bignumber(element.bid.staked_amount);
+    let total_token_delegated = math.bignumber("0");
+    let delegators = element.bid.delegators;
+    for ( let j = 0; j < delegators.length; j++) {
+        const delegated_amount = math.bignumber(delegators[j].staked_amount);
+        total_token_delegated = math.add(total_token_delegated, delegated_amount);
+    }
+    const total_bid = math.add(self_bid, total_token_delegated).toString();
+    return total_bid;
+}
+
 /**
  * Returns x raised to the n-th power.
  *
@@ -16,11 +31,20 @@ async function GetTopValidators(auction_state, era_index, number_of_validator) {
     const bids = auction_state.bids;
     const era_validator = auction_state.era_validators[era_index];
     let top_weights = [];
+    let weights = era_validator.validator_weights;
+
+    // add total_bid
+    {
+        for(let i =0;i < weights.length; i++) {
+            const total_stake = GetTotalBid(bids, weights[i].public_key);
+            weights[i]["total_stake"] = total_stake;
+        }
+    }
+
     //Get top 10 validators by weight
     {
-        let weights = era_validator.validator_weights;
         weights.sort((first, second) => {
-            return math.compare(second.weight, first.weight);
+            return math.compare(second.total_stake, first.total_stake);
         })
         top_weights = weights.slice(0, number_of_validator);
     }
@@ -30,7 +54,9 @@ async function GetTopValidators(auction_state, era_index, number_of_validator) {
     {
         for (let i = 0; i < top_weights.length; i++) {
             let element = bids.find(el => el.public_key == top_weights[i].public_key);
-            
+            const total_stake = GetTotalBid(bids, element.public_key);
+            element.bid["total_stake"] = total_stake;
+
             // Add number of delegatee
             let number_delegators = 0;
             if (element.bid.delegators !== undefined) {
@@ -43,8 +69,6 @@ async function GetTopValidators(auction_state, era_index, number_of_validator) {
             top_validators.push(element);
         }
     }
-
-    console.log("top_validators: ", top_validators);
 
     const result = {
         era_id: era_validator.era_id,
