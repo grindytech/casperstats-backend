@@ -1,5 +1,5 @@
 const { RequestRPC, GetBalance, QueryState } = require('../utils/utils');
-const { GetValidator, GetEraValidators, GetBids } = require('../utils/validator');
+const { GetValidators, GetEraValidators, GetBids } = require('../utils/validator');
 const { RpcApiName } = require('../utils/constant');
 
 require('dotenv').config();
@@ -18,8 +18,7 @@ module.exports = {
             res.status(200);
             res.json(value);
         }).catch(err => {
-            res.status(500);
-            res.json(err)
+            res.send(err);
         })
     },
 
@@ -31,8 +30,7 @@ module.exports = {
             res.status(200);
             res.json(balance);
         }catch(err) {
-            res.status(500);
-            res.json(err);
+            res.send(err);
         }
 
 
@@ -55,8 +53,7 @@ module.exports = {
             res.status(200);
             res.json(value);
         }).catch(err => {
-            res.status(500);
-            res.json(err);
+            res.send(err);
         })
     },
 
@@ -65,21 +62,19 @@ module.exports = {
             res.status(200);
             res.json(value.result);
         }).catch(err => {
-            res.status(500);
-            res.json(err)
+            res.send(err);
         })
     },
 
     GetValidators: async function (req, res) {
         const number = req.params.number;
         try {
-            const validators = await GetValidator(number);
+            const validators = await GetValidators(number);
             res.status(200);
             res.json(validators);
 
         } catch (err) {
-            res.status(500);
-            res.json(err);
+            res.send(err);
         }
     },
 
@@ -91,8 +86,7 @@ module.exports = {
             res.json(era_validators);
 
         } catch (err) {
-            res.status(500);
-            res.json(err);
+            res.send(err);
         }
 
     },
@@ -104,8 +98,7 @@ module.exports = {
             res.json(bids);
 
         } catch (err) {
-            res.status(500);
-            res.json(err);
+            res.send(err);
         }
     }
 };

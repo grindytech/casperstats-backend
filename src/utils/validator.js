@@ -14,19 +14,13 @@ const  math = require('mathjs');
 async function GetTopValidators(auction_state, era_index, number_of_validator) {
 
     const bids = auction_state.bids;
-    const era_validators = auction_state.era_validators[era_index];
+    const era_validator = auction_state.era_validators[era_index];
     let top_weights = [];
     //Get top 10 validators by weight
     {
-        let weights = era_validators.validator_weights;
+        let weights = era_validator.validator_weights;
         weights.sort((first, second) => {
-            if (first.weight > second.weight) {
-                return -1;
-            }
-            if (first.weight < second.weight) {
-                return 1;
-            }
-            return 0;
+            return math.compare(second.weight, first.weight);
         })
         top_weights = weights.slice(0, number_of_validator);
     }
@@ -50,8 +44,10 @@ async function GetTopValidators(auction_state, era_index, number_of_validator) {
         }
     }
 
+    console.log("top_validators: ", top_validators);
+
     const result = {
-        era_id: era_validators.era_id,
+        era_id: era_validator.era_id,
         validators: top_validators,
     }
 
@@ -68,7 +64,7 @@ async function GetTotalStake(auction_state, era_index) {
     return total_stake;
 }
 
-const GetValidator = async (number_of_validator) => {
+const GetValidators = async (number_of_validator) => {
 
     let result = {
         block_height: 0,
@@ -176,6 +172,6 @@ const GetBids = async () => {
 }
 
 module.exports = {
-    GetValidator, GetEraValidators, GetBids
+    GetValidators, GetEraValidators, GetBids
 }
 
