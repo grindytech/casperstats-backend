@@ -14,8 +14,7 @@ router.use("/state", state_route);
 
 // If no API routes are hit, send the React app
 router.get("*", (req, res) => {
-    res.status(200);
-    res.json("Welcome to Casper Stats");
+    res.status(500).send();
 });
 
 module.exports = router;
