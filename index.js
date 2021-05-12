@@ -7,26 +7,20 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-var corsOptions = {
-    origin: 'http://casperstats.io',
-    optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
-}
+app.use(cors());
 
-/* Nhiều domain */
-var whitelist = ['http://casperstats.com']
-var corsOptions = {
-    origin: function (origin, callback) {
-        if (whitelist.indexOf(origin) !== -1) {
-            callback(null, true)
-        } else {
-            callback(new Error('Not allowed by CORS'))
-        }
-    }
-}
+/* CROS middleware */
+app.use(function(req, res, next) {
+    // Mọi domain
+    // res.header("Access-Control-Allow-Origin", "*");
+   
+    // Domain nhất định
+    res.header("Access-Control-Allow-Origin", "https://casperstats.io");
+   
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+  });
 
-app.get('/products/:id', cors(corsOptions), function (req, res, next) {
-    res.json({ msg: 'This is CORS-enabled ' })
-})
 
 app.use(express.json());
 app.use(routes);
