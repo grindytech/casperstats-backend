@@ -7,6 +7,8 @@ require('dotenv').config();
 module.exports = {
 
     GetAccount: async function (req, res) {
+
+        // address or account hash
         let address = req.params.address;
         try{
           const account = await GetAccountData(address);
@@ -16,5 +18,4 @@ module.exports = {
           res.send(err);
         }
       },
-
 };

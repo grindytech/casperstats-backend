@@ -240,7 +240,6 @@ const GetType = async (param) => {
     
             // check normal address or validator
             const auction_info =  await (RequestRPC(RpcApiName.get_auction_info, []));
-            console.log("auction_info: ", auction_info)
             const current_validator_weights = auction_info.result.auction_state.era_validators[0].validator_weights;
             let element = current_validator_weights.find(el => el.public_key == param);
             if(element) {
