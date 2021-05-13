@@ -20,6 +20,7 @@ This project provide the REST api to interact with Casper blockchain
     - [get-block-deploy](#get-block-deploy)
     - [get-range-block](#get-range-block)
     - [get-latest-tx](#get-latest-tx)
+    - [get-proposer-blocks](#get-proposer-blocks)
 
   - [Info](#Info)
     - [get-deploy](#get-deploy)
@@ -31,6 +32,7 @@ This project provide the REST api to interact with Casper blockchain
     - [get-balance](#get-balance)
     - [get-auction-info](#get-auction-info)
     - [get-validators](#get-validators)
+    - [get-validator](#get-validator)
     - [get-era-validators](#get-era-validators)
     - [get-bids](#get-bids)
 
@@ -523,6 +525,42 @@ successResponse:
 |  |  |  |
 |  |  |  |
 
+
+### get-proposer-blocks
+
+```
+url: /chain/get-proposer-blocks?validator=&num=
+
+example: http://18.157.183.184:3030/chain/get-proposer-blocks?validator=017d96b9a63abcb61c870a4f55187a0a7ac24096bdb5fc585c12a686a4d892009e&num=2
+
+method: GET
+
+des: get number of latest transaction
+
+successResponse:
+[
+    {
+        "block_height": 32035,
+        "era_id": 406,
+        "deploys": 0,
+        "transfers": 0,
+        "timestamp": "2021-05-13T02:58:10.560Z",
+        "block_hash": "bc22422df5b3fa55a1fd120d847dfde14aebf820c3947741955f778bf54cad22"
+    },
+    {
+        "block_height": 32022,
+        "era_id": 406,
+        "deploys": 0,
+        "transfers": 0,
+        "timestamp": "2021-05-13T02:43:58.592Z",
+        "block_hash": "496a3fc3bb62d21967caa14d89d8b1ba87f47f485c98e290569b95d291f57dc1"
+    }
+]
+
+```
+
+
+
 ### Info
 
 #### get-deploy
@@ -988,7 +1026,7 @@ successResponse:
 ```
 url: /state/get-validators/:number
 
-example: http://18.157.183.184:3030/stateget-validators/3
+example: http://18.157.183.184:3030/state/get-validators/3
 
 method: GET
 
@@ -1033,6 +1071,66 @@ successResponse:
                 }
             }
         ]
+    }
+}
+
+```
+
+
+#### get-validator
+
+```
+url: /state/get-validator/:address
+
+example: http://18.157.183.184:3030/state/get-validator/017d96b9a63abcb61c870a4f55187a0a7ac24096bdb5fc585c12a686a4d892009e
+
+method: GET
+
+des: Return the information of validator
+
+
+successResponse:
+
+{
+    "public_key": "017d96b9a63abcb61c870a4f55187a0a7ac24096bdb5fc585c12a686a4d892009e",
+    "bid": {
+        "bonding_purse": "uref-cf4eb33f501ad2ee391d1d0ca0c1e9381e9edca10f3d85115f9c18474e1837ad-007",
+        "staked_amount": "99367483739340",
+        "delegation_rate": 10,
+        "delegators": [
+            {
+                "public_key": "012d2d359ac59dd92203c7fbaf7ec98dd0b16c51817e46fed69f1f66c5482bfec9",
+                "staked_amount": "10123673503",
+                "bonding_purse": "uref-e2f24f97869539f26a928dcd9fcd90d4de46c96b59242f7fa0958a4d13d11a3b-007",
+                "delegatee": "017d96b9a63abcb61c870a4f55187a0a7ac24096bdb5fc585c12a686a4d892009e"
+            },
+            {
+                "public_key": "015ba7402719a9f01a34cfa7548a625868930423ebbbe6ac64d7136a98ef5ba377",
+                "staked_amount": "101236735045",
+                "bonding_purse": "uref-9808ffc58daed94f8f3b36af1712e0b5a3790bf3a52b4c013a2c3f5096620505-007",
+                "delegatee": "017d96b9a63abcb61c870a4f55187a0a7ac24096bdb5fc585c12a686a4d892009e"
+            },
+            {
+                "public_key": "016faf01fa34c6ca0154fb4e7edf2a463b4408c432c0657c3f4f03dad80dd475dc",
+                "staked_amount": "8578174656",
+                "bonding_purse": "uref-e3da6a65e12068c48d61de7d54845d5e6d39e2c1ba34669ded1d6f312d624563-007",
+                "delegatee": "017d96b9a63abcb61c870a4f55187a0a7ac24096bdb5fc585c12a686a4d892009e"
+            },
+            {
+                "public_key": "019ff45f15e07b6c3f42744424d1bde635e8ca295a0be3f485573d4bbbba3c05c4",
+                "staked_amount": "4011712621",
+                "bonding_purse": "uref-5264a6ec0e11d8642983139ab3b4b05ccae5b04c1e4588e0b48eb69c2faf8915-007",
+                "delegatee": "017d96b9a63abcb61c870a4f55187a0a7ac24096bdb5fc585c12a686a4d892009e"
+            },
+            {
+                "public_key": "01cbed6cfe8643428bc04e4505c3495c266d19527a0d1164ab7e549831ba8d5229",
+                "staked_amount": "970460513089",
+                "bonding_purse": "uref-9471fb183700edaaa3b50a166c9cbdf8951bd61892738bf14ba0291d0d407932-007",
+                "delegatee": "017d96b9a63abcb61c870a4f55187a0a7ac24096bdb5fc585c12a686a4d892009e"
+            }
+        ],
+        "inactive": false,
+        "total_stake": "100461894548254"
     }
 }
 
