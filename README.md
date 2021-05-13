@@ -79,7 +79,7 @@ $ npm run dev
   ```
 url: /chain/get-block/:block
 
-example: http://18.157.183.184:3030/chain/get-block/69
+example: http://18.184.201.146:3030/chain/get-block/69
 
 method: GET
 
@@ -134,7 +134,7 @@ successResponse:
 ```
 url: /chain/get-block-tranfers
 
-example: http://18.157.183.184:3030/chain/get-block-tranfers/69
+example: http://18.184.201.146:3030/chain/get-block-tranfers/69
 
 method: GET
 
@@ -175,7 +175,7 @@ successResponse:
 ```
 url: /chain/get-state-root-hash/:block
 
-example: http://18.157.183.184:3030/chain/get-state-root-hash/69
+example: http://18.184.201.146:3030/chain/get-state-root-hash/69
 
 method: GET
 
@@ -208,7 +208,7 @@ successResponse:
 ```
 url: /chain/get-latest-block/:number
 
-example: http://18.157.183.184:3030/chain/get-latest-blocks/3
+example: http://18.184.201.146:3030/chain/get-latest-blocks/3
 
 method: GET
 
@@ -233,7 +233,7 @@ successResponse: block data
 ```
 url: /chain/get-block-transfer/:block
 
-example: http://18.157.183.184:3030/chain/get-block-transfer/11661
+example: http://18.184.201.146:3030/chain/get-block-transfer/11661
 
 method: GET
 
@@ -290,7 +290,7 @@ successResponse:
 ```
 url: /chain/get-block-deploy/:block
 
-example: http://18.157.183.184:3030/chain/get-block-deploy/11661
+example: http://18.184.201.146:3030/chain/get-block-deploy/11661
 
 method: GET
 
@@ -316,7 +316,7 @@ localhost:3031/chain/get-block-deploy/11661
 ```
 url: /chain/get-range-block?start=&end=
 
-example: http://18.157.183.184:3030/chain/get-range-block?start=1000&end=1005
+example: http://18.184.201.146:3030/chain/get-range-block?start=1000&end=1005
 
 method: GET
 
@@ -473,7 +473,7 @@ successResponse:
 ```
 url: /chain/get-latest-tx/:number
 
-example: http://18.157.183.184:3030/chain/get-latest-txs/3
+example: http://18.184.201.146:3030/chain/get-latest-txs/3
 
 method: GET
 
@@ -531,7 +531,7 @@ successResponse:
 ```
 url: /chain/get-proposer-blocks?validator=&num=
 
-example: http://18.157.183.184:3030/chain/get-proposer-blocks?validator=017d96b9a63abcb61c870a4f55187a0a7ac24096bdb5fc585c12a686a4d892009e&num=2
+example: http://18.184.201.146:3030/chain/get-proposer-blocks?validator=017d96b9a63abcb61c870a4f55187a0a7ac24096bdb5fc585c12a686a4d892009e&num=2
 
 method: GET
 
@@ -568,7 +568,7 @@ successResponse:
 ```
 url: /info/get-deploy/:hex
 
-example: http://18.157.183.184:3030/info/get-deploy/c51ce21e9d124bb6a9944ef4855ff42790297386c14632d8146c5ab0ee88a8ed
+example: http://18.184.201.146:3030/info/get-deploy/c51ce21e9d124bb6a9944ef4855ff42790297386c14632d8146c5ab0ee88a8ed
 
 method: GET
 
@@ -822,7 +822,7 @@ successResponse:
 ```
 url: /info/get-list-deploys?id=&b=
 
-example: http://18.157.183.184:3030/info/get-list-deploys?id=13&b=3207ff3e5d94984a6ab8de908764f8a2c8b4acbcc1ed5970b26728ac2b2b4490
+example: http://18.184.201.146:3030/info/get-list-deploys?id=13&b=3207ff3e5d94984a6ab8de908764f8a2c8b4acbcc1ed5970b26728ac2b2b4490
 
 method: GET
 
@@ -854,7 +854,7 @@ successResponse:
 ```
 url: /info/get-type/:param
 
-example: http://18.157.183.184:3030/info/get-type/db5f69c51ddacaeab0bee5c7e5665313489d99ffbbadd9208ff45092ee85476f
+example: http://18.184.201.146:3030/info/get-type/db5f69c51ddacaeab0bee5c7e5665313489d99ffbbadd9208ff45092ee85476f
 
 method: GET
 
@@ -888,7 +888,7 @@ successResponse:
 ```
 url: /sate/query-state?id=&s=&k=
 
-example: http://18.157.183.184:3030/state/query-state?id=12&s=97d55e7074133c9bf7ff1d7b1c9c6f5f84bff888bf0087f16d139356d334170f&k=01aea113d82a9d562563a2802b1abee7ac1ea40b6c100ddeda8e9be5666e1319dc
+example: http://18.184.201.146:3030/state/query-state?id=12&s=97d55e7074133c9bf7ff1d7b1c9c6f5f84bff888bf0087f16d139356d334170f&k=01aea113d82a9d562563a2802b1abee7ac1ea40b6c100ddeda8e9be5666e1319dc
 
 method: GET
 
@@ -945,7 +945,7 @@ successResponse:
 1.
 url: /state/get-balance/:address
 
-example: http://18.157.183.184:3030/state/get-balance/01aea113d82a9d562563a2802b1abee7ac1ea40b6c100ddeda8e9be5666e1319dc
+example: http://18.184.201.146:3030/state/get-balance/01aea113d82a9d562563a2802b1abee7ac1ea40b6c100ddeda8e9be5666e1319dc
 
 method: GET
 
@@ -954,7 +954,7 @@ des: Retrieves a purse's balance from the network
 2.
 url: /state/get-balance?id=&s=&p=
 
-example: http://18.157.183.184:3030/state/get-balance?id=12&s=97d55e7074133c9bf7ff1d7b1c9c6f5f84bff888bf0087f16d139356d334170f&p=uref-52d2021cafe721b5b114c3e45852178541e32ea1a904f904761a66d3dc804da0-007
+example: http://18.184.201.146:3030/state/get-balance?id=12&s=97d55e7074133c9bf7ff1d7b1c9c6f5f84bff888bf0087f16d139356d334170f&p=uref-52d2021cafe721b5b114c3e45852178541e32ea1a904f904761a66d3dc804da0-007
 
 method: GET
 
@@ -988,7 +988,7 @@ successResponse:
 ```
 url: /state/get-auction-info
 
-example: http://18.157.183.184:3030/state/get-auction-info
+example: http://18.184.201.146:3030/state/get-auction-info
 
 method: GET
 
@@ -1026,7 +1026,7 @@ successResponse:
 ```
 url: /state/get-validators/:number
 
-example: http://18.157.183.184:3030/state/get-validators/3
+example: http://18.184.201.146:3030/state/get-validators/3
 
 method: GET
 
@@ -1082,7 +1082,7 @@ successResponse:
 ```
 url: /state/get-validator/:address
 
-example: http://18.157.183.184:3030/state/get-validator/017d96b9a63abcb61c870a4f55187a0a7ac24096bdb5fc585c12a686a4d892009e
+example: http://18.184.201.146:3030/state/get-validator/017d96b9a63abcb61c870a4f55187a0a7ac24096bdb5fc585c12a686a4d892009e
 
 method: GET
 
@@ -1143,7 +1143,7 @@ successResponse:
 ```
 url: /state/get-era-validators
 
-example: http://18.157.183.184:3030/state/get-era-validators
+example: http://18.184.201.146:3030/state/get-era-validators
 
 method: GET
 
@@ -1160,7 +1160,7 @@ successResponse: validators information
 ```
 url: /state/get-era-validators
 
-example: http://18.157.183.184:3030/state/get-bids
+example: http://18.184.201.146:3030/state/get-bids
 
 method: GET
 

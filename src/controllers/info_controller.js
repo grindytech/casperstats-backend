@@ -1,5 +1,4 @@
-const { GetDeploy, GetType } = require('../utils/utils');
-const { Execute } = require('../utils/utils');
+const { GetDeploy, GetType } = require('../utils/common');
 
 const { RpcApiName, ELEMENT_TYPE } = require('../utils/constant');
 

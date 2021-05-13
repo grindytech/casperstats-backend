@@ -1,7 +1,7 @@
 const { RequestRPC, GetHeight, GetTxhashes,
   GetDeployhashes, GetDeploy, DoesDeploySuccess,
   GetTransfersFromDeploy, GetTransferDetail, GetBlock,
-  GetLatestTx } = require('../utils/utils');
+  GetLatestTx } = require('../utils/chain');
 const { RpcApiName } = require('../utils/constant');
 const { GetBlocksByProposer } = require('../utils/validator');
 

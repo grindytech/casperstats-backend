@@ -1,6 +1,8 @@
-const { RequestRPC, GetBalance, QueryState } = require('../utils/utils');
+const { RequestRPC, QueryState } = require('../utils/chain');
+const {GetBalance} = require('../utils/account');
 const { GetValidators, GetEraValidators, GetBids, GetValidatorData } = require('../utils/validator');
 const { RpcApiName } = require('../utils/constant');
+
 
 require('dotenv').config();
 
