@@ -3,7 +3,7 @@ const chain_controller = require('../controllers/chain_controller');
 
 router.route("/get-block/:block").get(chain_controller.GetBlock);
 router.route("/get-latest-blocks/:number").get(chain_controller.GetLatestBlocks);
-router.route("/get-block-tranfers/:block").get(chain_controller.GetBlockTx);
+router.route("/get-block-transfers/:block").get(chain_controller.GetBlockTx);
 router.route("/get-state-root-hash/:block").get(chain_controller.GetStateRootHash);
 router.route("/get-range-block").get(chain_controller.GetRangeBlock);
 
