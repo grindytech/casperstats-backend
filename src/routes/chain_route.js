@@ -7,7 +7,7 @@ router.route("/get-block-transfers/:block").get(chain_controller.GetBlockTx);
 router.route("/get-state-root-hash/:block").get(chain_controller.GetStateRootHash);
 router.route("/get-range-block").get(chain_controller.GetRangeBlock);
 
-router.route("/get-block-transfer/:block").get(chain_controller.GetBlockTransferTx);
+// router.route("/get-block-transfer/:block").get(chain_controller.GetBlockTransferTx);
 router.route("/get-block-deploy/:block").get(chain_controller.GetBlockDeployTx);
 
 // router for transaction
