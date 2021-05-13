@@ -10,7 +10,7 @@ This project provide the REST api to interact with Casper blockchain
   - [Installation](#installation)
 - [API](#API)
   - [Account](#Account)
-  
+    - [get-account](#get-account)
   - [Chain](#Chain)
     - [get-block](#get-block)
     - [get-block-tranfers](#get-block-tranfers)
@@ -70,6 +70,26 @@ $ npm run dev
 ## API
 
 ### Account
+
+
+  #### get-account
+  
+  ```
+url: /chain/get-account/:address
+
+example: http://18.184.201.146:3030/account/get-account/0190c434129ecbaeb34d33185ab6bf97c3c493fc50121a56a9ed8c4c52855b5ac1
+
+method: GET
+
+des:  Get information of the account
+
+successResponse:
+{
+    "public_key": "0190c434129ecbaeb34d33185ab6bf97c3c493fc50121a56a9ed8c4c52855b5ac1",
+    "account_hash": "41a5d1bc379d235fa0e745b04eb32af590ec064279c8d44f50865e55f8347836",
+    "balance": "29019240000"
+}
+```
 
 
 ### Chain
