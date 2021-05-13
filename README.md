@@ -1040,7 +1040,7 @@ successResponse:
 ```
 
 
-#### get-validators
+#### get-validator
 
 ```
 url: /state/get-validator/:address
