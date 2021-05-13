@@ -1,9 +1,8 @@
 const dotenv = require("dotenv");
 dotenv.config();
-const request = require('request');
 const { RpcApiName, ELEMENT_TYPE } = require('./constant');
-const { exec } = require("child_process");
 const account_fn = require('./account');
+const { GetHeight, RequestRPC } = require("./common");
 
 
 const GetTxhashes = async (block) => {
@@ -182,7 +181,6 @@ const GetLatestTx = async (number_of_tx) => {
     while (true) {
         let transfer = await GetTransfersInBlock(i);
         result.push(...transfer.transfers);
-
         if (result.length >= number_of_tx) {
             break;
         }

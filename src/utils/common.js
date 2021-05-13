@@ -169,6 +169,6 @@ const GetHeight = async () => {
 module.exports = {
     GetAccountData, GetHeight, QueryState, 
     GetLatestStateRootHash, Execute, GetBalance,
-    GetAccountHash
+    GetAccountHash, RequestRPC
 }
 

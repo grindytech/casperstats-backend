@@ -1,7 +1,7 @@
 const dotenv = require("dotenv");
 dotenv.config();
 const { RpcApiName } = require('./constant');
-const { RequestRPC, GetHeight } = require('./chain')
+const { RequestRPC, GetHeight } = require('./common')
 const math = require('mathjs');
 
 

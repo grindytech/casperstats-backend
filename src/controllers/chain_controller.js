@@ -1,7 +1,7 @@
-const { RequestRPC, GetHeight, GetTxhashes,
-  GetDeployhashes, GetDeploy, DoesDeploySuccess,
-  GetTransfersFromDeploy, GetTransferDetail, GetBlock,
+const {
+  GetDeployhashes, GetDeploy, GetBlock,
   GetLatestTx } = require('../utils/chain');
+const { RequestRPC, GetHeight } = require('../utils/common');
 const { RpcApiName } = require('../utils/constant');
 const { GetBlocksByProposer } = require('../utils/validator');
 
@@ -176,7 +176,6 @@ module.exports = {
     try {
       const num = req.params.number;
       const result = await GetLatestTx(num);
-
       res.status(200);
       res.json(result);
     } catch (err) {
@@ -192,7 +191,6 @@ module.exports = {
       res.status(200);
       res.json(data);
     } catch (err) {
-      console.log(err);
       res.send(err);
     }
   }

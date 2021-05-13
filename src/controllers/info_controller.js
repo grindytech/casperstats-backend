@@ -1,7 +1,7 @@
-const { GetDeploy, GetType } = require('../utils/common');
+const { GetDeploy, GetType } = require('../utils/chain');
 
 const { RpcApiName, ELEMENT_TYPE } = require('../utils/constant');
-
+const {Execute} = require('../utils/common');
 require('dotenv').config();
 
 module.exports = {

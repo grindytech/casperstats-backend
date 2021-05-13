@@ -1,5 +1,4 @@
-const { RequestRPC, QueryState } = require('../utils/chain');
-const {GetBalance} = require('../utils/account');
+const { RequestRPC, QueryState, GetBalance} = require('../utils/common');
 const { GetValidators, GetEraValidators, GetBids, GetValidatorData } = require('../utils/validator');
 const { RpcApiName } = require('../utils/constant');
 
