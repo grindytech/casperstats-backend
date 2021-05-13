@@ -1,5 +1,5 @@
 const { RequestRPC, GetBalance, QueryState } = require('../utils/utils');
-const { GetValidators, GetEraValidators, GetBids } = require('../utils/validator');
+const { GetValidators, GetEraValidators, GetBids, GetValidatorData } = require('../utils/validator');
 const { RpcApiName } = require('../utils/constant');
 
 require('dotenv').config();
@@ -99,6 +99,18 @@ module.exports = {
 
         } catch (err) {
             res.send(err);
+        }
+    },
+
+    GetValidator: async function (req, res) {
+        try {
+            const address = req.params.address;
+            const data = await GetValidatorData(address);
+            res.status(200);
+            res.json(data);
+        } catch(err) {
+            console.log(err);
+            res.send(err.message);
         }
     }
 };

@@ -195,7 +195,26 @@ const GetBids = async () => {
     return auction_info;
 }
 
+
+const GetValidatorData = async (address) => {
+    const auction_info = (await RequestRPC(RpcApiName.get_auction_info, [])).result;
+
+    // get total bid
+    let bids = auction_info.auction_state.bids;
+    let element = bids.find(el => el.public_key == address);
+
+    if(element) {
+        const total_stake = GetTotalBid(bids, element.public_key);
+        element.bid["total_stake"] = total_stake;
+    }
+    return element;
+}
+
+const GetBlocksByProposer = async (validator_address, number_of_block) => {
+
+}
+
 module.exports = {
-    GetValidators, GetEraValidators, GetBids
+    GetValidators, GetEraValidators, GetBids, GetValidatorData, GetBlocksByProposer
 }
 
