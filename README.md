@@ -16,7 +16,7 @@ This project provide the REST api to interact with Casper blockchain
     - [get-block-tranfers](#get-block-tranfers)
     - [get-state-root-hash](#get-state-root-hash)
     - [get-latest-blocks](#get-latest-blocks)
-    - [get-block-transfer](#get-block-transfer)
+    - [get-block-transfers](#get-block-transfer)
     - [get-block-deploy](#get-block-deploy)
     - [get-range-block](#get-range-block)
     - [get-latest-tx](#get-latest-tx)
