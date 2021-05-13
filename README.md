@@ -20,6 +20,7 @@ This project provide the REST api to interact with Casper blockchain
     - [get-block-deploy](#get-block-deploy)
     - [get-range-block](#get-range-block)
     - [get-latest-tx](#get-latest-tx)
+    - [get-proposer-blocks](#get-proposer-blocks)
 
   - [Info](#Info)
     - [get-deploy](#get-deploy)
@@ -523,6 +524,42 @@ successResponse:
 | ------------- | ------------- | ------------- |
 |  |  |  |
 |  |  |  |
+
+
+### get-proposer-blocks
+
+```
+url: /chain/get-proposer-blocks?validator=&num=
+
+example: http://18.157.183.184:3030/chain/get-proposer-blocks?validator=017d96b9a63abcb61c870a4f55187a0a7ac24096bdb5fc585c12a686a4d892009e&num=2
+
+method: GET
+
+des: get number of latest transaction
+
+successResponse:
+[
+    {
+        "block_height": 32035,
+        "era_id": 406,
+        "deploys": 0,
+        "transfers": 0,
+        "timestamp": "2021-05-13T02:58:10.560Z",
+        "block_hash": "bc22422df5b3fa55a1fd120d847dfde14aebf820c3947741955f778bf54cad22"
+    },
+    {
+        "block_height": 32022,
+        "era_id": 406,
+        "deploys": 0,
+        "transfers": 0,
+        "timestamp": "2021-05-13T02:43:58.592Z",
+        "block_hash": "496a3fc3bb62d21967caa14d89d8b1ba87f47f485c98e290569b95d291f57dc1"
+    }
+]
+
+```
+
+
 
 ### Info
 
