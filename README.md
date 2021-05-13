@@ -998,64 +998,42 @@ des: Return the number of top validator by total stake
 successResponse:
 
 {
-    "block_height": 26868,
+    "block_height": 31104,
     "total_active_validators": 100,
-    "total_bid_validators": 793,
-    "total_stake": 1448369395576771,
-    "era_validators": [
-        {
-            "era_id": 347,
-            "validators": [
-                {
-                    "public_key": "017d96b9a63abcb61c870a4f55187a0a7ac24096bdb5fc585c12a686a4d892009e",
-                    "bid": {
-                        "staked_amount": "84233389535392",
-                        "delegation_rate": 10
-                    }
-                },
-                {
-                    "public_key": "0106ca7c39cd272dbf21a86eeb3b36b7c26e2e9b94af64292419f7862936bca2ca",
-                    "bid": {
-                        "staked_amount": "84233126725902",
-                        "delegation_rate": 10
-                    }
-                },
-                {
-                    "public_key": "01a854ee50171a515aa9b0214fbc8b3438ff9100e8b1411a8dce432aa68ea5f73a",
-                    "bid": {
-                        "staked_amount": "1447726537285",
-                        "delegation_rate": 10
-                    }
+    "total_bid_validators": 813,
+    "total_stake": "1556302398004137",
+    "era_validators": {
+        "era_id": 398,
+        "validators": [
+            {
+                "public_key": "017d96b9a63abcb61c870a4f55187a0a7ac24096bdb5fc585c12a686a4d892009e",
+                "bid": {
+                    "staked_amount": "96635006989003",
+                    "delegation_rate": 10,
+                    "delegators": 0,
+                    "total_stake": "96635006989003"
                 }
-            ]
-        },
-        {
-            "era_id": 348,
-            "validators": [
-                {
-                    "public_key": "017d96b9a63abcb61c870a4f55187a0a7ac24096bdb5fc585c12a686a4d892009e",
-                    "bid": {
-                        "staked_amount": "84233389535392",
-                        "delegation_rate": 10
-                    }
-                },
-                {
-                    "public_key": "0106ca7c39cd272dbf21a86eeb3b36b7c26e2e9b94af64292419f7862936bca2ca",
-                    "bid": {
-                        "staked_amount": "84233126725902",
-                        "delegation_rate": 10
-                    }
-                },
-                {
-                    "public_key": "01a854ee50171a515aa9b0214fbc8b3438ff9100e8b1411a8dce432aa68ea5f73a",
-                    "bid": {
-                        "staked_amount": "1447726537285",
-                        "delegation_rate": 10
-                    }
+            },
+            {
+                "public_key": "0106ca7c39cd272dbf21a86eeb3b36b7c26e2e9b94af64292419f7862936bca2ca",
+                "bid": {
+                    "staked_amount": "96634705486266",
+                    "delegation_rate": 10,
+                    "delegators": 0,
+                    "total_stake": "96634705486266"
                 }
-            ]
-        }
-    ]
+            },
+            {
+                "public_key": "0105220d6629f6ef4484e2da5f58b6222832af8cabba4fbd7f1ad55e84a06ab319",
+                "bid": {
+                    "staked_amount": "50180676771243",
+                    "delegation_rate": 10,
+                    "delegators": 0,
+                    "total_stake": "50180676771243"
+                }
+            }
+        ]
+    }
 }
 
 ```
