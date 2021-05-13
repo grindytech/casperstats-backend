@@ -235,9 +235,17 @@ const GetType = async (param) => {
     } else {
 
         try {
+
+            // account-hash address
+            if (param.includes('account-hash-')) {
+                return {
+                    value: param,
+                    type: ELEMENT_TYPE.PUBLIC_KEY_HASH,
+                };
+            }
+
             // Check address
             await GetAccountHash(param);
-    
             // check normal address or validator
             const auction_info =  await (RequestRPC(RpcApiName.get_auction_info, []));
             const current_validator_weights = auction_info.result.auction_state.era_validators[0].validator_weights;
@@ -248,7 +256,8 @@ const GetType = async (param) => {
                     type: ELEMENT_TYPE.VALIDATOR,
                 };
             }
-    
+            
+            // public key hex
             return {
                 value: param,
                 type: ELEMENT_TYPE.PUBLIC_KEY_HEX,

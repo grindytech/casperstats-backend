@@ -10,6 +10,7 @@ const RpcApiName = {
 
 const ELEMENT_TYPE = {
     PUBLIC_KEY_HEX: "PUBLIC_KEY_HEX", //account address
+    PUBLIC_KEY_HASH: "PUBLIC_KEY_HASH",
     BLOCK_HEIGHT: "BLOCK_HEIGHT",
     BLOCK_HASH: "BLOCK_HASH",
     DEPLOY_HEX: "DEPLOY_HEX",
