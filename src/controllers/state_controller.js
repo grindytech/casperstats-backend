@@ -84,7 +84,6 @@ module.exports = {
             const era_validators = await GetEraValidators();
             res.status(200);
             res.json(era_validators);
-
         } catch (err) {
             res.send(err);
         }
@@ -109,7 +108,6 @@ module.exports = {
             res.status(200);
             res.json(data);
         } catch(err) {
-            console.log(err);
             res.send(err.message);
         }
     }

@@ -1,17 +1,17 @@
 const dotenv = require("dotenv");
 dotenv.config();
 const { RpcApiName } = require('./constant');
-const { RequestRPC } = require('./utils')
-const  math = require('mathjs');
+const { RequestRPC, GetHeight } = require('./utils')
+const math = require('mathjs');
 
 
 function GetTotalBid(bids, address) {
     // get total bid
     let element = bids.find(el => el.public_key == address);
-    let self_bid =  math.bignumber(element.bid.staked_amount);
+    let self_bid = math.bignumber(element.bid.staked_amount);
     let total_token_delegated = math.bignumber("0");
     let delegators = element.bid.delegators;
-    for ( let j = 0; j < delegators.length; j++) {
+    for (let j = 0; j < delegators.length; j++) {
         const delegated_amount = math.bignumber(delegators[j].staked_amount);
         total_token_delegated = math.add(total_token_delegated, delegated_amount);
     }
@@ -35,7 +35,7 @@ async function GetTopValidators(auction_state, era_index, number_of_validator) {
 
     // add total_bid
     {
-        for(let i =0;i < weights.length; i++) {
+        for (let i = 0; i < weights.length; i++) {
             const total_stake = GetTotalBid(bids, weights[i].public_key);
             weights[i]["total_stake"] = total_stake;
         }
@@ -62,7 +62,7 @@ async function GetTopValidators(auction_state, era_index, number_of_validator) {
             if (element.bid.delegators !== undefined) {
                 number_delegators = element.bid.delegators.length;
             }
-            
+
             delete element.bid["bonding_purse"];
             element.bid["delegators"] = number_delegators;
             delete element.bid["inactive"];
@@ -131,19 +131,19 @@ const GetEraValidators = async () => {
     // get total stake
     const total_stake_current_era = await GetTotalStake(auction_info.auction_state, 0);
     const total_stake_next_era = await GetTotalStake(auction_info.auction_state, 1);
-    
+
     auction_info.auction_state.era_validators[0]["total_stake"] = total_stake_current_era.toString();
     auction_info.auction_state.era_validators[1]["total_stake"] = total_stake_next_era.toString();
 
-    
+
     // Add number of delegators
     {
-        const bids  = auction_info.auction_state.bids;
-        for(let era_index = 0 ; era_index < 2; era_index++) {
+        const bids = auction_info.auction_state.bids;
+        for (let era_index = 0; era_index < 2; era_index++) {
             const validator_weights = auction_info.auction_state.era_validators[era_index].validator_weights;
-            for(let i = 0; i< validator_weights.length; i++) {
+            for (let i = 0; i < validator_weights.length; i++) {
                 let public_key = validator_weights[i].public_key;
-                
+
                 let element = bids.find(el => el.public_key == public_key);
 
                 const num_of_delegators = element.bid.delegators.length;
@@ -151,12 +151,12 @@ const GetEraValidators = async () => {
             }
         }
     }
- 
+
     //remove bids
     delete auction_info.auction_state.bids;
-    
+
     // sort validators by weight
-    for(let era_index =0 ; era_index < 2; era_index++) {
+    for (let era_index = 0; era_index < 2; era_index++) {
         auction_info.auction_state.era_validators[era_index].validator_weights.sort((first, second) => {
             return math.compare(second.weight, first.weight);
         })
@@ -171,12 +171,12 @@ const GetBids = async () => {
     // get total bid
     let bids = auction_info.auction_state.bids;
 
-    for( let i=0 ;i < bids.length ; i++) {
-        let self_bid =  math.bignumber(bids[i].bid.staked_amount);
+    for (let i = 0; i < bids.length; i++) {
+        let self_bid = math.bignumber(bids[i].bid.staked_amount);
 
         let total_token_delegated = math.bignumber("0");
         let delegators = bids[i].bid.delegators;
-        for ( let j = 0; j < delegators.length; j++) {
+        for (let j = 0; j < delegators.length; j++) {
             const delegated_amount = math.bignumber(delegators[j].staked_amount);
             total_token_delegated = math.add(total_token_delegated, delegated_amount);
         }
@@ -190,7 +190,7 @@ const GetBids = async () => {
 
     // sort bids by total_bid
     auction_info.auction_state.bids.sort((first, second) => {
-       return math.compare(second.total_bid, first.total_bid);
+        return math.compare(second.total_bid, first.total_bid);
     })
     return auction_info;
 }
@@ -203,7 +203,7 @@ const GetValidatorData = async (address) => {
     let bids = auction_info.auction_state.bids;
     let element = bids.find(el => el.public_key == address);
 
-    if(element) {
+    if (element) {
         const total_stake = GetTotalBid(bids, element.public_key);
         element.bid["total_stake"] = total_stake;
     }
@@ -211,7 +211,31 @@ const GetValidatorData = async (address) => {
 }
 
 const GetBlocksByProposer = async (validator_address, number_of_block) => {
+    const height = await GetHeight();
 
+    let blocks = [];
+    for (let i = height; i >= 0; i--) {
+        let params = [{ "Height": parseInt(i) }]
+        const block = await RequestRPC(RpcApiName.get_block, params);
+
+        if(block.result.block.body.proposer == validator_address) {
+
+            let brief_data = {
+                block_height: block.result.block.header.height,
+                era_id:  block.result.block.header.era_id,
+                deploys: block.result.block.body.deploy_hashes.length,
+                transfers: block.result.block.body.transfer_hashes.length,
+                timestamp: block.result.block.header.timestamp,
+                block_hash: block.result.block.hash,
+            }
+
+            blocks.push(brief_data);
+            if(blocks.length == number_of_block) {
+                break;
+            }
+        }
+    }
+    return blocks;
 }
 
 module.exports = {

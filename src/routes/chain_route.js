@@ -12,7 +12,9 @@ router.route("/get-block-deploy/:block").get(chain_controller.GetBlockDeployTx);
 
 // router for transaction
 router.route("/get-total-tx").get(chain_controller.GetTotalNumberTx);
-
 router.route("/get-latest-txs/:number").get(chain_controller.GetLatestTx);
+
+// blocks
+router.route("/get-proposer-blocks").get(chain_controller.GetBlocksByProposer);
 
 module.exports = router;

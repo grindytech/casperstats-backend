@@ -3,6 +3,7 @@ const { RequestRPC, GetHeight, GetTxhashes,
   GetTransfersFromDeploy, GetTransferDetail, GetBlock,
   GetLatestTx } = require('../utils/utils');
 const { RpcApiName } = require('../utils/constant');
+const { GetBlocksByProposer } = require('../utils/validator');
 
 require('dotenv').config();
 
@@ -181,5 +182,20 @@ module.exports = {
     } catch (err) {
       res.send(err);
     }
+  },
+
+  GetBlocksByProposer: async function (req, res) {
+    const validator = req.query.validator;
+    const number_of_blocks = req.query.num;
+    try {
+      const data = await GetBlocksByProposer(validator, number_of_blocks);
+      res.status(200);
+      res.json(data);
+    } catch (err) {
+      console.log(err);
+      res.send(err);
+    }
   }
+
+
 };
