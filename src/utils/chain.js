@@ -2,7 +2,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 const { RpcApiName, ELEMENT_TYPE } = require('./constant');
 const account_fn = require('./account');
-const { GetHeight, RequestRPC } = require("./common");
+const { GetHeight, RequestRPC, GetAccountHash } = require("./common");
 
 
 const GetTxhashes = async (block) => {
@@ -193,26 +193,7 @@ const GetLatestTx = async (number_of_tx) => {
 
 
 const GetType = async (param) => {
-    if (param.length == 66) { // public_key hex
-        await account_fn.GetBalance(param)
-
-        // check normal address or validator
-        const auction_info =  await (RequestRPC(RpcApiName.get_auction_info, []));
-        const current_validator_weights = auction_info.result.auction_state.era_validators[0].validator_weights;
-        let element = current_validator_weights.find(el => el.public_key == param);
-        if(element) {
-            return {
-                value: param,
-                type: ELEMENT_TYPE.VALIDATOR,
-            };
-        }
-
-        return {
-            value: param,
-            type: ELEMENT_TYPE.PUBLIC_KEY_HEX,
-        };
-
-    } else if (!isNaN(param)) { //block height
+    if (!isNaN(param)) { //block height
         let params = [{ "Height": parseInt(param) }]
 
         await RequestRPC(RpcApiName.get_block, params);
@@ -234,6 +215,7 @@ const GetType = async (param) => {
                 type: ELEMENT_TYPE.BLOCK_HASH,
             };
         } catch (err) {
+            console.log(err);
 
         }
 
@@ -251,6 +233,31 @@ const GetType = async (param) => {
         }
 
     } else {
+
+        try {
+            // Check address
+            await GetAccountHash(param);
+    
+            // check normal address or validator
+            const auction_info =  await (RequestRPC(RpcApiName.get_auction_info, []));
+            console.log("auction_info: ", auction_info)
+            const current_validator_weights = auction_info.result.auction_state.era_validators[0].validator_weights;
+            let element = current_validator_weights.find(el => el.public_key == param);
+            if(element) {
+                return {
+                    value: param,
+                    type: ELEMENT_TYPE.VALIDATOR,
+                };
+            }
+    
+            return {
+                value: param,
+                type: ELEMENT_TYPE.PUBLIC_KEY_HEX,
+            };
+        } catch(err) {
+            console.log(err);
+        }
+
         return {
             value: param,
             type: ELEMENT_TYPE.UNKNOWN,
