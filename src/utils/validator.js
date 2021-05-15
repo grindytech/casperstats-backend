@@ -206,6 +206,12 @@ const GetValidatorData = async (address) => {
     if (element) {
         const total_stake = GetTotalBid(bids, element.public_key);
         element.bid["total_stake"] = total_stake;
+    } else {
+        throw ({
+            "code": -32000,
+            "message": "validator not known",
+            "data": null
+            })
     }
     return element;
 }

@@ -109,7 +109,7 @@ module.exports = {
             res.status(200);
             res.json(data);
         } catch(err) {
-            res.send(err.message);
+            res.send(err);
         }
     }
 };
