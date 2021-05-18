@@ -2,7 +2,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 const { RpcApiName, ELEMENT_TYPE } = require('./constant');
 const account_fn = require('./account');
-const { GetHeight, RequestRPC, GetAccountHash } = require("./common");
+const { GetHeight, RequestRPC, GetAccountHash, GetBalanceByAccountHash } = require("./common");
 
 
 const GetTxhashes = async (block) => {
@@ -192,84 +192,152 @@ const GetLatestTx = async (number_of_tx) => {
 
 
 
+async function IsBlockHeight(param) {
+    try {
+        if (!isNaN(param)) { //block height
+            let params = [{ "Height": parseInt(param) }]
+            await RequestRPC(RpcApiName.get_block, params);
+            return true;
+        }
+    } catch (err) {
+
+    }
+    return false
+}
+
+async function IsBlockHash(param) {
+    if (param.length == 64) {  //block hash
+        // check block hash
+        try {
+            let params = [{ "Hash": param }]
+            await RequestRPC(RpcApiName.get_block, params);
+            return true;
+        } catch (err) { }
+    }
+    return false;
+}
+
+async function IsDeployHash(param) {
+    if (param.length == 64) {
+        try {
+            let deploy_info = await GetDeploy(param);
+            if (deploy_info.deploy.header.type == "deploy") {
+                return true;
+            }
+        } catch (err) { }
+    }
+    return false;
+}
+
+async function IsTransferHash(param) {
+    if (param.length == 64) {
+        try {
+            let deploy_info = await GetDeploy(param);
+            if (deploy_info.deploy.header.type == "transfer") {
+                return true;
+            }
+        } catch (err) { }
+    }
+    return false;
+}
+
+async function IsValidatorAddress(param) {
+    try {
+        const auction_info = await (RequestRPC(RpcApiName.get_auction_info, []));
+        const current_validator_weights = auction_info.result.auction_state.era_validators[0].validator_weights;
+        let element = current_validator_weights.find(el => el.public_key == param);
+        if (element) {
+            return true;
+        }
+    } catch (err) { }
+    return false;
+}
+
+async function IsAccountHash(param) {
+    try {
+        if(param.includes('account-hash-')) {
+            return true;
+        } 
+        let account_hash = "account-hash-" + param;
+        await GetBalanceByAccountHash(account_hash);
+        return true;
+    }catch(err) {}
+    return false;
+}
+
+async function IsPublicKeyHex(param) {
+    try {
+        await GetAccountHash(param);
+        return true;
+    }catch(err){}
+    return false;
+}
+
 const GetType = async (param) => {
-    if (!isNaN(param)) { //block height
-        let params = [{ "Height": parseInt(param) }]
 
-        await RequestRPC(RpcApiName.get_block, params);
+    // clean the input
+    param = param.replace(/\s+/g, '');
 
+    const is_blockheight = await IsBlockHeight(param);
+    if (is_blockheight) {
         return {
             value: param,
             type: ELEMENT_TYPE.BLOCK_HEIGHT,
         };
-    } else if (param.length == 64) {  //block hash | deploy hex | transfer hex
+    }
 
-        // check block hash
-        try {
-            let params = [{ "Hash": param }]
-
-            await RequestRPC(RpcApiName.get_block, params);
-
-            return {
-                value: param,
-                type: ELEMENT_TYPE.BLOCK_HASH,
-            };
-        } catch (err) {
-            console.log(err);
-
-        }
-
-        let deploy_info = await GetDeploy(param);
-        if(deploy_info.deploy.header.type == "deploy") {
-            return {
-                value: param,
-                type: ELEMENT_TYPE.DEPLOY_HEX,
-            };
-        } else if (deploy_info.deploy.header.type == "transfer") {
-            return {
-                value: param,
-                type: ELEMENT_TYPE.TRANSFER_HEX,
-            };
-        }
-
-    } else {
-
-        try {
-
-            // account-hash address
-            if (param.includes('account-hash-')) {
-                return {
-                    value: param,
-                    type: ELEMENT_TYPE.PUBLIC_KEY_HASH,
-                };
-            }
-
-            // Check address
-            await GetAccountHash(param);
-            // check normal address or validator
-            const auction_info =  await (RequestRPC(RpcApiName.get_auction_info, []));
-            const current_validator_weights = auction_info.result.auction_state.era_validators[0].validator_weights;
-            let element = current_validator_weights.find(el => el.public_key == param);
-            if(element) {
-                return {
-                    value: param,
-                    type: ELEMENT_TYPE.VALIDATOR,
-                };
-            }
-            
-            // public key hex
-            return {
-                value: param,
-                type: ELEMENT_TYPE.PUBLIC_KEY_HEX,
-            };
-        } catch(err) {
-            console.log(err);
-        }
-
+    const is_block_hash = await IsBlockHash(param);
+    if (is_block_hash) {
         return {
             value: param,
-            type: ELEMENT_TYPE.UNKNOWN,
+            type: ELEMENT_TYPE.BLOCK_HASH,
+        };
+    }
+
+    const is_deploy_hash = await IsDeployHash(param);
+    if (is_deploy_hash) {
+        return {
+            value: param,
+            type: ELEMENT_TYPE.DEPLOY_HEX,
         }
+    }
+
+    const is_transfer_hash = await IsTransferHash(param);
+    if (is_transfer_hash) {
+        return {
+            value: param,
+            type: ELEMENT_TYPE.TRANSFER_HEX,
+        }
+    }
+
+    const is_validator_address = await IsValidatorAddress(param);
+    if (is_validator_address) {
+        return {
+            value: param,
+            type: ELEMENT_TYPE.VALIDATOR,
+        }
+    }
+
+    const is_account_hash = await IsAccountHash(param);
+    if(is_account_hash) {
+        return {
+            value: param,
+            type: ELEMENT_TYPE.PUBLIC_KEY_HASH,
+        }
+    }
+
+
+    const is_pk_hex = await IsPublicKeyHex(param);
+    if(is_pk_hex) {
+        return {
+            value: param,
+            type: ELEMENT_TYPE.PUBLIC_KEY_HEX,
+        }
+    }
+
+    return {
+        value: param,
+        type: ELEMENT_TYPE.UNKNOWN,
     }
 }
 
