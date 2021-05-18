@@ -12,10 +12,10 @@ async function GetAccountData(address) {
         account_hash = address;
         public_key = null;
     } else
-    
     // try to get account hash if it's publickey otherwise it's an account hash
     try {
         account_hash = await common.GetAccountHash(address);
+        account_hash = "account-hash-" + account_hash.replace(/\n/g, '');
         public_key = address;
     } catch (err) {
         account_hash = "account-hash-" + address;
