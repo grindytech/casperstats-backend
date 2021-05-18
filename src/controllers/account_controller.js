@@ -15,6 +15,7 @@ module.exports = {
           res.json(account);
 
         }catch(err) {
+          console.log(err);
           res.send(err);
         }
       },

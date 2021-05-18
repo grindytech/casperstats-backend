@@ -27,7 +27,6 @@ app.get('/favicon.ico', (req, res) => {
   res.sendStatus(200);
 });
 
-
 app.use(express.json());
 app.use(routes);
 

@@ -12,7 +12,7 @@ router.use("/chain", chain_route);
 router.use("/info", info_route);
 router.use("/state", state_route);
 
-// If no API routes are hit, send the React app
+// If no API routes are hit, send the error
 router.get("*", (req, res) => {
     res.status(500).send();
 });

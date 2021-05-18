@@ -1,9 +1,9 @@
 const router = require('express').Router();
 const state_controller = require('../controllers/state_controller');
 
-router.route("/get-balance").get(state_controller.GetBalance);
-router.route("/get-balance/:address").get(state_controller.GetBalanceV2);
-router.route("/query-state").get(state_controller.QueryState);
+router.route("/get-balance-v2/:account_hash").get(state_controller.GetBalanceAccountHash);
+router.route("/get-balance/:address").get(state_controller.GetBalanceAddress);
+router.route("/query-state/:key").get(state_controller.QueryState);
 
 // Auction and staking
 router.route("/get-auction-info").get(state_controller.GetAuctionInfo);

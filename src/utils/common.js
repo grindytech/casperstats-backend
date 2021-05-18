@@ -46,6 +46,19 @@ const GetBalance = async (address) => {
     }
 }
 
+const GetBalanceByAccountHash = async (account_hash) => {
+    let s = await GetLatestStateRootHash(); //Hex-encoded hash of the state root
+    
+    const state = await QueryState(account_hash, s);
+    const main_purse = state.result.stored_value.Account.main_purse;
+
+    let params = [s, main_purse];
+    const result = await RequestRPC(RpcApiName.get_balance, params);
+    return {
+        "balance_value": result.result.balance_value
+    };
+}
+
 
 async function GetAccountData (address) {
  
@@ -144,6 +157,7 @@ const QueryState = async (key, state = "", id = undefined) => {
 
         let command = `${process.env.CASPER_CLIENT} query-state --node-address ${process.env.NETWORK_RPC_API} -k ${key} -s ${state}`;
 
+        console.log("command: ", command);
         if (id != undefined) {
             command = command + ` --id ${id}`;
         }
@@ -169,6 +183,6 @@ const GetHeight = async () => {
 module.exports = {
     GetAccountData, GetHeight, QueryState, 
     GetLatestStateRootHash, Execute, GetBalance,
-    GetAccountHash, RequestRPC
+    GetAccountHash, RequestRPC, GetBalanceByAccountHash
 }
 
