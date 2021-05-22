@@ -80,7 +80,7 @@ $ npm run dev
   ```
 url: /chain/get-account/:address
 
-example: http://18.184.201.146:3030/account/get-account/0190c434129ecbaeb34d33185ab6bf97c3c493fc50121a56a9ed8c4c52855b5ac1
+example: https://api.casperstats.io/account/get-account/0190c434129ecbaeb34d33185ab6bf97c3c493fc50121a56a9ed8c4c52855b5ac1
 
 method: GET
 
@@ -99,7 +99,7 @@ successResponse:
   ```
 url: /chain/get-pk/:account
 
-example: https://api-v2.casperstats.io/account/get-pk/01a9a366e66d6081d6e15e4a83cc33bb465669444d386eb43354b81e5740abbd07
+example: https://api.casperstats.io/account/get-pk/01a9a366e66d6081d6e15e4a83cc33bb465669444d386eb43354b81e5740abbd07
 
 method: GET
 
@@ -121,7 +121,7 @@ successResponse:
   ```
 url: /chain/get-transfers/:account
 
-example: https://api-v2.casperstats.io/account/get-transfers/?account=01a9a366e66d6081d6e15e4a83cc33bb465669444d386eb43354b81e5740abbd07&count=10
+example: https://api.casperstats.io/account/get-transfers/?account=01a9a366e66d6081d6e15e4a83cc33bb465669444d386eb43354b81e5740abbd07&count=10
 
 method: GET
 
