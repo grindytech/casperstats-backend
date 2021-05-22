@@ -11,6 +11,9 @@ This project provide the REST api to interact with Casper blockchain
 - [API](#API)
   - [Account](#Account)
     - [get-account](#get-account)
+    - [get-pk](#get-pk)
+    - [get-transfers](#get-transfers)
+    - [get-deploys](#get-deploys)
   - [Chain](#Chain)
     - [get-block](#get-block)
     - [get-block-tranfers](#get-block-tranfers)
@@ -90,6 +93,135 @@ successResponse:
     "balance": "29019240000"
 }
 ```
+
+  #### get-account
+  
+  ```
+url: /chain/get-pk/:account
+
+example: https://api-v2.casperstats.io/account/get-pk/01a9a366e66d6081d6e15e4a83cc33bb465669444d386eb43354b81e5740abbd07
+
+method: GET
+
+des:  Get holder account
+
+successResponse:
+{
+    "public_key_hex": "01a9a366e66d6081d6e15e4a83cc33bb465669444d386eb43354b81e5740abbd07",
+    "account_hash": "fddc9e59905430de5bba59aa955eb21709614a574e9eee5a44fe967a8655ef28"
+}
+```
+
+| Params  | Type | Description | Required |
+| ------------- | ------------- | ------------- |------------- |
+| account | string | public_key or account_hash | Yes |
+
+  #### get-transfers
+  
+  ```
+url: /chain/get-transfers/:account
+
+example: https://api-v2.casperstats.io/account/get-transfers/?account=01a9a366e66d6081d6e15e4a83cc33bb465669444d386eb43354b81e5740abbd07&count=10
+
+method: GET
+
+des:  Get number of transfers of account
+
+
+successResponse:
+[
+    {
+        "deploy_hash": "9bd16eb573f05fd0c6942ccbd3c315ad830efee9837ea7bf87517cd76bd8457d",
+        "from_address": "496d542527e1a29f576ab7c3f4c947bfcdc9b4145f75f6ec40e36089432d7351",
+        "to_address": "fddc9e59905430de5bba59aa955eb21709614a574e9eee5a44fe967a8655ef28",
+        "value": "12842200000000",
+        "fee": "0",
+        "from_balance": "20067008805760358",
+        "to_balance": "990000"
+    },
+    {
+        "deploy_hash": "489ea64c920e5fcb6d82a8d411e5b146781f1fa93825c3ec7aec9b8e75d4acef",
+        "from_address": "fddc9e59905430de5bba59aa955eb21709614a574e9eee5a44fe967a8655ef28",
+        "to_address": "94664ce59fa2e6eb0cc69d270fc91dd9dd2ba02a1f7964c69f036ef4a68bb96f",
+        "value": "12842199990000",
+        "fee": "0",
+        "from_balance": "990000",
+        "to_balance": "208907540949605242"
+    },
+    {
+        "deploy_hash": "fb51b58c06e0f61e97765fce72d0350658b648e7a5180cbd2bd4c4c680803deb",
+        "from_address": "496d542527e1a29f576ab7c3f4c947bfcdc9b4145f75f6ec40e36089432d7351",
+        "to_address": "fddc9e59905430de5bba59aa955eb21709614a574e9eee5a44fe967a8655ef28",
+        "value": "22411700000000",
+        "fee": "0",
+        "from_balance": "20067008805760358",
+        "to_balance": "990000"
+    }
+]
+```
+
+| Params  | Type | Description | Required |
+| ------------- | ------------- | ------------- |------------- |
+| account | string | public_key or account_hash | Yes |
+| count | number | number of transfers will be return | Yes |
+
+
+  #### get-deploys
+  
+  ```
+url: /chain/get-deploys/:account
+
+example: https://api-v2.casperstats.io/account/get-deploys/?account=01a9a366e66d6081d6e15e4a83cc33bb465669444d386eb43354b81e5740abbd07&count=4
+
+method: GET
+
+des:  Get number of deploys of an account
+
+successResponse:
+[
+    {
+        "deploy_hash": "19ed303b7e54d47cd1403ba9ef5aa992add3aee9c827ebce8bb54c636fab63e1",
+        "hash": "96e75a41c4a39ff5b5bfa89f84d66fb509c5876cbe0b2336fab4145c26361afe",
+        "timestamp": "2021-05-19T05:15:21.645Z",
+        "public_key": "01a9a366e66d6081d6e15e4a83cc33bb465669444d386eb43354b81e5740abbd07",
+        "gas_price": 1,
+        "cost": "10000",
+        "status": "success"
+    },
+    {
+        "deploy_hash": "489ea64c920e5fcb6d82a8d411e5b146781f1fa93825c3ec7aec9b8e75d4acef",
+        "hash": "ab16f72362487360995daf7a4937ba05f2bb91608880a176322c06b31c1af16a",
+        "timestamp": "2021-05-18T23:46:41.691Z",
+        "public_key": "01a9a366e66d6081d6e15e4a83cc33bb465669444d386eb43354b81e5740abbd07",
+        "gas_price": 1,
+        "cost": "10000",
+        "status": "success"
+    },
+    {
+        "deploy_hash": "6998077047ec1fbff11c107db34d5dd36596e5eb088de1d5f0a0fb2a0d93f8f4",
+        "hash": "128eb0c66b8082939da61b6ba5925adfd1e4e96b024a83dc4e58c3f74ca7004c",
+        "timestamp": "2021-05-19T03:27:16.165Z",
+        "public_key": "01a9a366e66d6081d6e15e4a83cc33bb465669444d386eb43354b81e5740abbd07",
+        "gas_price": 1,
+        "cost": "10000",
+        "status": "success"
+    },
+    {
+        "deploy_hash": "c6a714f878de77d6ed00870ba8f6c13cbc5fc3d115c5c0a240e3d36f51d40911",
+        "hash": "9bbd163fb043f54a1ed7408933ac8289ba0f49a7b24049f80f93609b84cfd967",
+        "timestamp": "2021-05-18T23:48:53.499Z",
+        "public_key": "01a9a366e66d6081d6e15e4a83cc33bb465669444d386eb43354b81e5740abbd07",
+        "gas_price": 1,
+        "cost": "10000",
+        "status": "success"
+    }
+]
+```
+
+| Params  | Type | Description | Required |
+| ------------- | ------------- | ------------- |------------- |
+| account | string | public_key or account_hash | Yes |
+| count | number | number of deploys will be return | Yes |
 
 
 ### Chain
