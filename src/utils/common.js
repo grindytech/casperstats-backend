@@ -4,6 +4,12 @@ const { RpcApiName } = require('./constant');
 const request = require('request');
 const { exec } = require("child_process");
 
+var db_config = {
+    host: process.env.HOST,
+    user: process.env.DB_USER,
+    password: process.env.PASSWORD,
+    database: process.env.DATABASE_NAME
+}
 
 async function GetAccountHash(address) {
     return new Promise((resolve, reject) => {
@@ -21,7 +27,8 @@ async function GetAccountHash(address) {
                 reject(stderr);
                 return;
             }
-            return resolve(String(stdout));
+            const result = String(stdout).replace(/\n/g, '');
+            return resolve(result);
         });
 
     })
@@ -168,7 +175,6 @@ const QueryState = async (key, state = "", id = undefined) => {
             reject(err);
         })
     })
-
 }
 
 const GetHeight = async () => {
@@ -183,6 +189,7 @@ const GetHeight = async () => {
 module.exports = {
     GetAccountData, GetHeight, QueryState, 
     GetLatestStateRootHash, Execute, GetBalance,
-    GetAccountHash, RequestRPC, GetBalanceByAccountHash
+    GetAccountHash, RequestRPC, GetBalanceByAccountHash,
+    db_config
 }
 
