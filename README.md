@@ -94,7 +94,7 @@ successResponse:
 }
 ```
 
-  #### get-account
+  #### get-pk
   
   ```
 url: /chain/get-pk/:account
@@ -103,7 +103,7 @@ example: https://api-v2.casperstats.io/account/get-pk/01a9a366e66d6081d6e15e4a83
 
 method: GET
 
-des:  Get holder account
+des:  Get publickey or account_hash depends on the input
 
 successResponse:
 {
