@@ -126,31 +126,6 @@ module.exports = {
     }
   },
 
-  // GetBlockTransferTx: async function (req, res) {
-  //   let b = req.params.block;
-  //   try {
-  //     let txhashes = await GetTxhashes(b);
-  //     let data = [];
-  //     for (let i = 0; i < txhashes.length; i++) {
-  //       let pass = await DoesDeploySuccess(txhashes[i]);
-  //       if (pass) {
-  //         let transfers = await GetTransfersFromDeploy("deploy-" + txhashes[i]);
-  //         for (let j = 0; j < transfers.length; j++) {
-  //           let transfer_detail = await GetTransferDetail(transfers[j]);
-  //           data.push(transfer_detail);
-  //         }
-  //       } else {
-  //         let deploy_detail = await GetDeploy(txhashes[i]);
-  //         data.push(deploy_detail);
-  //       }
-  //     }
-  //     res.status(200);
-  //     res.json(data);
-  //   } catch (err) {
-  //     res.send(err)
-  //   }
-  // },
-
   GetBlockDeployTx: async function (req, res) {
     let b = req.params.block;
     try {
@@ -172,7 +147,6 @@ module.exports = {
   },
 
   GetLatestTx: async function (req, res) {
-
     try {
       const num = req.params.number;
       const result = await GetLatestTx(num);
