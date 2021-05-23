@@ -1,3 +1,4 @@
+const { GetTotalNumberOfTransfers } = require('../models/transfer');
 const {
   GetDeployhashes, GetDeploy, GetBlock,
   GetLatestTx } = require('../utils/chain');
@@ -142,8 +143,16 @@ module.exports = {
     }
   },
 
-  GetTotalNumberTx: async function (req, res) {
-
+  CountTransfers: async function (req, res) {
+    GetTotalNumberOfTransfers().then(value => {
+      if(value.length === 1) {
+        res.json(value[0]);
+      }else {
+        res.json({});
+      }
+    }).catch(err => {
+      res.send(err);
+    })
   },
 
   GetLatestTx: async function (req, res) {

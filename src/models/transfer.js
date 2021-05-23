@@ -15,13 +15,23 @@ async function GetTransfersByAccountHash(account_hash, count) {
         var sql = `SELECT * FROM transfer WHERE from_address = '${account_hash}' OR to_address = '${account_hash}' LIMIT ${count}`;
         pool.query(sql, function (err, result) {
             if (err) {
-                console.log(err)
                 reject(err);
             }
-            console.log(result);
             resolve(result);
         });
     })
 }
 
-module.exports = { GetTransfersByAccountHash }
+async function GetTotalNumberOfTransfers() {
+    return new Promise((resolve, reject) => {
+        var sql = `SELECT COUNT(*) AS number_of_transfers FROM transfer`;
+        pool.query(sql, function (err, result) {
+            if (err) {
+                reject(err);
+            }
+            resolve(result);
+        });
+    })
+}
+
+module.exports = { GetTransfersByAccountHash, GetTotalNumberOfTransfers }

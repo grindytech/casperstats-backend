@@ -7,11 +7,10 @@ router.route("/get-block-transfers/:block").get(chain_controller.GetBlockTx);
 router.route("/get-state-root-hash/:block").get(chain_controller.GetStateRootHash);
 router.route("/get-range-block").get(chain_controller.GetRangeBlock);
 
-// router.route("/get-block-transfer/:block").get(chain_controller.GetBlockTransferTx);
 router.route("/get-block-deploy/:block").get(chain_controller.GetBlockDeployTx);
 
 // router for transaction
-router.route("/get-total-tx").get(chain_controller.GetTotalNumberTx);
+router.route("/count-transfers").get(chain_controller.CountTransfers);
 router.route("/get-latest-txs/:number").get(chain_controller.GetLatestTx);
 
 // blocks
