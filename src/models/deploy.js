@@ -22,4 +22,4 @@ async function GetDeploysByPublicKey(public_key, count) {
     })
 }
 
-module.exports = { GetDeploysByPublicKey }
+module.exports = { GetDeploysByPublicKey}

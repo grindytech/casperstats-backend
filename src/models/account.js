@@ -24,6 +24,21 @@ async function GetPublicKeyHexByAccountHash(account) {
 
 }
 
+async function GetRichAccounts(count) {
+    return new Promise((resolve, reject) => {
+        var sql = `SELECT * FROM account ORDER BY balance * 1 DESC LIMIT ${count}`;
+        pool.query(sql, function (err, result) {
+            if (err) {
+                reject(err);
+            }
+            resolve(result);
+        });
+    })
+}
+
+
+
+
 module.exports = {
-   GetPublicKeyHexByAccountHash
+   GetPublicKeyHexByAccountHash, GetRichAccounts
 }

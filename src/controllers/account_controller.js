@@ -5,7 +5,7 @@ const { GetAccountData } = require('../utils/account');
 const mysql = require('mysql');
 require('dotenv').config();
 
-const { GetPublicKeyHexByAccountHash } = require('../models/account');
+const { GetPublicKeyHexByAccountHash, GetRichAccounts } = require('../models/account');
 const { GetTransfersByAccountHash } = require('../models/transfer');
 const { GetDeploysByPublicKey } = require('../models/deploy');
 const { GetAccountHash } = require('../utils/common');
@@ -68,6 +68,15 @@ module.exports = {
     const count = req.query.count;
 
     GetDeploysByPublicKey(account, count).then(value => {
+      res.json(value);
+    }).catch(err => {
+      res.send(err);
+    })
+  },
+
+  GetRichAccounts: async function (req, res) {
+    const count = req.params.count;
+    GetRichAccounts(count).then(value => {
       res.json(value);
     }).catch(err => {
       res.send(err);
