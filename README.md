@@ -31,6 +31,8 @@ This project provide the REST api to interact with Casper blockchain
     - [get-list-deploys](#get-list-deploys)
     - [get-type](#get-type)
     - [get-circle-supply](#get-circle-supply)
+    - [get-volume](#get-volume)
+    - [get-transfers-volume](#get-transfers-volume)
  
   - [State](#State)
     - [query-state](#query-state)
@@ -881,6 +883,95 @@ successResponse:
     "circle_supply": "402220054717844053"
 }
 ```
+
+
+#### get-volume
+
+```
+url: /info/get-volume/:count
+
+example: http://18.184.201.146:3030/info/get-volume/7
+
+method: GET
+
+des:  Get daily volume of the last $count day
+successResponse:
+[
+    {
+        "date": "2021-05-24",
+        "volume": null
+    },
+    {
+        "date": "2021-05-23",
+        "volume": null
+    },
+    {
+        "date": "2021-05-22",
+        "volume": null
+    },
+    {
+        "date": "2021-05-21",
+        "volume": null
+    },
+    {
+        "date": "2021-05-20",
+        "volume": null
+    },
+    {
+        "date": "2021-05-19",
+        "volume": "876274653665334"
+    },
+    {
+        "date": "2021-05-18",
+        "volume": "394980274159668"
+    }
+]
+```
+
+#### get-volume
+
+```
+url: /info/get-volume/:count
+
+example: http://18.184.201.146:3030/info/get-transfers-volume/7
+
+method: GET
+
+des:  Get daily volume transfers of the last $count day
+successResponse:
+[
+    {
+        "date": "2021-05-24",
+        "number_of_transfers": 0
+    },
+    {
+        "date": "2021-05-23",
+        "number_of_transfers": 0
+    },
+    {
+        "date": "2021-05-22",
+        "number_of_transfers": 0
+    },
+    {
+        "date": "2021-05-21",
+        "number_of_transfers": 0
+    },
+    {
+        "date": "2021-05-20",
+        "number_of_transfers": 0
+    },
+    {
+        "date": "2021-05-19",
+        "number_of_transfers": 53
+    },
+    {
+        "date": "2021-05-18",
+        "number_of_transfers": 21
+    }
+]
+```
+
+
 
 ### State
 
