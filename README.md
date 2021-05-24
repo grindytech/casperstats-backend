@@ -175,7 +175,7 @@ successResponse:
   ```
 url: /chain/get-deploys/:account
 
-example: https://api-v2.casperstats.io/account/get-deploys/?account=01a9a366e66d6081d6e15e4a83cc33bb465669444d386eb43354b81e5740abbd07&count=4
+example: https://api.casperstats.io/account/get-deploys/?account=01a9a366e66d6081d6e15e4a83cc33bb465669444d386eb43354b81e5740abbd07&count=4
 
 method: GET
 
@@ -233,7 +233,7 @@ successResponse:
   ```
 url: /account/get-rich-accounts/:count
 
-example: https://api-v2.casperstats.io/account/get-rich-accounts/10
+example: https://api.casperstats.io/account/get-rich-accounts/10
 
 method: GET
 
