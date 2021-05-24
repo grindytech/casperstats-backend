@@ -11,7 +11,7 @@ This project provide the REST api to interact with Casper blockchain
 - [API](#API)
   - [Account](#Account)
     - [get-account](#get-account)
-    - [get-pk](#get-pk)
+    - [get-holder](#get-holder)
     - [get-transfers](#get-transfers)
     - [get-deploys](#get-deploys)
     - [get-rich-accounts](#get-rich-accounts)
@@ -95,12 +95,12 @@ successResponse:
 }
 ```
 
-  #### get-pk
+  #### get-holder
   
   ```
-url: /chain/get-pk/:account
+url: /chain/get-holder/:account
 
-example: https://api.casperstats.io/account/get-pk/01a9a366e66d6081d6e15e4a83cc33bb465669444d386eb43354b81e5740abbd07
+example: https://api.casperstats.io/account/get-holder/01a9a366e66d6081d6e15e4a83cc33bb465669444d386eb43354b81e5740abbd07
 
 method: GET
 
