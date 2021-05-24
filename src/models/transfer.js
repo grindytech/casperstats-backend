@@ -46,4 +46,16 @@ async function GetNumberOfTransfersByDate(from, to) {
     })
 }
 
-module.exports = { GetTransfersByAccountHash, GetTotalNumberOfTransfers, GetNumberOfTransfersByDate }
+async function GetVolumeByDate(from, to) {
+    return new Promise((resolve, reject) => {
+        var sql = `SELECT CAST(SUM(CAST(transfer.value AS UNSIGNED INTEGER)) as CHAR) as volume FROM transfer WHERE DATE(timestamp) BETWEEN '${from}' AND '${to}'`;
+        pool.query(sql, function (err, result) {
+            if (err) {
+                reject(err);
+            }
+            resolve(result);
+        });
+    })
+}
+
+module.exports = { GetTransfersByAccountHash, GetTotalNumberOfTransfers, GetNumberOfTransfersByDate, GetVolumeByDate }

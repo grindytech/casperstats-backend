@@ -5,7 +5,7 @@ const { Execute } = require('../utils/common');
 require('dotenv').config();
 
 const { GetCircleSupply } = require('../models/account');
-const { GetNumberOfTransfersByDate } = require('../models/transfer');
+const { GetNumberOfTransfersByDate, GetVolumeByDate } = require('../models/transfer');
 
 module.exports = {
     GetDeploy: async function (req, res) {
@@ -82,6 +82,34 @@ module.exports = {
                 const paser_data = {
                     "date": the_date,
                     "number_of_transfers": data.number_of_transfers,
+                }
+
+                result.push(paser_data);
+            }
+            res.json(result);
+        } catch (err) {
+            res.send(err);
+        }
+    },
+
+    GetVolume: async function (req, res) {
+
+        try {
+            const count = req.params.count;
+            var datetime = new Date();
+
+            let result = [];
+
+            for (let i = 0; i < count; i++) {
+                let the_date = new Date();
+                the_date.setDate(datetime.getDate() - i);
+                the_date = the_date.toISOString().slice(0, 10);
+                let data = await GetVolumeByDate(the_date, the_date);
+                data = data[0];
+
+                const paser_data = {
+                    "date": the_date,
+                    "volume": data.volume,
                 }
 
                 result.push(paser_data);

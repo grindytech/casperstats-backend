@@ -6,5 +6,6 @@ router.route("/get-list-deploys").get(info_controller.GetListDeploys);
 router.route("/get-type/:param").get(info_controller.GetType);
 router.route("/get-circle-supply/").get(info_controller.GetCircleSupply);
 router.route("/get-transfer-volume/:count").get(info_controller.GetTransferVolume);
+router.route("/get-volume/:count").get(info_controller.GetVolume);
 
 module.exports = router;
