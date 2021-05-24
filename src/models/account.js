@@ -10,7 +10,7 @@ const pool = mysql.createPool({
     debug: false
 });
 
-async function GetPublicKeyHexByAccountHash(account) {
+async function GetHolder(account) {
 
     return new Promise((resolve, reject) => {
         var sql = `SELECT * FROM account WHERE account_hash = '${account}' OR public_key_hex = '${account}' LIMIT 1`;
@@ -36,9 +36,19 @@ async function GetRichAccounts(count) {
     })
 }
 
-
+async function GetCircleSupply() {
+    return new Promise((resolve, reject) => {
+        var sql = `SELECT CAST(SUM(CAST(account.balance AS UNSIGNED INTEGER)) as CHAR) as circle_supply FROM account`;
+        pool.query(sql, function (err, result) {
+            if (err) {
+                reject(err);
+            }
+            resolve(result);
+        });
+    })
+}
 
 
 module.exports = {
-   GetPublicKeyHexByAccountHash, GetRichAccounts
+   GetHolder, GetRichAccounts, GetCircleSupply
 }

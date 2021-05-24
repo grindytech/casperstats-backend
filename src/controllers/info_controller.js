@@ -1,8 +1,11 @@
 const { GetDeploy, GetType } = require('../utils/chain');
 
 const { RpcApiName, ELEMENT_TYPE } = require('../utils/constant');
-const {Execute} = require('../utils/common');
+const { Execute } = require('../utils/common');
 require('dotenv').config();
+
+const { GetCircleSupply } = require('../models/account');
+const { GetNumberOfTransfersByDate } = require('../models/transfer');
 
 module.exports = {
     GetDeploy: async function (req, res) {
@@ -44,12 +47,48 @@ module.exports = {
             const type = await GetType(param);
             res.status(200);
             res.json(type);
-        }catch(err) {
+        } catch (err) {
             res.json({
                 value: param,
                 type: ELEMENT_TYPE.UNKNOWN,
             });
         }
+    },
 
+    GetCircleSupply: async function (req, res) {
+        GetCircleSupply().then(value => {
+            res.json(value[0]);
+        }).catch(err => {
+            console.log(err);
+            res.send(err);
+        })
+    },
+
+    GetTransferVolume: async function (req, res) {
+
+        try {
+            const count = req.params.count;
+            var datetime = new Date();
+
+            let result = [];
+
+            for (let i = 0; i < count; i++) {
+                let the_date = new Date();
+                the_date.setDate(datetime.getDate() - i);
+                the_date = the_date.toISOString().slice(0, 10);
+                let data = await GetNumberOfTransfersByDate(the_date, the_date);
+                data = data[0];
+
+                const paser_data = {
+                    "date": the_date,
+                    "number_of_transfers": data.number_of_transfers,
+                }
+
+                result.push(paser_data);
+            }
+            res.json(result);
+        } catch (err) {
+            res.send(err);
+        }
     }
 };
