@@ -11,9 +11,10 @@ This project provide the REST api to interact with Casper blockchain
 - [API](#API)
   - [Account](#Account)
     - [get-account](#get-account)
-    - [get-pk](#get-pk)
+    - [get-holder](#get-holder)
     - [get-transfers](#get-transfers)
     - [get-deploys](#get-deploys)
+    - [get-rich-accounts](#get-rich-accounts)
   - [Chain](#Chain)
     - [get-block](#get-block)
     - [get-block-tranfers](#get-block-tranfers)
@@ -29,7 +30,8 @@ This project provide the REST api to interact with Casper blockchain
     - [get-deploy](#get-deploy)
     - [get-list-deploys](#get-list-deploys)
     - [get-type](#get-type)
-
+    - [get-circle-supply](#get-circle-supply)
+ 
   - [State](#State)
     - [query-state](#query-state)
     - [get-balance](#get-balance)
@@ -94,12 +96,12 @@ successResponse:
 }
 ```
 
-  #### get-pk
+  #### get-holder
   
   ```
-url: /chain/get-pk/:account
+url: /chain/get-holder/:account
 
-example: https://api.casperstats.io/account/get-pk/01a9a366e66d6081d6e15e4a83cc33bb465669444d386eb43354b81e5740abbd07
+example: https://api.casperstats.io/account/get-holder/01a9a366e66d6081d6e15e4a83cc33bb465669444d386eb43354b81e5740abbd07
 
 method: GET
 
@@ -223,6 +225,44 @@ successResponse:
 | account | string | public_key or account_hash | Yes |
 | count | number | number of deploys will be return | Yes |
 
+
+ #### get-rich-accounts
+  
+  ```
+url: /account/get-rich-accounts/:count
+
+example: https://api-v2.casperstats.io/account/get-rich-accounts/10
+
+method: GET
+
+des:  Get number of deploys of an account
+
+successResponse:
+[
+    {
+        "account_hash": "94664ce59fa2e6eb0cc69d270fc91dd9dd2ba02a1f7964c69f036ef4a68bb96f",
+        "public_key_hex": "",
+        "balance": "202015814105797797",
+        "active_date": "2021-05-18T22:56:21.072Z"
+    },
+    {
+        "account_hash": "45f3aa6ce2a450dd5a4f2cc4cc9054aded66de6b6cfc4ad977e7251cf94b649b",
+        "public_key_hex": "02029d865f743f9a67c82c84d443cbd8187bc4a08ca7b4c985f0caca1a4ee98b1f4c",
+        "balance": "158485177433565525",
+        "active_date": "2021-05-18T22:54:20.066Z"
+    },
+    {
+        "account_hash": "496d542527e1a29f576ab7c3f4c947bfcdc9b4145f75f6ec40e36089432d7351",
+        "public_key_hex": "0203f3f44c9e80e2cedc1a2909631a3adea8866ee32187f74d0912387359b0ff36a2",
+        "balance": "17733390362368359",
+        "active_date": "2021-05-18T22:58:32.217Z"
+    }
+]
+```
+
+| Params  | Type | Description | Required |
+| ------------- | ------------- | ------------- |------------- |
+| count | number | number of richest accounts| Yes |
 
 ### Chain
 
@@ -825,8 +865,22 @@ successResponse:
 |  UNKNOWN| string | can not search the data |
 
 
+#### get-circle-supply
 
+```
+url: /info/get-circle-supply/:param
 
+example: http://18.184.201.146:3030/info/get-circle-supply
+
+method: GET
+
+des:  Get type of input
+
+successResponse:
+{
+    "circle_supply": "402220054717844053"
+}
+```
 
 ### State
 
