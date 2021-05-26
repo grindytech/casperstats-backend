@@ -33,7 +33,13 @@ module.exports = {
       if (value.length == 1) {
         res.json(value[0]);
       } else {
-        res.send(null);
+        console.log("account old")
+        GetAccountData(account).then(acc => {
+          res.json(acc);
+        }).catch(err => {
+          console.log(err)
+          res.send(err);
+        })
       }
     }).catch(err => {
       res.send(err);
@@ -79,7 +85,27 @@ module.exports = {
     try {
       const hash = await GetAccountHash(account);
       account_hash = hash;
-    } catch (err) {}
+    } catch (err) { }
+
+    GetTransfersByAccountHash(account_hash, count).then(value => {
+      res.json(value);
+    }).catch(err => {
+      res.send(err);
+    })
+  },
+
+  GetAccountTransfersRange: async function (req, res) {
+
+    const account = req.query.account;
+    const start = req.query.start;
+    const end = req.query.end;
+
+    let account_hash = account;
+    // Get account_hash if possible
+    try {
+      const hash = await GetAccountHash(account);
+      account_hash = hash;
+    } catch (err) { }
 
     GetTransfersByAccountHash(account_hash, count).then(value => {
       res.json(value);
@@ -98,6 +124,18 @@ module.exports = {
       res.send(err);
     })
   },
+
+  GetAccountDeploysRange: async function (req, res) {
+    const account = req.query.account;
+    const count = req.query.count;
+
+    GetDeploysByPublicKey(account, count).then(value => {
+      res.json(value);
+    }).catch(err => {
+      res.send(err);
+    })
+  },
+
 
   GetRichAccounts: async function (req, res) {
     const count = req.params.count;
