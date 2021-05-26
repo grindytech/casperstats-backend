@@ -84,7 +84,7 @@ $ npm run dev
   ```
 url: /chain/get-account/:address
 
-example: https://api.casperstats.io/account/get-account/0190c434129ecbaeb34d33185ab6bf97c3c493fc50121a56a9ed8c4c52855b5ac1
+example: https://api.casperstats.io/account/get-account/01b92e36567350dd7b339d709bfe341df6fda853e85315418f1bb3ddd414d9f5be
 
 method: GET
 
@@ -92,9 +92,10 @@ des:  Get information of the account
 
 successResponse:
 {
-    "public_key": "0190c434129ecbaeb34d33185ab6bf97c3c493fc50121a56a9ed8c4c52855b5ac1",
-    "account_hash": "41a5d1bc379d235fa0e745b04eb32af590ec064279c8d44f50865e55f8347836",
-    "balance": "29019240000"
+    "account_hash": "94664ce59fa2e6eb0cc69d270fc91dd9dd2ba02a1f7964c69f036ef4a68bb96f",
+    "public_key_hex": "01b92e36567350dd7b339d709bfe341df6fda853e85315418f1bb3ddd414d9f5be",
+    "balance": "204661364801484072",
+    "active_date": "2021-05-19T16:33:16.952Z"
 }
 ```
 
@@ -105,9 +106,9 @@ successResponse:
   #### get-transfers
   
   ```
-url: /chain/get-transfers/:account
+url: /chain/get-transfers/?account=&start=&count=
 
-example: https://api.casperstats.io/account/get-transfers/?account=01a9a366e66d6081d6e15e4a83cc33bb465669444d386eb43354b81e5740abbd07&count=10
+example: https://api.casperstats.io/account/get-transfers/?account=45f3aa6ce2a450dd5a4f2cc4cc9054aded66de6b6cfc4ad977e7251cf94b649b&start=2&count=5
 
 method: GET
 
@@ -117,30 +118,53 @@ des:  Get number of transfers of account
 successResponse:
 [
     {
-        "deploy_hash": "9bd16eb573f05fd0c6942ccbd3c315ad830efee9837ea7bf87517cd76bd8457d",
-        "from_address": "496d542527e1a29f576ab7c3f4c947bfcdc9b4145f75f6ec40e36089432d7351",
-        "to_address": "fddc9e59905430de5bba59aa955eb21709614a574e9eee5a44fe967a8655ef28",
-        "value": "12842200000000",
+        "deploy_hash": "790777950dc169710ddbdba5c2a869e607719d26e11a724f147be2d6de52a7eb",
+        "timestamp": "2021-05-19T15:20:38.456Z",
+        "from_address": "45f3aa6ce2a450dd5a4f2cc4cc9054aded66de6b6cfc4ad977e7251cf94b649b",
+        "to_address": "76bea7e9b3ba17b95f92eafebd22f3ca5ac1e5bd9441ebd9a86e6f040f0957d8",
+        "value": "10000000000",
         "fee": "0",
-        "from_balance": "20067008805760358",
+        "from_balance": "156487207566812521",
+        "to_balance": "0"
+    },
+    {
+        "deploy_hash": "fb435e1f6c33f9901f2e4ee5ff24b93be801ef118296b4eebf99bbcebfa5e28e",
+        "timestamp": "2021-05-19T15:08:32.692Z",
+        "from_address": "45f3aa6ce2a450dd5a4f2cc4cc9054aded66de6b6cfc4ad977e7251cf94b649b",
+        "to_address": "b3ba08f5246166a687d0a831126300b8788924bb40be9e528bd6071f739d2835",
+        "value": "1679630146000",
+        "fee": "0",
+        "from_balance": "156487207566812521",
+        "to_balance": "10"
+    },
+    {
+        "deploy_hash": "0f04294860df18bc22145638051c2fafe397879f1c5f10e187a22e60ef2da498",
+        "timestamp": "2021-05-19T15:04:44.171Z",
+        "from_address": "45f3aa6ce2a450dd5a4f2cc4cc9054aded66de6b6cfc4ad977e7251cf94b649b",
+        "to_address": "d712441908ea2233779eb4e6679e85f003f5b021be5833df30c219e5940765fc",
+        "value": "1616666000000",
+        "fee": "0",
+        "from_balance": "156487207566812521",
         "to_balance": "990000"
     },
     {
-        "deploy_hash": "489ea64c920e5fcb6d82a8d411e5b146781f1fa93825c3ec7aec9b8e75d4acef",
-        "from_address": "fddc9e59905430de5bba59aa955eb21709614a574e9eee5a44fe967a8655ef28",
-        "to_address": "94664ce59fa2e6eb0cc69d270fc91dd9dd2ba02a1f7964c69f036ef4a68bb96f",
-        "value": "12842199990000",
+        "deploy_hash": "28820df6fd37759ccd3d00b1cbcfde5eb0eeca81a7983cfc6769a3424cf8c199",
+        "timestamp": "2021-05-19T14:52:40.829Z",
+        "from_address": "45f3aa6ce2a450dd5a4f2cc4cc9054aded66de6b6cfc4ad977e7251cf94b649b",
+        "to_address": "b3ba08f5246166a687d0a831126300b8788924bb40be9e528bd6071f739d2835",
+        "value": "10000000000",
         "fee": "0",
-        "from_balance": "990000",
-        "to_balance": "208907540949605242"
+        "from_balance": "156487207566812521",
+        "to_balance": "10"
     },
     {
-        "deploy_hash": "fb51b58c06e0f61e97765fce72d0350658b648e7a5180cbd2bd4c4c680803deb",
-        "from_address": "496d542527e1a29f576ab7c3f4c947bfcdc9b4145f75f6ec40e36089432d7351",
-        "to_address": "fddc9e59905430de5bba59aa955eb21709614a574e9eee5a44fe967a8655ef28",
-        "value": "22411700000000",
+        "deploy_hash": "9b0717b63a9860892bbd3a0dfffc5e258e2d0524399857d9c3663ad6aa19f039",
+        "timestamp": "2021-05-19T14:48:43.418Z",
+        "from_address": "45f3aa6ce2a450dd5a4f2cc4cc9054aded66de6b6cfc4ad977e7251cf94b649b",
+        "to_address": "345adf2bfc9fefb5e35657b9c2c4a2f4d1e77dbdd49b993623c0b4f2ecb6ca46",
+        "value": "2463336567666",
         "fee": "0",
-        "from_balance": "20067008805760358",
+        "from_balance": "156487207566812521",
         "to_balance": "990000"
     }
 ]
@@ -149,6 +173,7 @@ successResponse:
 | Params  | Type | Description | Required |
 | ------------- | ------------- | ------------- |------------- |
 | account | string | public_key or account_hash | Yes |
+| start | number | start tranfers | Yes |
 | count | number | number of transfers will be return | Yes |
 
 
@@ -157,7 +182,7 @@ successResponse:
   ```
 url: /chain/get-deploys/:account
 
-example: https://api.casperstats.io/account/get-deploys/?account=01a9a366e66d6081d6e15e4a83cc33bb465669444d386eb43354b81e5740abbd07&count=4
+example: https://api.casperstats.io/account/get-deploys/?account=02029d865f743f9a67c82c84d443cbd8187bc4a08ca7b4c985f0caca1a4ee98b1f4c&start=1&count=2
 
 method: GET
 
@@ -166,37 +191,19 @@ des:  Get number of deploys of an account
 successResponse:
 [
     {
-        "deploy_hash": "19ed303b7e54d47cd1403ba9ef5aa992add3aee9c827ebce8bb54c636fab63e1",
-        "hash": "96e75a41c4a39ff5b5bfa89f84d66fb509c5876cbe0b2336fab4145c26361afe",
-        "timestamp": "2021-05-19T05:15:21.645Z",
-        "public_key": "01a9a366e66d6081d6e15e4a83cc33bb465669444d386eb43354b81e5740abbd07",
+        "deploy_hash": "171a4e298ebf00fc5bfd6d1006e6df63d17919ab80c3e0ae45a80c4b6a84d88f",
+        "hash": "e3f12e712f25c3ba0b7ba736fd1b3bfb5c96346df8066fa368f3be93977344aa",
+        "timestamp": "2021-05-18T23:08:28.867Z",
+        "public_key": "02029d865f743f9a67c82c84d443cbd8187bc4a08ca7b4c985f0caca1a4ee98b1f4c",
         "gas_price": 1,
         "cost": "10000",
         "status": "success"
     },
     {
-        "deploy_hash": "489ea64c920e5fcb6d82a8d411e5b146781f1fa93825c3ec7aec9b8e75d4acef",
-        "hash": "ab16f72362487360995daf7a4937ba05f2bb91608880a176322c06b31c1af16a",
-        "timestamp": "2021-05-18T23:46:41.691Z",
-        "public_key": "01a9a366e66d6081d6e15e4a83cc33bb465669444d386eb43354b81e5740abbd07",
-        "gas_price": 1,
-        "cost": "10000",
-        "status": "success"
-    },
-    {
-        "deploy_hash": "6998077047ec1fbff11c107db34d5dd36596e5eb088de1d5f0a0fb2a0d93f8f4",
-        "hash": "128eb0c66b8082939da61b6ba5925adfd1e4e96b024a83dc4e58c3f74ca7004c",
-        "timestamp": "2021-05-19T03:27:16.165Z",
-        "public_key": "01a9a366e66d6081d6e15e4a83cc33bb465669444d386eb43354b81e5740abbd07",
-        "gas_price": 1,
-        "cost": "10000",
-        "status": "success"
-    },
-    {
-        "deploy_hash": "c6a714f878de77d6ed00870ba8f6c13cbc5fc3d115c5c0a240e3d36f51d40911",
-        "hash": "9bbd163fb043f54a1ed7408933ac8289ba0f49a7b24049f80f93609b84cfd967",
-        "timestamp": "2021-05-18T23:48:53.499Z",
-        "public_key": "01a9a366e66d6081d6e15e4a83cc33bb465669444d386eb43354b81e5740abbd07",
+        "deploy_hash": "fbf042dc29aaac1e6b510a3351d87ce246ed92dd8e1bf65755ae80c0a7a65d89",
+        "hash": "6eebec482a7d66cd1f7d986bd48bda0d75a46d4c99f9dc4d7c37ab1e2dc35ca1",
+        "timestamp": "2021-05-18T23:16:20.399Z",
+        "public_key": "02029d865f743f9a67c82c84d443cbd8187bc4a08ca7b4c985f0caca1a4ee98b1f4c",
         "gas_price": 1,
         "cost": "10000",
         "status": "success"
@@ -207,6 +214,7 @@ successResponse:
 | Params  | Type | Description | Required |
 | ------------- | ------------- | ------------- |------------- |
 | account | string | public_key or account_hash | Yes |
+| start | number | start index | Yes |
 | count | number | number of deploys will be return | Yes |
 
 
