@@ -11,7 +11,6 @@ This project provide the REST api to interact with Casper blockchain
 - [API](#API)
   - [Account](#Account)
     - [get-account](#get-account)
-    - [get-holder](#get-holder)
     - [get-transfers](#get-transfers)
     - [get-deploys](#get-deploys)
     - [get-rich-accounts](#get-rich-accounts)
@@ -96,26 +95,6 @@ successResponse:
     "public_key": "0190c434129ecbaeb34d33185ab6bf97c3c493fc50121a56a9ed8c4c52855b5ac1",
     "account_hash": "41a5d1bc379d235fa0e745b04eb32af590ec064279c8d44f50865e55f8347836",
     "balance": "29019240000"
-}
-```
-
-  #### get-holder
-  
-  ```
-url: /chain/get-holder/:account
-
-example: https://api.casperstats.io/account/get-holder/01a9a366e66d6081d6e15e4a83cc33bb465669444d386eb43354b81e5740abbd07
-
-method: GET
-
-des:  Get publickey or account_hash depends on the input
-
-successResponse:
-{
-    "account_hash": "94664ce59fa2e6eb0cc69d270fc91dd9dd2ba02a1f7964c69f036ef4a68bb96f",
-    "public_key_hex": "01b92e36567350dd7b339d709bfe341df6fda853e85315418f1bb3ddd414d9f5be",
-    "balance": "204777682515540815",
-    "active_date": "2021-05-26T03:06:13.445Z"
 }
 ```
 
