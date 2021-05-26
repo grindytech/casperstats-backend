@@ -108,8 +108,9 @@ module.exports = {
   },
 
   GetRichAccounts: async function (req, res) {
-    const count = req.params.count;
-    GetRichAccounts(count).then(value => {
+    const start = req.query.start;
+    const count = req.query.count;
+    GetRichAccounts(start, count).then(value => {
       res.json(value);
     }).catch(err => {
       res.send(err);

@@ -36,9 +36,9 @@ async function GetTotalNumberOfAccount() {
 
 }
 
-async function GetRichAccounts(count) {
+async function GetRichAccounts(start, count) {
     return new Promise((resolve, reject) => {
-        var sql = `SELECT * FROM account ORDER BY balance * 1 DESC LIMIT ${count}`;
+        var sql = `SELECT * FROM account ORDER BY balance * 1 DESC LIMIT ${start}, ${count}`;
         pool.query(sql, function (err, result) {
             if (err) {
                 reject(err);
