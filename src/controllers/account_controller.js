@@ -17,18 +17,16 @@ module.exports = {
   GetAccount: async function (req, res) {
 
     // address or account hash
-    let address = req.params.address;
-    try {
-      const account = await GetAccountData(address);
-      res.json(account);
+    // let address = req.params.address;
+    // try {
+    //   const account = await GetAccountData(address);
+    //   res.json(account);
 
-    } catch (err) {
-      console.log(err);
-      res.send(err);
-    }
-  },
+    // } catch (err) {
+    //   console.log(err);
+    //   res.send(err);
+    // }
 
-  GetHolder: async function (req, res) {
     const account = req.params.account;
 
     GetHolder(account).then(value => {
@@ -41,6 +39,20 @@ module.exports = {
       res.send(err);
     })
   },
+
+  // GetHolder: async function (req, res) {
+  //   const account = req.params.account;
+
+  //   GetHolder(account).then(value => {
+  //     if (value.length == 1) {
+  //       res.json(value[0]);
+  //     } else {
+  //       res.send(null);
+  //     }
+  //   }).catch(err => {
+  //     res.send(err);
+  //   })
+  // },
 
   CountHolders: async function (req, res) {
     const account = req.params.account;
