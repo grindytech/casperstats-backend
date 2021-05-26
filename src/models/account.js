@@ -11,9 +11,21 @@ const pool = mysql.createPool({
 });
 
 async function GetHolder(account) {
-
     return new Promise((resolve, reject) => {
         var sql = `SELECT * FROM account WHERE account_hash = '${account}' OR public_key_hex = '${account}' LIMIT 1`;
+        pool.query(sql, function (err, result) {
+            if (err) {
+                reject(err);
+            }
+            resolve(result);
+        });
+    })
+}
+
+async function GetTotalNumberOfAccount() {
+
+    return new Promise((resolve, reject) => {
+        var sql = 'SELECT COUNT(*) AS number_of_holders FROM account';
         pool.query(sql, function (err, result) {
             if (err) {
                 reject(err);
@@ -50,5 +62,5 @@ async function GetCircleSupply() {
 
 
 module.exports = {
-   GetHolder, GetRichAccounts, GetCircleSupply
+   GetHolder, GetRichAccounts, GetCircleSupply, GetTotalNumberOfAccount
 }

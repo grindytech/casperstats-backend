@@ -5,7 +5,7 @@ const { GetAccountData } = require('../utils/account');
 const mysql = require('mysql');
 require('dotenv').config();
 
-const { GetHolder, GetRichAccounts } = require('../models/account');
+const { GetHolder, GetRichAccounts, GetTotalNumberOfAccount } = require('../models/account');
 const { GetTransfersByAccountHash } = require('../models/transfer');
 const { GetDeploysByPublicKey } = require('../models/deploy');
 const { GetAccountHash } = require('../utils/common');
@@ -36,6 +36,20 @@ module.exports = {
         res.json(value[0]);
       } else {
         res.send(null);
+      }
+    }).catch(err => {
+      res.send(err);
+    })
+  },
+
+  CountHolders: async function (req, res) {
+    const account = req.params.account;
+
+    GetTotalNumberOfAccount().then(value => {
+      if (value.length == 1) {
+        res.json(value[0]);
+      } else {
+        res.send(0);
       }
     }).catch(err => {
       res.send(err);
