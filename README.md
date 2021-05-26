@@ -15,6 +15,7 @@ This project provide the REST api to interact with Casper blockchain
     - [get-transfers](#get-transfers)
     - [get-deploys](#get-deploys)
     - [get-rich-accounts](#get-rich-accounts)
+    - [count-holders](#count-holders)
   - [Chain](#Chain)
     - [get-block](#get-block)
     - [get-block-tranfers](#get-block-tranfers)
@@ -265,6 +266,25 @@ successResponse:
 | Params  | Type | Description | Required |
 | ------------- | ------------- | ------------- |------------- |
 | count | number | number of richest accounts| Yes |
+
+
+ #### count-holders
+  
+  ```
+url: /account/count-holders
+
+example: https://api.casperstats.io/account/count-holders
+
+method: GET
+
+des:  Get number of holders
+
+successResponse:
+{
+    "number_of_holders": 208
+}
+```
+
 
 ### Chain
 
