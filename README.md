@@ -221,9 +221,9 @@ successResponse:
  #### get-rich-accounts
   
   ```
-url: /account/get-rich-accounts/:count
+url: /account/get-rich-accounts/?start=&count=
 
-example: https://api.casperstats.io/account/get-rich-accounts/10
+example: https://api.casperstats.io/account/get-rich-accounts/?start=1&count=4
 
 method: GET
 
@@ -232,22 +232,22 @@ des:  Get number of deploys of an account
 successResponse:
 [
     {
-        "account_hash": "94664ce59fa2e6eb0cc69d270fc91dd9dd2ba02a1f7964c69f036ef4a68bb96f",
-        "public_key_hex": "",
-        "balance": "202015814105797797",
-        "active_date": "2021-05-18T22:56:21.072Z"
-    },
-    {
         "account_hash": "45f3aa6ce2a450dd5a4f2cc4cc9054aded66de6b6cfc4ad977e7251cf94b649b",
         "public_key_hex": "02029d865f743f9a67c82c84d443cbd8187bc4a08ca7b4c985f0caca1a4ee98b1f4c",
-        "balance": "158485177433565525",
-        "active_date": "2021-05-18T22:54:20.066Z"
+        "balance": "156487207566812521",
+        "active_date": "2021-05-19T15:40:28.410Z"
+    },
+    {
+        "account_hash": "a616c7838d3d03fe0b45c07560ce413f23ccaf35247addc91d1cf7a788db2635",
+        "public_key_hex": "0140a48b549ae33cf28e39241a33dd5e22f491d8811f9d83981f3549d418e06da0",
+        "balance": "85770068273700210",
+        "active_date": "2021-05-19T16:28:47.542Z"
     },
     {
         "account_hash": "496d542527e1a29f576ab7c3f4c947bfcdc9b4145f75f6ec40e36089432d7351",
         "public_key_hex": "0203f3f44c9e80e2cedc1a2909631a3adea8866ee32187f74d0912387359b0ff36a2",
-        "balance": "17733390362368359",
-        "active_date": "2021-05-18T22:58:32.217Z"
+        "balance": "16218427128814365",
+        "active_date": "2021-05-19T16:31:44.849Z"
     }
 ]
 ```
