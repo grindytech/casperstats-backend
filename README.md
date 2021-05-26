@@ -937,7 +937,7 @@ successResponse:
 ]
 ```
 
-#### get-volume
+#### get-transfers-volume
 
 ```
 url: /info/get-volume/:count
