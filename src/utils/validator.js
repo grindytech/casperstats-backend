@@ -3,6 +3,7 @@ dotenv.config();
 const { RpcApiName } = require('./constant');
 const { RequestRPC, GetHeight } = require('./common')
 const math = require('mathjs');
+const {GetCircleSupply} = require('../models/account');
 
 
 function GetTotalBid(bids, address) {
@@ -95,6 +96,7 @@ const GetValidators = async (number_of_validator) => {
         total_active_validators: 0,
         total_bid_validators: 0,
         total_stake: "",
+        circle_supply: 0,
         era_validators: {}
     }
 
@@ -105,6 +107,10 @@ const GetValidators = async (number_of_validator) => {
         const auction_state = auction_info.result.auction_state;
 
         result.block_height = auction_state.block_height;
+
+        //circle supply
+        const circle_supply = await  GetCircleSupply();
+        result.circle_supply = circle_supply[0].circle_supply;
 
         // calculate total_stake
         let total_stake = 0;
