@@ -15,6 +15,7 @@ This project provide the REST api to interact with Casper blockchain
     - [get-transfers](#get-transfers)
     - [get-deploys](#get-deploys)
     - [get-rich-accounts](#get-rich-accounts)
+    - [count-holders](#count-holders)
   - [Chain](#Chain)
     - [get-block](#get-block)
     - [get-block-tranfers](#get-block-tranfers)
@@ -111,8 +112,10 @@ des:  Get publickey or account_hash depends on the input
 
 successResponse:
 {
-    "public_key_hex": "01a9a366e66d6081d6e15e4a83cc33bb465669444d386eb43354b81e5740abbd07",
-    "account_hash": "fddc9e59905430de5bba59aa955eb21709614a574e9eee5a44fe967a8655ef28"
+    "account_hash": "94664ce59fa2e6eb0cc69d270fc91dd9dd2ba02a1f7964c69f036ef4a68bb96f",
+    "public_key_hex": "01b92e36567350dd7b339d709bfe341df6fda853e85315418f1bb3ddd414d9f5be",
+    "balance": "204777682515540815",
+    "active_date": "2021-05-26T03:06:13.445Z"
 }
 ```
 
@@ -265,6 +268,25 @@ successResponse:
 | Params  | Type | Description | Required |
 | ------------- | ------------- | ------------- |------------- |
 | count | number | number of richest accounts| Yes |
+
+
+ #### count-holders
+  
+  ```
+url: /account/count-holders
+
+example: https://api.casperstats.io/account/count-holders
+
+method: GET
+
+des:  Get number of holders
+
+successResponse:
+{
+    "number_of_holders": 208
+}
+```
+
 
 ### Chain
 
