@@ -10,9 +10,10 @@ const pool = mysql.createPool({
     debug: false
 });
 
-async function GetDeploysByPublicKey(public_key, count) {
+async function GetDeploysByPublicKey(public_key, start, count) {
     return new Promise((resolve, reject) => {
-        var sql = `SELECT * FROM deploy WHERE public_key = '${public_key}' LIMIT ${count}`;
+
+        var sql = `SELECT * FROM deploy WHERE public_key = '${public_key}' ORDER BY timestamp LIMIT ${start}, ${count}`;
         pool.query(sql, function (err, result) {
             if (err) {
                 reject(err);

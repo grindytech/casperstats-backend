@@ -97,26 +97,15 @@ module.exports = {
 
   GetAccountDeploys: async function (req, res) {
     const account = req.query.account;
+    const start = req.query.start;
     const count = req.query.count;
 
-    GetDeploysByPublicKey(account, count).then(value => {
+    GetDeploysByPublicKey(account, start, count).then(value => {
       res.json(value);
     }).catch(err => {
       res.send(err);
     })
   },
-
-  GetAccountDeploysRange: async function (req, res) {
-    const account = req.query.account;
-    const count = req.query.count;
-
-    GetDeploysByPublicKey(account, count).then(value => {
-      res.json(value);
-    }).catch(err => {
-      res.send(err);
-    })
-  },
-
 
   GetRichAccounts: async function (req, res) {
     const count = req.params.count;
