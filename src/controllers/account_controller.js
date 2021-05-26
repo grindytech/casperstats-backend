@@ -77,6 +77,7 @@ module.exports = {
   GetAccountTransfers: async function (req, res) {
 
     const account = req.query.account;
+    const start = req.query.start;
     const count = req.query.count;
 
     let account_hash = account;
@@ -87,27 +88,7 @@ module.exports = {
       account_hash = hash;
     } catch (err) { }
 
-    GetTransfersByAccountHash(account_hash, count).then(value => {
-      res.json(value);
-    }).catch(err => {
-      res.send(err);
-    })
-  },
-
-  GetAccountTransfersRange: async function (req, res) {
-
-    const account = req.query.account;
-    const start = req.query.start;
-    const end = req.query.end;
-
-    let account_hash = account;
-    // Get account_hash if possible
-    try {
-      const hash = await GetAccountHash(account);
-      account_hash = hash;
-    } catch (err) { }
-
-    GetTransfersByAccountHash(account_hash, count).then(value => {
+    GetTransfersByAccountHash(account_hash, start, count).then(value => {
       res.json(value);
     }).catch(err => {
       res.send(err);
