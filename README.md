@@ -30,7 +30,7 @@ This project provide the REST api to interact with Casper blockchain
     - [get-deploy](#get-deploy)
     - [get-list-deploys](#get-list-deploys)
     - [get-type](#get-type)
-    - [get-circle-supply](#get-circle-supply)
+    - [get-circulating-supply](#get-circulating-supply)
     - [get-volume](#get-volume)
     - [get-transfers-volume](#get-transfers-volume)
  
@@ -876,12 +876,12 @@ successResponse:
 |  UNKNOWN| string | can not search the data |
 
 
-#### get-circle-supply
+#### get-circulating-supply
 
 ```
-url: /info/get-circle-supply/:param
+url: /info/get-circulating-supply/:param
 
-example: http://18.184.201.146:3030/info/get-circle-supply
+example: http://18.184.201.146:3030/info/get-circulating-supply
 
 method: GET
 
@@ -889,7 +889,7 @@ des:  Get type of input
 
 successResponse:
 {
-    "circle_supply": "402220054717844053"
+    "circulating_supply": "402220054717844053"
 }
 ```
 
