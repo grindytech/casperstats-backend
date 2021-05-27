@@ -4,7 +4,7 @@ const { RpcApiName, ELEMENT_TYPE } = require('../utils/constant');
 const { Execute } = require('../utils/common');
 require('dotenv').config();
 
-const { GetCircleSupply } = require('../models/account');
+const { GetCirculatingSupply } = require('../models/account');
 const { GetNumberOfTransfersByDate, GetVolumeByDate } = require('../models/transfer');
 
 module.exports = {
@@ -55,8 +55,8 @@ module.exports = {
         }
     },
 
-    GetCircleSupply: async function (req, res) {
-        GetCircleSupply().then(value => {
+    GetCirculatingSupply: async function (req, res) {
+        GetCirculatingSupply().then(value => {
             res.json(value[0]);
         }).catch(err => {
             console.log(err);

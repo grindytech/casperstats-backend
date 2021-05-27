@@ -48,9 +48,9 @@ async function GetRichAccounts(start, count) {
     })
 }
 
-async function GetCircleSupply() {
+async function GetCirculatingSupply() {
     return new Promise((resolve, reject) => {
-        var sql = `SELECT CAST(SUM(CAST(account.balance AS UNSIGNED INTEGER)) as CHAR) as circle_supply FROM account`;
+        var sql = `SELECT CAST(SUM(CAST(account.balance AS UNSIGNED INTEGER)) as CHAR) as circulating_supply FROM account`;
         pool.query(sql, function (err, result) {
             if (err) {
                 reject(err);
@@ -62,5 +62,5 @@ async function GetCircleSupply() {
 
 
 module.exports = {
-   GetHolder, GetRichAccounts, GetCircleSupply, GetTotalNumberOfAccount
+   GetHolder, GetRichAccounts, GetCirculatingSupply, GetTotalNumberOfAccount
 }
