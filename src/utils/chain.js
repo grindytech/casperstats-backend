@@ -2,7 +2,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 const { RpcApiName, ELEMENT_TYPE } = require('./constant');
 const account_fn = require('./account');
-const { GetHeight, RequestRPC, GetAccountHash, GetBalanceByAccountHash } = require("./common");
+const { GetHeight, RequestRPC, GetAccountHash, GetBalanceByAccountHash, Execute } = require("./common");
 
 
 const GetTxhashes = async (block) => {
@@ -145,6 +145,24 @@ const GetBlock = async (block) => {
             // add current_height to getblock
             value.result["current_height"] = height;
             delete value.result.block.proofs;
+            resolve(value);
+        }).catch(err => {
+            reject(err);
+        })
+    })
+}
+
+
+const GetDeploysInBlock = async (block) => {
+    return new Promise((resolve, reject) => {
+
+        let command = `${process.env.CASPER_CLIENT} list-deploys --node-address ${process.env.NETWORK_RPC_API}`;
+
+        if (block) {
+            command = command + ` -b ${block}`;
+        }
+
+        Execute(command).then(value => {
             resolve(value);
         }).catch(err => {
             reject(err);
@@ -345,5 +363,5 @@ module.exports = {
     GetTxhashes, GetDeployhashes,
     GetDeploy, DoesDeploySuccess, GetTransfersFromDeploy,
     GetTransferDetail, GetBlock, GetLatestTx,
-    GetTransfersInBlock, GetType
+    GetTransfersInBlock, GetType, GetDeploysInBlock
 }

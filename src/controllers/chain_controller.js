@@ -2,7 +2,9 @@ const { GetBlocksByValidator } = require('../models/block_model');
 const { GetTotalNumberOfTransfers } = require('../models/transfer');
 const {
   GetDeployhashes, GetDeploy, GetBlock,
-  GetLatestTx } = require('../utils/chain');
+  GetLatestTx, 
+  GetTransfersInBlock,
+  GetDeploysInBlock} = require('../utils/chain');
 const { RequestRPC, GetHeight } = require('../utils/common');
 const { RpcApiName } = require('../utils/constant');
 const { GetBlocksByProposer } = require('../utils/validator');
@@ -173,10 +175,22 @@ module.exports = {
     const count = req.query.count;
 
     try {
-      const data = await GetBlocksByValidator(validator, start, count);
+      let data = await GetBlocksByValidator(validator, start, count);
+
+      for (let i = 0; i < data.length; i++) {
+        delete data[i]["parent_hash"];
+        delete data[i]["state_root_hash"];
+        delete data[i]["validator"];
+
+        const  deploys = await GetDeploysInBlock(data[i].height);
+        const transfers = await GetTransfersInBlock(data[i].height);
+        data[i]["deploys"] = deploys.deploy_hashes.length + deploys.transfer_hashes.length;
+        data[i]["transfers"] = transfers.transfers.length;
+      }
       res.status(200);
       res.json(data);
     } catch (err) {
+      console.log(err);
       res.send(err);
     }
   }
