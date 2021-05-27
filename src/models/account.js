@@ -55,12 +55,14 @@ async function GetCirculatingSupply() {
             if (err) {
                 reject(err);
             }
-            resolve(result);
+            // hard code
+            const hard_code = [{ circulating_supply: "400000000000000000" }];
+            resolve(hard_code);
         });
     })
 }
 
 
 module.exports = {
-   GetHolder, GetRichAccounts, GetCirculatingSupply, GetTotalNumberOfAccount
+    GetHolder, GetRichAccounts, GetCirculatingSupply, GetTotalNumberOfAccount
 }
