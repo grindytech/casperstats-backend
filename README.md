@@ -756,9 +756,9 @@ successResponse:
 ### get-proposer-blocks
 
 ```
-url: /chain/get-proposer-blocks?validator=&num=
+url: /chain/get-proposer-blocks?validator=&start=&count=
 
-example: http://18.184.201.146:3030/chain/get-proposer-blocks?validator=017d96b9a63abcb61c870a4f55187a0a7ac24096bdb5fc585c12a686a4d892009e&num=2
+example: http://18.184.201.146:3030/chain/get-proposer-blocks?validator=01419478cc7a68037c553c0214d595cb6b432c71ef73ece0d7a5f98c5eb1ecb44a&count=10&start=0
 
 method: GET
 
@@ -767,25 +767,104 @@ des: get number of latest transaction
 successResponse:
 [
     {
-        "block_height": 32035,
-        "era_id": 406,
-        "deploys": 0,
-        "transfers": 0,
-        "timestamp": "2021-05-13T02:58:10.560Z",
-        "block_hash": "bc22422df5b3fa55a1fd120d847dfde14aebf820c3947741955f778bf54cad22"
+        "hash": "bf5ae8994782dbc6ab47f6ca07b75c116153776ca128c606ac2971656c209f49",
+        "height": 62804,
+        "timestamp": "2021-05-19T13:30:25.664Z",
+        "era": 586,
+        "parent_hash": "88476fd5c89f65e502f5efe90f1e67d738136d508ae452ae2e1b267a0c893db4",
+        "state_root_hash": "32fd0ede84634fc733c91c0dd2f4e9b43a4a5abb4a765cf78f5207e5edc46eb3",
+        "validator": "01419478cc7a68037c553c0214d595cb6b432c71ef73ece0d7a5f98c5eb1ecb44a"
     },
     {
-        "block_height": 32022,
-        "era_id": 406,
-        "deploys": 0,
-        "transfers": 0,
-        "timestamp": "2021-05-13T02:43:58.592Z",
-        "block_hash": "496a3fc3bb62d21967caa14d89d8b1ba87f47f485c98e290569b95d291f57dc1"
+        "hash": "533e51e8b55cda7d6ae5ea437565695e1d83aec602575e90583683a1ded5ad98",
+        "height": 62794,
+        "timestamp": "2021-05-19T13:19:30.304Z",
+        "era": 586,
+        "parent_hash": "c138a03119c68fb5207f6e6845f50bc4c0aced4943cc47dfff66ea57fc294ded",
+        "state_root_hash": "bbd77c0d5b95db4ca72ac16b1b9e239786a2cf6f9f4ac356b7ed35114c88147d",
+        "validator": "01419478cc7a68037c553c0214d595cb6b432c71ef73ece0d7a5f98c5eb1ecb44a"
+    },
+    {
+        "hash": "7a13528285e60d021a8e1851200b310c3af327a0c89ada19f12b55ce1d0b790e",
+        "height": 62785,
+        "timestamp": "2021-05-19T13:09:40.480Z",
+        "era": 586,
+        "parent_hash": "e1d05d355ea02c13ac0b1726ac650721cba1e907a40732c2a0f08922515e8315",
+        "state_root_hash": "2a10b462188aff567bf61a625d9551626660bed40f9759fd71cac3ad7489f172",
+        "validator": "01419478cc7a68037c553c0214d595cb6b432c71ef73ece0d7a5f98c5eb1ecb44a"
+    },
+    {
+        "hash": "e8d3b648e174548004de4443feeb40390417a180258f62b9a97bc665f2de596f",
+        "height": 62765,
+        "timestamp": "2021-05-19T12:47:49.760Z",
+        "era": 586,
+        "parent_hash": "1f9cc0d6410d5e8d2da917d1c5a5032744b7f7b693b844b8b9dc67aaa67662b3",
+        "state_root_hash": "d7cbf4ac6db1bf2a3b4112a3649c541a5a5bac6c5045c76e703b77a817f21475",
+        "validator": "01419478cc7a68037c553c0214d595cb6b432c71ef73ece0d7a5f98c5eb1ecb44a"
+    },
+    {
+        "hash": "59b613d14dd4f55855aa4ddeeaed580caf0129647bbd20c0b4e41588e5cf7c18",
+        "height": 62739,
+        "timestamp": "2021-05-19T12:19:25.824Z",
+        "era": 585,
+        "parent_hash": "b14bbcdb48c2dc13dd87f2214628fe2e527b1a2b61dbcf9471a5aab2b47d0591",
+        "state_root_hash": "311380ab9a800300c27885605a7d9e26c7273f4e67d83dcfef6c4410901108ce",
+        "validator": "01419478cc7a68037c553c0214d595cb6b432c71ef73ece0d7a5f98c5eb1ecb44a"
+    },
+    {
+        "hash": "b14bbcdb48c2dc13dd87f2214628fe2e527b1a2b61dbcf9471a5aab2b47d0591",
+        "height": 62738,
+        "timestamp": "2021-05-19T12:18:20.288Z",
+        "era": 585,
+        "parent_hash": "83444f50c93e74d89b6ca9c108c4496ad51bf6d701a9dd862e46b64f5a207f92",
+        "state_root_hash": "5f8694169afc49f8d9d7b13818348bfaa46592310cf8eb2e353ce0f434417569",
+        "validator": "01419478cc7a68037c553c0214d595cb6b432c71ef73ece0d7a5f98c5eb1ecb44a"
+    },
+    {
+        "hash": "0100f62fb8d29c615c74a511d40fd84e5a82b45bf83e866962035c355358afa2",
+        "height": 62639,
+        "timestamp": "2021-05-19T10:30:12.224Z",
+        "era": 584,
+        "parent_hash": "636472a62b679aba70268fdafbd21247b698ce888926530c4631863275f90649",
+        "state_root_hash": "31ddd19cc4fd0d1cafd58459f50c17459f4c91ab7418a5fed5708ffd50353cdf",
+        "validator": "01419478cc7a68037c553c0214d595cb6b432c71ef73ece0d7a5f98c5eb1ecb44a"
+    },
+    {
+        "hash": "ffef4e46c01dbff1d47b7c942e72051dd1dc11f7758857f0ea03d5cdca8ce43f",
+        "height": 62590,
+        "timestamp": "2021-05-19T09:36:40.960Z",
+        "era": 584,
+        "parent_hash": "e4b9a4d30987c602b4ec82d20960ef8be946312ac26114c1266ad7d8ace5d882",
+        "state_root_hash": "a075635303250b6381237bf08c9916b2d1b6299480387a796c5d76c29035f067",
+        "validator": "01419478cc7a68037c553c0214d595cb6b432c71ef73ece0d7a5f98c5eb1ecb44a"
+    },
+    {
+        "hash": "02d8e92b720468de365bcba67c20b5633753b5979f56d31e98126e28b970d527",
+        "height": 62547,
+        "timestamp": "2021-05-19T08:49:42.912Z",
+        "era": 584,
+        "parent_hash": "e8a89e343ea4a5af1344d9bd122318046ddaad0c1e0906375388df968ed0dd08",
+        "state_root_hash": "9063119c2191c688db5c30ad925cd947556c4f65f1dc36b832b0a950611f23cc",
+        "validator": "01419478cc7a68037c553c0214d595cb6b432c71ef73ece0d7a5f98c5eb1ecb44a"
+    },
+    {
+        "hash": "f3044f4f73f7218b311c18432aef943b6bdf661347c9ddcdf150e012f4e7c064",
+        "height": 62528,
+        "timestamp": "2021-05-19T08:28:57.728Z",
+        "era": 583,
+        "parent_hash": "8bc6277b16225ded97f98cf43cc00006ce5edaf0a2cbea4a9c5100ed4a7b6cd5",
+        "state_root_hash": "18e2b45d223189b5a47edf3595540f5baecb8c9ee830a0821b237dab86a52005",
+        "validator": "01419478cc7a68037c553c0214d595cb6b432c71ef73ece0d7a5f98c5eb1ecb44a"
     }
 ]
-
 ```
 
+
+| Params  | Type | Description | Required |
+| ------------- | ------------- | ------------- |------------- |
+| validator | string | Validator's public_key | Yes |
+| start | index number | start | Yes |
+| count | number of blocks return |  end | Yes |
 
 
 ### Info
