@@ -698,9 +698,9 @@ successResponse:
 #### get-latest-tx
 
 ```
-url: /chain/get-latest-tx/:number
+url: /chain/get-latest-tx/
 
-example: http://18.184.201.146:3030/chain/get-latest-txs/3
+example: http://api.casperstats.io/chain/get-latest-txs?start=0&count=3
 
 method: GET
 
@@ -709,34 +709,34 @@ des: get number of latest transaction
 successResponse:
 [
     {
-        "deploy_hash": "4b7709a04a1d8bb379ff702f1d19b561f70d0faa42916ca46f5ec9e4a9a4301d",
-        "from": "account-hash-302fbd5a2013148e55fe0483229568e94af57828768db37206120387f791cd1c",
-        "to": null,
-        "source": "uref-200fbbacbeb80e515fa810f0e9c6d2962832e9ae08da673af572fc5d89c6058b-007",
-        "target": "uref-6fec657027fe0e6235fccc9ee5836bec081321fc009854a0ea7b79de080b6b07-007",
-        "amount": "900000000000",
-        "gas": "0",
-        "id": null
+        "deploy_hash": "19ecc72368b1bd2bb592e845a8639fd50fede5c5f8e69604e65e8f36a9518c1d",
+        "timestamp": "2021-05-19T15:08:24.246Z",
+        "from_address": "2eeb39fd238590c0b811fe6543ad845203cc8508eef9643ecaf03befbdf8f5e1",
+        "to_address": "a616c7838d3d03fe0b45c07560ce413f23ccaf35247addc91d1cf7a788db2635",
+        "value": "2361666000000",
+        "fee": "0",
+        "from_balance": "990000",
+        "to_balance": "98288308498499960"
     },
     {
-        "deploy_hash": "5de8cba264a82ede4623d0c07415a9c71c5bdab9fc3f43fcb551427666a700ca",
-        "from": "account-hash-9a0822e9005889874fd36362db5ddaf4815d55e44c9cf1edf6c8be8971570c8b",
-        "to": null,
-        "source": "uref-c2c8f3387dccc28f070063b94b65ee6cb2983783ce564a6b8a5acf702de14571-007",
-        "target": "uref-acc88de13a74724d2ebafb3abacd4f3c6ffc723dd258208822c181ead02be1ed-007",
-        "amount": "900000000000",
-        "gas": "0",
-        "id": null
+        "deploy_hash": "085edde280cd58808b9911dd80b9d8a44288b0f1745fdcd72eebcab63083d355",
+        "timestamp": "2021-05-19T15:07:54.402Z",
+        "from_address": "496d542527e1a29f576ab7c3f4c947bfcdc9b4145f75f6ec40e36089432d7351",
+        "to_address": "af34713e99d8723a19280f623df1c7a8ced29bf74c4d1f13e77059c8c6844720",
+        "value": "6149500000000",
+        "fee": "0",
+        "from_balance": "12947238920913706",
+        "to_balance": "6149500990000"
     },
     {
-        "deploy_hash": "762619ae4746bbc347d65951ae02590688dbce53b02e0c1b173fdb7cf4d8d16e",
-        "from": "account-hash-b383c7cc23d18bc1b42406a1b2d29fc8dba86425197b6f553d7fd61375b5e446",
-        "to": "account-hash-302fbd5a2013148e55fe0483229568e94af57828768db37206120387f791cd1c",
-        "source": "uref-b06a1ab0cfb52b5d4f9a08b68a5dbe78e999de0b0484c03e64f5c03897cf637b-007",
-        "target": "uref-200fbbacbeb80e515fa810f0e9c6d2962832e9ae08da673af572fc5d89c6058b-004",
-        "amount": "1000000000000",
-        "gas": "0",
-        "id": null
+        "deploy_hash": "52b79230e42ed50feae2ea9659ae83b4aa98da625bba801e790e9bebcb8c8121",
+        "timestamp": "2021-05-19T15:07:19.363Z",
+        "from_address": "496d542527e1a29f576ab7c3f4c947bfcdc9b4145f75f6ec40e36089432d7351",
+        "to_address": "5aeccb60ac1dd7b83fb68a1c03df2f01040004ccf305873d442660922be29d02",
+        "value": "3998800000000",
+        "fee": "0",
+        "from_balance": "12953388420923706",
+        "to_balance": "1145973999999993"
     }
 ]
 
