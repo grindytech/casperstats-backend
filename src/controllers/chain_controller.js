@@ -1,3 +1,4 @@
+const { GetBlocksByValidator } = require('../models/block_model');
 const { GetTotalNumberOfTransfers } = require('../models/transfer');
 const {
   GetDeployhashes, GetDeploy, GetBlock,
@@ -168,9 +169,11 @@ module.exports = {
 
   GetBlocksByProposer: async function (req, res) {
     const validator = req.query.validator;
-    const number_of_blocks = req.query.num;
+    const start = req.query.start;
+    const count = req.query.count;
+
     try {
-      const data = await GetBlocksByProposer(validator, number_of_blocks);
+      const data = await GetBlocksByValidator(validator, start, count);
       res.status(200);
       res.json(data);
     } catch (err) {
