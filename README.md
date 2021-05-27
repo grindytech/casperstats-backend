@@ -879,7 +879,7 @@ successResponse:
 #### get-circulating-supply
 
 ```
-url: /info/get-circulating-supply/:param
+url: /info/get-circulating-supply/
 
 example: http://18.184.201.146:3030/info/get-circulating-supply
 

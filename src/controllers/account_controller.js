@@ -22,7 +22,6 @@ module.exports = {
       if (value.length == 1) {
         res.json(value[0]);
       } else {
-        console.log("account old")
         GetAccountData(account).then(acc => {
           res.json(acc);
         }).catch(err => {
@@ -66,9 +65,9 @@ module.exports = {
     GetTransfersByAccountHash(account_hash, start, count).then(value => {
 
       // add type in or out
-      for(let i = 0; i< value.length; i++) {
+      for (let i = 0; i < value.length; i++) {
 
-        if(account_hash == value[i].from_address) {
+        if (account_hash == value[i].from_address) {
           value[i]["type"] = "out";
         } else {
           value[i]["type"] = "in";
@@ -85,11 +84,22 @@ module.exports = {
     const start = req.query.start;
     const count = req.query.count;
 
-    GetDeploysByPublicKey(account, start, count).then(value => {
+    let public_key_hex = "";
+    {
+      try {
+        const get_holder = await GetHolder(account);
+        const holder = get_holder[0];
+        public_key_hex = holder.public_key_hex;
+      } catch (err) {
+        public_key_hex = account;
+      }
+    }
+    GetDeploysByPublicKey(public_key_hex, start, count).then(value => {
       res.json(value);
     }).catch(err => {
       res.send(err);
     })
+
   },
 
   GetRichAccounts: async function (req, res) {
