@@ -860,6 +860,12 @@ successResponse:
 ```
 
 
+| Params  | Type | Description | Required |
+| ------------- | ------------- | ------------- |------------- |
+| validator | string | Validator's public_key | Yes |
+| start | index number | start | Yes |
+| count | number of blocks return |  end | Yes |
+
 
 ### Info
 
