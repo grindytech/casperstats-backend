@@ -11,7 +11,7 @@ router.route("/get-block-deploy/:block").get(chain_controller.GetBlockDeployTx);
 
 // router for transaction
 router.route("/count-transfers").get(chain_controller.CountTransfers);
-router.route("/get-latest-txs/:number").get(chain_controller.GetLatestTx);
+router.route("/get-latest-txs/").get(chain_controller.GetLatestTx);
 
 // blocks
 router.route("/get-proposer-blocks").get(chain_controller.GetBlocksByProposer);

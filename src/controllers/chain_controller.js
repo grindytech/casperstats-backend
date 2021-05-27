@@ -1,5 +1,5 @@
 const { GetBlocksByValidator } = require('../models/block_model');
-const { GetTotalNumberOfTransfers } = require('../models/transfer');
+const { GetTotalNumberOfTransfers, GetTransfers } = require('../models/transfer');
 const {
   GetDeployhashes, GetDeploy, GetBlock,
   GetLatestTx, 
@@ -7,7 +7,6 @@ const {
   GetDeploysInBlock} = require('../utils/chain');
 const { RequestRPC, GetHeight } = require('../utils/common');
 const { RpcApiName } = require('../utils/constant');
-const { GetBlocksByProposer } = require('../utils/validator');
 
 require('dotenv').config();
 
@@ -160,8 +159,9 @@ module.exports = {
 
   GetLatestTx: async function (req, res) {
     try {
-      const num = req.params.number;
-      const result = await GetLatestTx(num);
+      const start = req.query.start;
+      const count = req.query.count;
+      const result = await GetTransfers(start, count);
       res.status(200);
       res.json(result);
     } catch (err) {
