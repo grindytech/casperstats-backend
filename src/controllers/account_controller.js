@@ -67,6 +67,10 @@ module.exports = {
       // add type in or out
       for (let i = 0; i < value.length; i++) {
 
+        if(value[i].to_address === "null") {
+          value[i].to_address = null;
+        }
+
         if (account_hash == value[i].from_address) {
           value[i]["type"] = "out";
         } else {
