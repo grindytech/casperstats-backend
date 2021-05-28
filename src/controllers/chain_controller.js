@@ -161,7 +161,14 @@ module.exports = {
     try {
       const start = req.query.start;
       const count = req.query.count;
-      const result = await GetTransfers(start, count);
+      let result = await GetTransfers(start, count);
+
+      for(let i = 0; i < result.length; i++) {
+        if(result[i].to_address === "null") {
+          result[i].to_address = null;
+        }
+      }
+
       res.status(200);
       res.json(result);
     } catch (err) {
