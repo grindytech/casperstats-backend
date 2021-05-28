@@ -56,8 +56,10 @@ async function GetCirculatingSupply() {
                 reject(err);
             }
             // hard code
-            const hard_code = [{ circulating_supply: "400000000000000000" }];
-            resolve(hard_code);
+            // const hard_code = [{ circulating_supply: "400000000000000000" }];
+            // resolve(hard_code);
+
+            resolve(result);
         });
     })
 }
