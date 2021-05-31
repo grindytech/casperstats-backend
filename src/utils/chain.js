@@ -383,7 +383,7 @@ const GetRecentCirculatingSupply = async () => {
             if (result.error) {
                 reject(result.error);
             } else {
-                resolve({ circulating_supply: body });
+                resolve({ circulating_supply: body + "000000000" });
             }
         });
     })
