@@ -1,4 +1,4 @@
-const { GetDeploy, GetType } = require('../utils/chain');
+const { GetDeploy, GetType, GetRecentCirculatingSupply } = require('../utils/chain');
 
 const { RpcApiName, ELEMENT_TYPE } = require('../utils/constant');
 const { Execute } = require('../utils/common');
@@ -56,10 +56,18 @@ module.exports = {
     },
 
     GetCirculatingSupply: async function (req, res) {
-        GetCirculatingSupply().then(value => {
-            res.json(value[0]);
+        // GetCirculatingSupply().then(value => {
+        //     res.json(value[0]);
+        // }).catch(err => {
+        //     console.log(err);
+        //     res.send(err);
+        // })
+
+        
+        // CasperLabs APIs
+        GetRecentCirculatingSupply().then(value => {
+            res.json(value);
         }).catch(err => {
-            console.log(err);
             res.send(err);
         })
     },

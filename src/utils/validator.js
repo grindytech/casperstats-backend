@@ -4,6 +4,7 @@ const { RpcApiName } = require('./constant');
 const { RequestRPC, GetHeight } = require('./common')
 const math = require('mathjs');
 const {GetCirculatingSupply} = require('../models/account');
+const { GetRecentCirculatingSupply, GetRecentTotalSupply } = require("./chain");
 
 
 function GetTotalBid(bids, address) {
@@ -97,6 +98,7 @@ const GetValidators = async (number_of_validator) => {
         total_bid_validators: 0,
         total_stake: "",
         circulating_supply: 0,
+        total_supply: 0,
         era_validators: {}
     }
 
@@ -109,8 +111,12 @@ const GetValidators = async (number_of_validator) => {
         result.block_height = auction_state.block_height;
 
         //circle supply
-        const circulating_supply = await  GetCirculatingSupply();
-        result.circulating_supply = circulating_supply[0].circulating_supply;
+        const circulating_supply = await  GetRecentCirculatingSupply();
+        result.circulating_supply = circulating_supply.circulating_supply;
+
+        // total_supply
+        const total_supply = await GetRecentTotalSupply();
+        result.total_supply = total_supply.total_supply;
 
         // calculate total_stake
         let total_stake = 0;

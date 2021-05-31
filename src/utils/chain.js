@@ -3,6 +3,7 @@ dotenv.config();
 const { RpcApiName, ELEMENT_TYPE } = require('./constant');
 const account_fn = require('./account');
 const { GetHeight, RequestRPC, GetAccountHash, GetBalanceByAccountHash, Execute } = require("./common");
+const request = require('request');
 
 
 const GetTxhashes = async (block) => {
@@ -273,13 +274,13 @@ async function IsValidatorAddress(param) {
 
 async function IsAccountHash(param) {
     try {
-        if(param.includes('account-hash-')) {
+        if (param.includes('account-hash-')) {
             return true;
-        } 
+        }
         let account_hash = "account-hash-" + param;
         await GetBalanceByAccountHash(account_hash);
         return true;
-    }catch(err) {}
+    } catch (err) { }
     return false;
 }
 
@@ -287,7 +288,7 @@ async function IsPublicKeyHex(param) {
     try {
         await GetAccountHash(param);
         return true;
-    }catch(err){}
+    } catch (err) { }
     return false;
 }
 
@@ -337,7 +338,7 @@ const GetType = async (param) => {
     }
 
     const is_account_hash = await IsAccountHash(param);
-    if(is_account_hash) {
+    if (is_account_hash) {
         return {
             value: param,
             type: ELEMENT_TYPE.PUBLIC_KEY_HASH,
@@ -346,7 +347,7 @@ const GetType = async (param) => {
 
 
     const is_pk_hex = await IsPublicKeyHex(param);
-    if(is_pk_hex) {
+    if (is_pk_hex) {
         return {
             value: param,
             type: ELEMENT_TYPE.PUBLIC_KEY_HEX,
@@ -359,9 +360,67 @@ const GetType = async (param) => {
     }
 }
 
+const GetRecentCirculatingSupply = async () => {
+
+    // const latest_block = await RequestRPC(RpcApiName.get_block, []);
+
+    // const eraID = latest_block.result.block.header.era_id;
+    // const block_height = latest_block.result.block.header.height;
+    // const timestamp = latest_block.result.block.header.timestamp;
+    let options = {
+        url: `https://cspr.rpc.best/circulating`,
+        method: "get",
+        headers:
+        {
+            "content-type": "application/json"
+        }
+    };
+
+    return new Promise((resolve, reject) => {
+
+        request(options, (error, response, body) => {
+            const result = JSON.parse(body);
+            if (result.error) {
+                reject(result.error);
+            } else {
+                resolve({ circulating_supply: body });
+            }
+        });
+    })
+}
+
+const GetRecentTotalSupply = async () => {
+    // const latest_block = await RequestRPC(RpcApiName.get_block, []);
+
+    // const eraID = latest_block.result.block.header.era_id;
+    // const block_height = latest_block.result.block.header.height;
+    // const timestamp = latest_block.result.block.header.timestamp;
+    let options = {
+        url: `https://cspr.rpc.best/total`,
+        method: "get",
+        headers:
+        {
+            "content-type": "application/json"
+        }
+    };
+
+    return new Promise((resolve, reject) => {
+
+        request(options, (error, response, body) => {
+            const result = JSON.parse(body);
+            if (result.error) {
+                reject(result.error);
+            } else {
+                resolve({ total_supply: body });
+            }
+        });
+    })
+}
+
 module.exports = {
     GetTxhashes, GetDeployhashes,
     GetDeploy, DoesDeploySuccess, GetTransfersFromDeploy,
     GetTransferDetail, GetBlock, GetLatestTx,
-    GetTransfersInBlock, GetType, GetDeploysInBlock
+    GetTransfersInBlock, GetType, GetDeploysInBlock,
+    GetRecentCirculatingSupply, GetRecentTotalSupply
 }
