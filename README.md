@@ -1216,38 +1216,40 @@ des: Return the number of top validator by total stake
 successResponse:
 
 {
-    "block_height": 31104,
-    "total_active_validators": 100,
-    "total_bid_validators": 813,
-    "total_stake": "1556302398004137",
+    "block_height": 78031,
+    "total_active_validators": 77,
+    "total_bid_validators": 90,
+    "total_stake": "3604923212499331600",
+    "circulating_supply": "1097786534",
+    "total_supply": "10119365275875535476",
     "era_validators": {
-        "era_id": 398,
+        "era_id": 724,
         "validators": [
             {
-                "public_key": "017d96b9a63abcb61c870a4f55187a0a7ac24096bdb5fc585c12a686a4d892009e",
+                "public_key": "0190c434129ecbaeb34d33185ab6bf97c3c493fc50121a56a9ed8c4c52855b5ac1",
                 "bid": {
-                    "staked_amount": "96635006989003",
-                    "delegation_rate": 10,
-                    "delegators": 0,
-                    "total_stake": "96635006989003"
+                    "staked_amount": "15714656050783608",
+                    "delegation_rate": 100,
+                    "delegators": 3,
+                    "total_stake": "469555297050783608"
                 }
             },
             {
-                "public_key": "0106ca7c39cd272dbf21a86eeb3b36b7c26e2e9b94af64292419f7862936bca2ca",
+                "public_key": "01717c1899762ffdbd12def897ac905f1debff38e8bafb081620cb6da5a6bb1f25",
                 "bid": {
-                    "staked_amount": "96634705486266",
+                    "staked_amount": "1396774438048140",
                     "delegation_rate": 10,
-                    "delegators": 0,
-                    "total_stake": "96634705486266"
+                    "delegators": 22,
+                    "total_stake": "411323863870397573"
                 }
             },
             {
-                "public_key": "0105220d6629f6ef4484e2da5f58b6222832af8cabba4fbd7f1ad55e84a06ab319",
+                "public_key": "015fd964620f98e551065079e142840dac3fb25bd97a0d4722411cb439f9247d72",
                 "bid": {
-                    "staked_amount": "50180676771243",
+                    "staked_amount": "1136449561305517",
                     "delegation_rate": 10,
-                    "delegators": 0,
-                    "total_stake": "50180676771243"
+                    "delegators": 18,
+                    "total_stake": "334677672930790510"
                 }
             }
         ]
