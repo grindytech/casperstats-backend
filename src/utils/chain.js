@@ -368,7 +368,7 @@ const GetRecentCirculatingSupply = async () => {
     // const block_height = latest_block.result.block.header.height;
     // const timestamp = latest_block.result.block.header.timestamp;
     let options = {
-        url: `https://cspr.rpc.best/circulating`,
+        url: `https://api.cspr.live/supply`,
         method: "get",
         headers:
         {
@@ -383,7 +383,7 @@ const GetRecentCirculatingSupply = async () => {
             if (result.error) {
                 reject(result.error);
             } else {
-                resolve({ circulating_supply: body + "000000000" });
+                resolve({ circulating_supply: result.data.circulating + "000000000" });
             }
         });
     })
