@@ -32,7 +32,7 @@ This project provide the REST api to interact with Casper blockchain
     - [get-type](#get-type)
     - [get-circulating-supply](#get-circulating-supply)
     - [get-volume](#get-volume)
-    - [get-transfers-volume](#get-transfers-volume)
+    - [get-transfer-volume](#get-transfer-volume)
  
   - [State](#State)
     - [query-state](#query-state)
@@ -1016,12 +1016,12 @@ successResponse:
 ]
 ```
 
-#### get-transfers-volume
+#### get-transfer-volume
 
 ```
 url: /info/get-volume/:count
 
-example: https://api.casperstats.io/info/get-transfers-volume/7
+example: https://api.casperstats.io/info/get-transfer-volume/7
 
 method: GET
 
