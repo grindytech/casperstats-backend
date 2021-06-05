@@ -282,7 +282,7 @@ successResponse:
   ```
 url: /chain/get-block/:block
 
-example: http://18.184.201.146:3030/chain/get-block/69
+example: https://api.casperstats.io/chain/get-block/69
 
 method: GET
 
@@ -335,7 +335,7 @@ successResponse:
 ```
 url: /chain/get-block-tranfers
 
-example: http://18.184.201.146:3030/chain/get-block-transfers/54675
+example: https://api.casperstats.io/chain/get-block-transfers/54675
 
 method: GET
 
@@ -402,7 +402,7 @@ successResponse:
 ```
 url: /chain/get-state-root-hash/:block
 
-example: http://18.184.201.146:3030/chain/get-state-root-hash/69
+example: https://api.casperstats.io/chain/get-state-root-hash/69
 
 method: GET
 
@@ -435,7 +435,7 @@ successResponse:
 ```
 url: /chain/get-latest-block/:number
 
-example: http://18.184.201.146:3030/chain/get-latest-blocks/3
+example: https://api.casperstats.io/chain/get-latest-blocks/3
 
 method: GET
 
@@ -460,7 +460,7 @@ successResponse: block data
 ```
 url: /chain/get-block-transfers/:block
 
-example: http://18.184.201.146:3030/chain/get-block-transfers/11661
+example: https://api.casperstats.io/chain/get-block-transfers/11661
 
 method: GET
 
@@ -517,7 +517,7 @@ successResponse:
 ```
 url: /chain/get-block-deploy/:block
 
-example: http://18.184.201.146:3030/chain/get-block-deploy/54543
+example: https://api.casperstats.io/chain/get-block-deploy/54543
 
 method: GET
 
@@ -543,7 +543,7 @@ localhost:3031/chain/get-block-deploy/11661
 ```
 url: /chain/get-range-block?start=&end=
 
-example: http://18.184.201.146:3030/chain/get-range-block?start=1000&end=1005
+example: https://api.casperstats.io/chain/get-range-block?start=1000&end=1005
 
 method: GET
 
@@ -758,7 +758,7 @@ successResponse:
 ```
 url: /chain/get-proposer-blocks?validator=&start=&count=
 
-example: http://18.184.201.146:3030/chain/get-proposer-blocks?validator=01419478cc7a68037c553c0214d595cb6b432c71ef73ece0d7a5f98c5eb1ecb44a&count=10&start=0
+example: https://api.casperstats.io/chain/get-proposer-blocks?validator=01419478cc7a68037c553c0214d595cb6b432c71ef73ece0d7a5f98c5eb1ecb44a&count=10&start=0
 
 method: GET
 
@@ -874,7 +874,7 @@ successResponse:
 ```
 url: /info/get-deploy/:hex
 
-example: http://18.184.201.146:3030/info/get-deploy/e48d18ff10e0935f7d1f6ec4044e2b390e4209dab9e1ba6de6ad27db00aabee2
+example: https://api.casperstats.io/info/get-deploy/e48d18ff10e0935f7d1f6ec4044e2b390e4209dab9e1ba6de6ad27db00aabee2
 
 method: GET
 
@@ -899,7 +899,7 @@ successResponse: Deploy data
 ```
 url: /info/get-list-deploys?id=&b=
 
-example: http://18.184.201.146:3030/info/get-list-deploys?id=13&b=3207ff3e5d94984a6ab8de908764f8a2c8b4acbcc1ed5970b26728ac2b2b4490
+example: https://api.casperstats.io/info/get-list-deploys?id=13&b=3207ff3e5d94984a6ab8de908764f8a2c8b4acbcc1ed5970b26728ac2b2b4490
 
 method: GET
 
@@ -931,7 +931,7 @@ successResponse:
 ```
 url: /info/get-type/:param
 
-example: http://18.184.201.146:3030/info/get-type/e4753c7282ed884beb6394425e51c3db80f2217b89b0e692cf923bbdfd9bbb2d
+example: https://api.casperstats.io/info/get-type/e4753c7282ed884beb6394425e51c3db80f2217b89b0e692cf923bbdfd9bbb2d
 
 method: GET
 
@@ -960,7 +960,7 @@ successResponse:
 ```
 url: /info/get-circulating-supply/
 
-example: http://18.184.201.146:3030/info/get-circulating-supply
+example: https://api.casperstats.io/info/get-circulating-supply
 
 method: GET
 
@@ -978,7 +978,7 @@ successResponse:
 ```
 url: /info/get-volume/:count
 
-example: http://18.184.201.146:3030/info/get-volume/7
+example: https://api.casperstats.io/info/get-volume/7
 
 method: GET
 
@@ -1021,7 +1021,7 @@ successResponse:
 ```
 url: /info/get-volume/:count
 
-example: http://18.184.201.146:3030/info/get-transfers-volume/7
+example: https://api.casperstats.io/info/get-transfers-volume/7
 
 method: GET
 
@@ -1068,7 +1068,7 @@ successResponse:
 ```
 url: /sate/query-state?id=&s=&k=
 
-example: http://18.184.201.146:3030/state/query-state?id=12&s=97d55e7074133c9bf7ff1d7b1c9c6f5f84bff888bf0087f16d139356d334170f&k=01aea113d82a9d562563a2802b1abee7ac1ea40b6c100ddeda8e9be5666e1319dc
+example: https://api.casperstats.io/state/query-state?id=12&s=97d55e7074133c9bf7ff1d7b1c9c6f5f84bff888bf0087f16d139356d334170f&k=01aea113d82a9d562563a2802b1abee7ac1ea40b6c100ddeda8e9be5666e1319dc
 
 method: GET
 
@@ -1125,7 +1125,7 @@ successResponse:
 1.
 url: /state/get-balance/:address
 
-example: http://18.184.201.146:3030/state/get-balance/01aea113d82a9d562563a2802b1abee7ac1ea40b6c100ddeda8e9be5666e1319dc
+example: https://api.casperstats.io/state/get-balance/01aea113d82a9d562563a2802b1abee7ac1ea40b6c100ddeda8e9be5666e1319dc
 
 method: GET
 
@@ -1134,7 +1134,7 @@ des: Retrieves a purse's balance from the network
 2.
 url: /state/get-balance?id=&s=&p=
 
-example: http://18.184.201.146:3030/state/get-balance?id=12&s=97d55e7074133c9bf7ff1d7b1c9c6f5f84bff888bf0087f16d139356d334170f&p=uref-52d2021cafe721b5b114c3e45852178541e32ea1a904f904761a66d3dc804da0-007
+example: https://api.casperstats.io/state/get-balance?id=12&s=97d55e7074133c9bf7ff1d7b1c9c6f5f84bff888bf0087f16d139356d334170f&p=uref-52d2021cafe721b5b114c3e45852178541e32ea1a904f904761a66d3dc804da0-007
 
 method: GET
 
@@ -1168,7 +1168,7 @@ successResponse:
 ```
 url: /state/get-auction-info
 
-example: http://18.184.201.146:3030/state/get-auction-info
+example: https://api.casperstats.io/state/get-auction-info
 
 method: GET
 
@@ -1206,7 +1206,7 @@ successResponse:
 ```
 url: /state/get-validators/:number
 
-example: http://18.184.201.146:3030/state/get-validators/3
+example: https://api.casperstats.io/state/get-validators/3
 
 method: GET
 
@@ -1264,7 +1264,7 @@ successResponse:
 ```
 url: /state/get-validator/:address
 
-example: http://18.184.201.146:3030/state/get-validator/017d96b9a63abcb61c870a4f55187a0a7ac24096bdb5fc585c12a686a4d892009e
+example: https://api.casperstats.io/state/get-validator/017d96b9a63abcb61c870a4f55187a0a7ac24096bdb5fc585c12a686a4d892009e
 
 method: GET
 
@@ -1325,7 +1325,7 @@ successResponse:
 ```
 url: /state/get-era-validators
 
-example: http://18.184.201.146:3030/state/get-era-validators
+example: https://api.casperstats.io/state/get-era-validators
 
 method: GET
 
@@ -1342,7 +1342,7 @@ successResponse: validators information
 ```
 url: /state/get-era-validators
 
-example: http://18.184.201.146:3030/state/get-bids
+example: https://api.casperstats.io/state/get-bids
 
 method: GET
 
