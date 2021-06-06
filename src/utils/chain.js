@@ -396,7 +396,7 @@ const GetRecentTotalSupply = async () => {
     // const block_height = latest_block.result.block.header.height;
     // const timestamp = latest_block.result.block.header.timestamp;
     let options = {
-        url: `https://cspr.rpc.best/total`,
+        url: `https://api.cspr.live/supply`,
         method: "get",
         headers:
         {
@@ -411,7 +411,7 @@ const GetRecentTotalSupply = async () => {
             if (result.error) {
                 reject(result.error);
             } else {
-                resolve({ total_supply: body });
+                resolve({ circulating_supply: result.data.total + "000000000" });
             }
         });
     })
