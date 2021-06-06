@@ -411,7 +411,7 @@ const GetRecentTotalSupply = async () => {
             if (result.error) {
                 reject(result.error);
             } else {
-                resolve({ circulating_supply: result.data.total + "000000000" });
+                resolve({ total_supply: result.data.total + "000000000" });
             }
         });
     })
