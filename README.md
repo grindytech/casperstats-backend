@@ -1028,34 +1028,34 @@ method: GET
 des:  Get daily volume transfers of the last $count day
 successResponse:
 [
-    {
-        "date": "2021-05-24",
-        "number_of_transfers": 0
-    },
-    {
-        "date": "2021-05-23",
-        "number_of_transfers": 0
-    },
-    {
-        "date": "2021-05-22",
-        "number_of_transfers": 0
-    },
-    {
-        "date": "2021-05-21",
-        "number_of_transfers": 0
-    },
-    {
-        "date": "2021-05-20",
-        "number_of_transfers": 0
-    },
-    {
-        "date": "2021-05-19",
-        "number_of_transfers": 53
-    },
-    {
-        "date": "2021-05-18",
-        "number_of_transfers": 21
-    }
+    [
+        1623024000,
+        207
+    ],
+    [
+        1622937600,
+        200
+    ],
+    [
+        1622851200,
+        268
+    ],
+    [
+        1622764800,
+        292
+    ],
+    [
+        1622678400,
+        400
+    ],
+    [
+        1622592000,
+        326
+    ],
+    [
+        1622505600,
+        246
+    ]
 ]
 ```
 
