@@ -115,10 +115,10 @@ module.exports = {
                 let data = await GetVolumeByDate(the_date, the_date);
                 data = data[0];
 
-                const paser_data = {
-                    "date": the_date,
-                    "volume": data.volume,
-                }
+                const paser_data = [
+                    Math.floor(new Date(the_date).getTime() / 1000),
+                    data.volume,
+                ]
 
                 result.push(paser_data);
             }
