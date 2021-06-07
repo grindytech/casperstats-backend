@@ -87,10 +87,10 @@ module.exports = {
                 let data = await GetNumberOfTransfersByDate(the_date, the_date);
                 data = data[0];
 
-                const paser_data = {
-                    "date": the_date,
-                    "number_of_transfers": data.number_of_transfers,
-                }
+                const paser_data = [
+                    Math.floor(new Date(the_date).getTime() / 1000),
+                    data.number_of_transfers,
+                ]
 
                 result.push(paser_data);
             }
