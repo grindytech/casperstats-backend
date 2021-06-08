@@ -88,7 +88,7 @@ module.exports = {
                 data = data[0];
 
                 const paser_data = [
-                    Math.floor(new Date(the_date).getTime() / 1000),
+                    Math.floor(new Date(the_date).getTime()),
                     data.number_of_transfers,
                 ]
 
@@ -116,7 +116,7 @@ module.exports = {
                 data = data[0];
 
                 const paser_data = [
-                    Math.floor(new Date(the_date).getTime() / 1000),
+                    Math.floor(new Date(the_date).getTime()),
                     data.volume,
                 ]
 
