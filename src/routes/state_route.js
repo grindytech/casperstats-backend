@@ -3,6 +3,7 @@ const state_controller = require('../controllers/state_controller');
 
 router.route("/get-balance-v2/:account_hash").get(state_controller.GetBalanceAccountHash);
 router.route("/get-balance/:address").get(state_controller.GetBalanceAddress);
+router.route("/get-balance-state/").get(state_controller.GetBalanceState);
 router.route("/query-state/:key").get(state_controller.QueryState);
 
 // Auction and staking

@@ -1,4 +1,4 @@
-const { RequestRPC, QueryState, GetBalance, GetBalanceByAccountHash} = require('../utils/common');
+const { RequestRPC, QueryState, GetBalance, GetBalanceByAccountHash, GetBalanceByState} = require('../utils/common');
 const { GetValidators, GetEraValidators, GetBids, GetValidatorData } = require('../utils/validator');
 const { RpcApiName } = require('../utils/constant');
 
@@ -97,6 +97,19 @@ module.exports = {
             res.status(200);
             res.json(data);
         } catch(err) {
+            res.send(err);
+        }
+    },
+
+    GetBalanceState: async function (req, res) {
+        const account_hash = req.query.account_hash;
+        const state = req.query.state;
+        try{
+            const result = await GetBalanceByState(account_hash, state);
+            console.log(result);
+            res.json(result);
+        }catch(err) {   
+            console.log(err);
             res.send(err);
         }
     }

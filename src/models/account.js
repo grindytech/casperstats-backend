@@ -10,6 +10,7 @@ const pool = mysql.createPool({
     debug: false
 });
 
+
 async function GetHolder(account) {
     return new Promise((resolve, reject) => {
         var sql = `SELECT * FROM account WHERE account_hash = '${account}' OR public_key_hex = '${account}' LIMIT 1`;
@@ -18,6 +19,22 @@ async function GetHolder(account) {
                 reject(err);
             }
             resolve(result);
+        });
+    })
+}
+async function GetNumberOfAccountFromDate(date) {
+    return new Promise((resolve, reject) => {
+        var sql = `SELECT COUNT(*) AS number_of_holders FROM account WHERE DATE(active_date) > '${date}'`;
+        pool.query(sql, function (err, result) {
+            if (err) {
+                reject(err);
+            }
+
+            if (result.length == 1) {
+                resolve(result[0]);
+            } else {
+                resolve(0);
+            }
         });
     })
 }
@@ -30,7 +47,12 @@ async function GetTotalNumberOfAccount() {
             if (err) {
                 reject(err);
             }
-            resolve(result);
+
+            if (result.length == 1) {
+                resolve(result[0]);
+            } else {
+                resolve(0);
+            }
         });
     })
 
@@ -55,16 +77,13 @@ async function GetCirculatingSupply() {
             if (err) {
                 reject(err);
             }
-            // hard code
-            const hard_code = [{ circulating_supply: "400000000000000000" }];
-            resolve(hard_code);
-
-            // resolve(result);
+            resolve(result);
         });
     })
 }
 
 
 module.exports = {
-    GetHolder, GetRichAccounts, GetCirculatingSupply, GetTotalNumberOfAccount
+    GetHolder, GetRichAccounts, GetCirculatingSupply,
+    GetTotalNumberOfAccount, GetNumberOfAccountFromDate
 }

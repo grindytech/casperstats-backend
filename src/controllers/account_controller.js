@@ -38,11 +38,7 @@ module.exports = {
     const account = req.params.account;
 
     GetTotalNumberOfAccount().then(value => {
-      if (value.length == 1) {
-        res.json(value[0]);
-      } else {
-        res.send(0);
-      }
+        res.json(value);
     }).catch(err => {
       res.send(err);
     })

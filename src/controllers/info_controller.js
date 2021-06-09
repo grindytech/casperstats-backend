@@ -4,7 +4,7 @@ const { RpcApiName, ELEMENT_TYPE } = require('../utils/constant');
 const { Execute } = require('../utils/common');
 require('dotenv').config();
 
-const { GetCirculatingSupply } = require('../models/account');
+const { GetCirculatingSupply, GetTotalNumberOfAccount, GetNumberOfAccountFromDate } = require('../models/account');
 const { GetNumberOfTransfersByDate, GetVolumeByDate } = require('../models/transfer');
 
 module.exports = {
@@ -56,18 +56,22 @@ module.exports = {
     },
 
     GetCirculatingSupply: async function (req, res) {
-        // GetCirculatingSupply().then(value => {
-        //     res.json(value[0]);
-        // }).catch(err => {
-        //     console.log(err);
-        //     res.send(err);
-        // })
 
-        
+
+
         // CasperLabs APIs
         GetRecentCirculatingSupply().then(value => {
             res.json(value);
         }).catch(err => {
+            res.send(err);
+        })
+    },
+
+    GetSupply: async function (req, res) {
+        GetCirculatingSupply().then(value => {
+            res.json(value[0]);
+        }).catch(err => {
+            console.log(err);
             res.send(err);
         })
     },
@@ -126,5 +130,42 @@ module.exports = {
         } catch (err) {
             res.send(err);
         }
+    },
+
+    GetStats: async function (req, res) {
+        let stats = {
+            holders: 0,
+            last_holders: 0, // last 30 days 
+            validators: 0,
+            last_validators: 0,// last 30 days  
+            circulating: 0,
+            last_circulating: 0, // last 30 days  
+            total_supply: 0,
+            last_total_supply: 0, // last 30 days  
+            price: 0,
+            last_price: 0,// last 30 days  
+            marketcap: 0,
+            last_marketcap: 0,// last 30 days  
+            transactions: 0,
+            last_transactions: 0, // last 24h
+            transfers: [], // last 60 days transfer
+        }
+
+        let last_30_days = new Date();
+        {
+            var datetime = new Date();
+            last_30_days.setDate(datetime.getDate() - 30);
+            last_30_days = last_30_days.toISOString().slice(0, 10);
+        }
+
+        // holder
+        {
+            const holders = (await GetTotalNumberOfAccount()).number_of_holders;
+            const last_holders = (await GetNumberOfAccountFromDate(last_30_days)).number_of_holders;
+            stats.holders = holders;
+            stats.last_holders = last_holders;
+        }
+
+        res.json(stats);
     }
 };

@@ -66,6 +66,15 @@ const GetBalanceByAccountHash = async (account_hash) => {
     };
 }
 
+const GetBalanceByState = async (account_hash, s) => {
+    const state = await QueryState(account_hash, s);
+    const main_purse = state.result.stored_value.Account.main_purse;
+
+    let params = [s, main_purse];
+    const result = await RequestRPC(RpcApiName.get_balance, params);
+    return result.result.balance_value;
+}
+
 
 async function GetAccountData (address) {
  
@@ -190,6 +199,6 @@ module.exports = {
     GetAccountData, GetHeight, QueryState, 
     GetLatestStateRootHash, Execute, GetBalance,
     GetAccountHash, RequestRPC, GetBalanceByAccountHash,
-    db_config
+    db_config, GetBalanceByState
 }
 

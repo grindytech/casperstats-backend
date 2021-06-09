@@ -2,7 +2,6 @@ const { GetBlocksByValidator } = require('../models/block_model');
 const { GetTotalNumberOfTransfers, GetTransfers } = require('../models/transfer');
 const {
   GetDeployhashes, GetDeploy, GetBlock,
-  GetLatestTx, 
   GetTransfersInBlock,
   GetDeploysInBlock} = require('../utils/chain');
 const { RequestRPC, GetHeight } = require('../utils/common');
