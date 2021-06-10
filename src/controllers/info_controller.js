@@ -119,35 +119,35 @@ module.exports = {
     GetStats: async function (req, res) {
         let stats = {
             holders: 0,
-            holders_change: 0, // last 24 days 
+            holders_change: 0, // last 24 hours 
             validators: 0,
-            validators_change: 0,// last 24 days  
+            validators_change: 0,// last 24 hours  
             circulating: 0,
-            circulating_change: 0, // last 24 days  
+            circulating_change: 0, // last 24 hours  
             total_supply: 0,
-            total_supply_change: 0, // last 24 days  
+            total_supply_change: 0, // last 24 hours  
             price: 0,
-            price_change: 0,// last 24 days  
+            price_change: 0,// last 24 hours  
             marketcap: 0,
-            marketcap_change: 0,// last 24 days  
+            marketcap_change: 0,// last 24 hours  
             transactions: 0,
-            transactions_change: 0, // last 24h
+            transactions_change: 0, // last 24 hours
             transfers: [], // last 60 days transfer
-        }
-
-        let last_30_days = new Date();
-        {
-            var datetime = new Date();
-            last_30_days.setDate(datetime.getDate() - 30);
-            last_30_days = last_30_days.toISOString().slice(0, 10);
         }
 
         // holder
         {
+            var datetime = new Date();
+            let yesterday = new Date();
+            {
+                yesterday.setDate(datetime.getDate() - 1);
+                yesterday = yesterday.toISOString();
+            }
+
             const holders = (await GetTotalNumberOfAccount()).number_of_holders;
-            const last_holders = (await GetNumberOfAccountFromDate(last_30_days)).number_of_holders;
+            const last_holders = (await GetNumberOfAccountFromDate(yesterday)).number_of_holders;
             stats.holders = holders;
-            stats.holders_change = last_holders;
+            stats.holders_change = (Number(holders) - Number(last_holders)) / Number(last_holders) * 100;
         }
 
 
