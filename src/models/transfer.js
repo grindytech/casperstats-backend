@@ -54,7 +54,11 @@ async function GetNumberOfTransfersByDate(from, to) {
             if (err) {
                 reject(err);
             }
-            resolve(result);
+            if (result.length == 1) {
+                resolve(result[0]);
+            } else {
+                resolve(0);
+            }
         });
     })
 }

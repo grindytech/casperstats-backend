@@ -4,6 +4,7 @@ const { RpcApiName, ELEMENT_TYPE } = require('./constant');
 const account_fn = require('./account');
 const { GetHeight, RequestRPC, GetAccountHash, GetBalanceByAccountHash, Execute } = require("./common");
 const request = require('request');
+const { GetNumberOfTransfersByDate } = require("../models/transfer");
 
 
 const GetTxhashes = async (block) => {
@@ -417,10 +418,51 @@ const GetRecentTotalSupply = async () => {
     })
 }
 
+const GetCasperlabsSupply = async () => {
+    let options = {
+        url: `https://api.cspr.live/supply`,
+        method: "get",
+        headers:
+        {
+            "content-type": "application/json"
+        }
+    };
+
+    return new Promise((resolve, reject) => {
+
+        request(options, (error, response, body) => {
+            const result = JSON.parse(body);
+            if (result.error) {
+                reject(result.error);
+            } else {
+                resolve(result);
+            }
+        });
+    })
+}
+
+const GetTransfersVolume = async (count) => {
+    var datetime = new Date();
+    let result = [];
+    for (let i = 0; i < count; i++) {
+        let the_date = new Date();
+        the_date.setDate(datetime.getDate() - i);
+        the_date = the_date.toISOString().slice(0, 10);
+        let data = await GetNumberOfTransfersByDate(the_date, the_date);
+        const paser_data = [
+            Math.floor(new Date(the_date).getTime()),
+            data.number_of_transfers,
+        ]
+        result.push(paser_data);
+    }
+    return result;
+}
+
 module.exports = {
     GetTxhashes, GetDeployhashes,
     GetDeploy, DoesDeploySuccess, GetTransfersFromDeploy,
     GetTransferDetail, GetBlock, GetLatestTx,
     GetTransfersInBlock, GetType, GetDeploysInBlock,
-    GetRecentCirculatingSupply, GetRecentTotalSupply
+    GetRecentCirculatingSupply, GetRecentTotalSupply,
+    GetCasperlabsSupply, GetTransfersVolume
 }

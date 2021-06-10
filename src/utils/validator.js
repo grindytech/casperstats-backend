@@ -3,7 +3,6 @@ dotenv.config();
 const { RpcApiName } = require('./constant');
 const { RequestRPC, GetHeight } = require('./common')
 const math = require('mathjs');
-const {GetCirculatingSupply} = require('../models/account');
 const { GetRecentCirculatingSupply, GetRecentTotalSupply } = require("./chain");
 
 
