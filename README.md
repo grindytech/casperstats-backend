@@ -33,6 +33,7 @@ This project provide the REST api to interact with Casper blockchain
     - [get-circulating-supply](#get-circulating-supply)
     - [get-volume](#get-volume)
     - [get-transfer-volume](#get-transfer-volume)
+    - [get-stats](#get-stats)
  
   - [State](#State)
     - [query-state](#query-state)
@@ -1059,6 +1060,43 @@ successResponse:
 ]
 ```
 
+
+#### get-stats
+
+```
+url: /info/get-stats
+
+example: https://api.casperstats.io/info/get-stats
+
+method: GET
+
+des:  Get daily stats
+successResponse:
+{
+    "holders": 7257,
+    "holders_change": 4575,
+    "validators": 85,
+    "validators_change": 0,
+    "circulating": "591181941000000000",
+    "circulating_change": 0,
+    "total_supply": "10141086469000000000",
+    "total_supply_change": 0,
+    "price": 0.265445,
+    "price_change": -2.84416,
+    "marketcap": 156908740,
+    "marketcap_change": 0.14022,
+    "transactions": 0,
+    "transactions_change": null,
+    "transfers": []
+}
+```
+
+
+| ResponseField  | Type | Description |
+| ------------- | ------------- | ------------- |
+| holders |  number | current number of holders |
+| *_change | number | percentage of changes last 24 hours |
+| transfers | number | volume transfers on last 60 days (on-chain) |
 
 
 ### State
