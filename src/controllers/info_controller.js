@@ -147,7 +147,7 @@ module.exports = {
             const holders = (await GetTotalNumberOfAccount()).number_of_holders;
             const last_holders = (await GetNumberOfAccountFromDate(yesterday)).number_of_holders;
             stats.holders = holders;
-            stats.holders_change = (Number(last_holders) - Number(holders)) / Number(last_holders) * 100;
+            stats.holders_change = (Number(holders) - Number(last_holders)) / Number(holders) * 100;
         }
 
 
