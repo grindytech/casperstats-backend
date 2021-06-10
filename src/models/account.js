@@ -24,7 +24,7 @@ async function GetHolder(account) {
 }
 async function GetNumberOfAccountFromDate(date) {
     return new Promise((resolve, reject) => {
-        var sql = `SELECT COUNT(*) AS number_of_holders FROM account WHERE DATE(active_date) > '${date}'`;
+        var sql = `SELECT COUNT(*) AS number_of_holders FROM account WHERE DATE(active_date) < '${date}'`;
         pool.query(sql, function (err, result) {
             if (err) {
                 reject(err);
