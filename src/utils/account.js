@@ -22,7 +22,6 @@ async function GetAccountData(address) {
         public_key = null;
     }
     
-    console.log(account_hash);
     const balance = await common.GetBalanceByAccountHash(account_hash);
     const account = {
         "account_hash": account_hash.replace('account-hash-', ''),

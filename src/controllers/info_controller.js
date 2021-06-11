@@ -72,7 +72,6 @@ module.exports = {
         GetCirculatingSupply().then(value => {
             res.json(value[0]);
         }).catch(err => {
-            console.log(err);
             res.send(err);
         })
     },
@@ -83,7 +82,6 @@ module.exports = {
             const result = await GetTransfersVolume(count);
             res.json(result);
         } catch (err) {
-            console.log(err);
             res.send(err);
         }
     },
@@ -177,8 +175,6 @@ module.exports = {
 
                 }
                 let data = await CoinGeckoClient.coins.fetch('casper-network', params);
-                // console.log(data);
-
                 stats.price = data.data.market_data.current_price.usd;
                 stats.price_change = data.data.market_data.price_change_percentage_24h;
                 stats.marketcap = data.data.market_data.market_cap.usd;

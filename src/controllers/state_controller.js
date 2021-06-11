@@ -106,10 +106,8 @@ module.exports = {
         const state = req.query.state;
         try{
             const result = await GetBalanceByState(account_hash, state);
-            console.log(result);
             res.json(result);
         }catch(err) {   
-            console.log(err);
             res.send(err);
         }
     }

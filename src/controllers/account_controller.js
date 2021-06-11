@@ -25,7 +25,6 @@ module.exports = {
         GetAccountData(account).then(acc => {
           res.json(acc);
         }).catch(err => {
-          console.log(err)
           res.send(err);
         })
       }
