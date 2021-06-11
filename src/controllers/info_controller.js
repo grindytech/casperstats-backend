@@ -218,7 +218,7 @@ module.exports = {
             let yesterday_transfers = (await GetNumberOfTransfersByDate(before_yesterday, yesterday)).number_of_transfers;
 
             stats.transactions = today_transfers;
-            stats.transactions_change = ((Number(today_transfers) - Number(yesterday_transfers)) / Number(today_transfers)) * 100;
+            stats.transactions_change = ((Number(today_transfers) - Number(yesterday_transfers)) / Number(yesterday_transfers)) * 100;
         }
 
         // transfers
