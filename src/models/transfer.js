@@ -50,6 +50,7 @@ async function GetTotalNumberOfTransfers() {
 async function GetNumberOfTransfersByDate(from, to) {
     return new Promise((resolve, reject) => {
         var sql = `SELECT COUNT(*) AS number_of_transfers FROM transfer WHERE DATE(timestamp) BETWEEN '${from}' AND '${to}'`;
+        console.log(sql);
         pool.query(sql, function (err, result) {
             if (err) {
                 reject(err);

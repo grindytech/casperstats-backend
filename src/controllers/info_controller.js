@@ -218,8 +218,8 @@ module.exports = {
                 before_yesterday = before_yesterday.toISOString();
             }
 
-            let today_transfers = (await GetNumberOfTransfersByDate(now, yesterday)).number_of_transfers;
-            let yesterday_transfers = (await GetNumberOfTransfersByDate(yesterday, before_yesterday)).number_of_transfers;
+            let today_transfers = (await GetNumberOfTransfersByDate(yesterday, now)).number_of_transfers;
+            let yesterday_transfers = (await GetNumberOfTransfersByDate(before_yesterday, yesterday)).number_of_transfers;
 
             stats.transactions = today_transfers;
             stats.transactions_change = ((Number(today_transfers) - Number(yesterday_transfers)) / Number(today_transfers)) * 100;
