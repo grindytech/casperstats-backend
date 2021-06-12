@@ -325,7 +325,9 @@ successResponse:
 
 | Params  | Type | Description | Required |
 | ------------- | ------------- | ------------- |------------- |
-| count | number | number of richest accounts| Yes |
+| account | string | account| Yes |
+| start | number | start from today| Yes |
+| count | number | number of day | Yes |
 
 
 
