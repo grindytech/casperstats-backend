@@ -222,10 +222,7 @@ const GetValidatorData = async (address) => {
         const sort_value = element.bid.delegators.sort(function (a, b) {
             return math.compare(b.staked_amount, a.staked_amount);
         })
-
         element.bid.delegators = sort_value;
-
-        console.log(sort_value);
     } else {
         throw ({
             "code": -32000,

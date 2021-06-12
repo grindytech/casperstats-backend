@@ -151,9 +151,6 @@ module.exports = {
           }
           const seigniorage_allocations = era_info.era_summary.stored_value.EraInfo.seigniorage_allocations;
           const allocation_filter = seigniorage_allocations.filter(function (element) {
-            // console.log(delegator.Delegator.delegator_public_key);
-            // console.log(account);
-
             if (element.Delegator) {
               return element.Delegator.delegator_public_key == account;
             } else if (element.Validator) {
