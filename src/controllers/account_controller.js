@@ -126,7 +126,6 @@ module.exports = {
         let the_date = new Date();
         the_date.setDate(the_time.getDate() - (Number(start) + i));
         the_date = the_date.toISOString().slice(0, 10);
-        console.log(the_date);
         const switchs = await GetSwitchBlockByDate(the_date);
         switch_blocks.push({ "date": the_date, "switchs": switchs });
       }
@@ -140,6 +139,7 @@ module.exports = {
         const switchs = switch_blocks[i].switchs;
         
         let daily_rewards = math.bignumber("0");
+        let validator = "";
         // calculate daily rewards
         for (let ii = 0; ii < switchs.length; ii++) {
           const height = switchs[ii].height;
@@ -165,16 +165,31 @@ module.exports = {
             if (allocation_filter[j].Delegator) {
               const reward = math.bignumber(allocation_filter[j].Delegator.amount);
               daily_rewards = math.add(daily_rewards, reward);
-            } else if (element.Validator) {
+              if(validator == "") {
+                  validator = allocation_filter[j].Delegator.validator_public_key;
+              }
+
+            } else if (allocation_filter[j].Validator) {
               const reward = math.bignumber(allocation_filter[j].Validator.amount);
               daily_rewards = math.add(daily_rewards, reward);
+              if(validator == "") {
+                validator = allocation_filter[j].Validator.validator_public_key;
+              }
             }
           }
         }
 
+        // calculate APY
+        let APY = 0;
+        {
+
+        }
+
         rewards.push({
           "date": switch_blocks[i].date,
+          "validator": validator,
           "rewards": daily_rewards.toString(),
+          "APY": APY,
         })
       }
     }
