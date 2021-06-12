@@ -458,11 +458,18 @@ const GetTransfersVolume = async (count) => {
     return result;
 }
 
+const GetEraInfoBySwitchBlock = async (hash) => {
+    let params = [{ "Hash": hash }]
+    const result = await RequestRPC(RpcApiName.get_era_info_by_switch_block, params);
+    return result.result;
+}
+
 module.exports = {
     GetTxhashes, GetDeployhashes,
     GetDeploy, DoesDeploySuccess, GetTransfersFromDeploy,
     GetTransferDetail, GetBlock, GetLatestTx,
     GetTransfersInBlock, GetType, GetDeploysInBlock,
     GetRecentCirculatingSupply, GetRecentTotalSupply,
-    GetCasperlabsSupply, GetTransfersVolume
+    GetCasperlabsSupply, GetTransfersVolume,
+    GetEraInfoBySwitchBlock
 }

@@ -23,4 +23,34 @@ async function GetBlocksByValidator(validator_public_key, start, count) {
     })
 }
 
-module.exports = { GetBlocksByValidator } 
+async function GetSwitchBlockByDate(date) {
+    return new Promise((resolve, reject) => {
+
+        var sql = `SELECT era , MAX(height) as height FROM block WHERE DATE(timestamp) BETWEEN '${date}' AND '${date}' GROUP BY era ORDER BY height DESC`;
+        pool.query(sql, function (err, result) {
+            if (err) {
+                reject(err);
+            }
+            resolve(result);
+        });
+    })
+}
+
+async function GetBlockHashByHeight(height) {
+    return new Promise((resolve, reject) => {
+
+        var sql = `SELECT hash FROM block WHERE height = ${height}`;
+        pool.query(sql, function (err, result) {
+            if (err) {
+                reject(err);
+            }
+            if(result.length > 0) {
+                resolve(result[0]);
+            } else {
+                resolve("");
+            }
+        });
+    })
+}
+
+module.exports = { GetBlocksByValidator, GetSwitchBlockByDate,GetBlockHashByHeight } 

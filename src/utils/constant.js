@@ -6,6 +6,7 @@ const RpcApiName = {
     get_deploy: "info_get_deploy",
     get_balance: "state_get_balance",
     get_auction_info: "state_get_auction_info",
+    get_era_info_by_switch_block: "chain_get_era_info_by_switch_block",
 }
 
 const ELEMENT_TYPE = {

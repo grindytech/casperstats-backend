@@ -7,5 +7,6 @@ router.route("/get-transfers").get(account_controller.GetAccountTransfers);
 router.route("/get-deploys/").get(account_controller.GetAccountDeploys);
 router.route("/get-rich-accounts/").get(account_controller.GetRichAccounts);
 router.route("/count-holders/").get(account_controller.CountHolders);
+router.route("/get-rewards").get(account_controller.GetRewards);
 
 module.exports = router;
