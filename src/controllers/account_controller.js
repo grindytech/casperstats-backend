@@ -180,16 +180,16 @@ module.exports = {
         }
 
         // calculate APY
-        let APY = 0;
-        {
+        // let APY = 0;
+        // {
 
-        }
+        // }
 
         rewards.push({
           "date": switch_blocks[i].date,
           "validator": validator,
           "rewards": daily_rewards.toString(),
-          "APY": APY,
+          // "APY": APY,
         })
       }
     }
