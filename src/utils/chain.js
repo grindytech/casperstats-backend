@@ -5,6 +5,7 @@ const account_fn = require('./account');
 const { GetHeight, RequestRPC, GetAccountHash, GetBalanceByAccountHash, Execute } = require("./common");
 const request = require('request');
 const { GetNumberOfTransfersByDate } = require("../models/transfer");
+const { GetLatestEra, GetTotalRewardByEra } = require("../models/era");
 
 
 const GetTxhashes = async (block) => {
@@ -463,6 +464,8 @@ const GetEraInfoBySwitchBlock = async (hash) => {
     const result = await RequestRPC(RpcApiName.get_era_info_by_switch_block, params);
     return result.result;
 }
+
+
 
 module.exports = {
     GetTxhashes, GetDeployhashes,

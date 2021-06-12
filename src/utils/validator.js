@@ -4,6 +4,7 @@ const { RpcApiName } = require('./constant');
 const { RequestRPC, GetHeight } = require('./common')
 const math = require('mathjs');
 const { GetRecentCirculatingSupply, GetRecentTotalSupply } = require("./chain");
+const { GetTotalRewardByPublicKey, GetLatestEra, GetTotalRewardByEra } = require("../models/era");
 
 
 function GetTotalBid(bids, address) {
@@ -206,6 +207,21 @@ const GetBids = async () => {
     return auction_info;
 }
 
+const GetAPY = async () => {
+
+    const total_reward_last_era = 0;
+    const latest_era = await GetLatestEra();
+    const latest_total_reward = await GetTotalRewardByEra(latest_era.era_id);
+
+    let total_stake = 0;
+    {
+        const auction_info = await RequestRPC(RpcApiName.get_auction_info, []);
+        const auction_state = auction_info.result.auction_state;
+        total_stake = await GetTotalStake(auction_state, 0);
+    }
+    console.log(latest_total_reward.total_reward);
+    console.log(total_stake);
+}
 
 const GetValidatorData = async (address) => {
     const auction_info = (await RequestRPC(RpcApiName.get_auction_info, [])).result;
@@ -223,6 +239,13 @@ const GetValidatorData = async (address) => {
             return math.compare(b.staked_amount, a.staked_amount);
         })
         element.bid.delegators = sort_value;
+
+        // add total rewards paid
+        const total_reward = await GetTotalRewardByPublicKey(element.public_key);
+        element.total_reward = total_reward.total_reward;
+        // calculate APY
+        await GetAPY();
+
     } else {
         throw ({
             "code": -32000,
