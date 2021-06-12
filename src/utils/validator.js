@@ -217,6 +217,15 @@ const GetValidatorData = async (address) => {
     if (element) {
         const total_stake = GetTotalBid(bids, element.public_key);
         element.bid["total_stake"] = total_stake;
+
+        // sort delegator by stake
+        const sort_value = element.bid.delegators.sort(function (a, b) {
+            return math.compare(b.staked_amount, a.staked_amount);
+        })
+
+        element.bid.delegators = sort_value;
+
+        console.log(sort_value);
     } else {
         throw ({
             "code": -32000,
