@@ -294,31 +294,26 @@ successResponse:
         "date": "2021-06-12",
         "validator": "0107c39ec309b16b2e9244f661c711b817659f3a48cbf7f602181ea13a9e4ce3ba",
         "rewards": "38665966",
-        "APY": 0
     },
     {
         "date": "2021-06-11",
         "validator": "0107c39ec309b16b2e9244f661c711b817659f3a48cbf7f602181ea13a9e4ce3ba",
         "rewards": "92468051",
-        "APY": 0
     },
     {
         "date": "2021-06-10",
         "validator": "0107c39ec309b16b2e9244f661c711b817659f3a48cbf7f602181ea13a9e4ce3ba",
         "rewards": "4654629",
-        "APY": 0
     },
     {
         "date": "2021-06-09",
         "validator": "0107c39ec309b16b2e9244f661c711b817659f3a48cbf7f602181ea13a9e4ce3ba",
         "rewards": "4659278",
-        "APY": 0
     },
     {
         "date": "2021-06-08",
         "validator": "0107c39ec309b16b2e9244f661c711b817659f3a48cbf7f602181ea13a9e4ce3ba",
         "rewards": "4674328",
-        "APY": 0
     }
 ]
 ```
