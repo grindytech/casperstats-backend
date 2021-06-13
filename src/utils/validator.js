@@ -246,8 +246,7 @@ const GetValidatorData = async (address) => {
         element.total_reward = total_reward.total_reward;
         // calculate APY
         const apy = await GetAPY();
-        const commission = element.bid.delegation_rate;
-        element.APY = apy - (apy * commission / 100);
+        element.APY = apy;
 
     } else {
         throw ({
