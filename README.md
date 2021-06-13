@@ -1294,7 +1294,7 @@ successResponse:
 ```
 url: /state/get-validators/:number
 
-example: https://api.casperstats.io/state/get-validators/3
+example: api.casperstats.io/state/get-validator/0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c
 
 method: GET
 
@@ -1304,44 +1304,246 @@ des: Return the number of top validator by total stake
 successResponse:
 
 {
-    "block_height": 78031,
-    "total_active_validators": 77,
-    "total_bid_validators": 90,
-    "total_stake": "3604923212499331600",
-    "circulating_supply": "1097786534",
-    "total_supply": "10119365275875535476",
-    "era_validators": {
-        "era_id": 724,
-        "validators": [
+    "public_key": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c",
+    "bid": {
+        "bonding_purse": "uref-f8741b7cd2fce2069998eaeac3dfac543284dc3cff6973ba63f2c11a5d9d548b-007",
+        "staked_amount": "60420413461486",
+        "delegation_rate": 10,
+        "delegators": [
             {
-                "public_key": "0190c434129ecbaeb34d33185ab6bf97c3c493fc50121a56a9ed8c4c52855b5ac1",
-                "bid": {
-                    "staked_amount": "15714656050783608",
-                    "delegation_rate": 100,
-                    "delegators": 3,
-                    "total_stake": "469555297050783608"
-                }
+                "public_key": "012325dc6969af448e93fe5299571ae6b4f0ad87b0a51df9f34225b242116416d1",
+                "staked_amount": "7960933176827136",
+                "bonding_purse": "uref-32d6fdbbbafc77ddddb8ae4ad633b18bdd354bbe1bcf3427800bef8c582a9228-007",
+                "delegatee": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c"
             },
             {
-                "public_key": "01717c1899762ffdbd12def897ac905f1debff38e8bafb081620cb6da5a6bb1f25",
-                "bid": {
-                    "staked_amount": "1396774438048140",
-                    "delegation_rate": 10,
-                    "delegators": 22,
-                    "total_stake": "411323863870397573"
-                }
+                "public_key": "01b7b1b5856758bd59ebb8beebccd6dbf4bc489628032921dd83e54c919b4d0a72",
+                "staked_amount": "7960933176827136",
+                "bonding_purse": "uref-0ad9da724056eedeffa39a037da46af00780c718abbdb5e90c7b6c7700166f4c-007",
+                "delegatee": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c"
             },
             {
-                "public_key": "015fd964620f98e551065079e142840dac3fb25bd97a0d4722411cb439f9247d72",
-                "bid": {
-                    "staked_amount": "1136449561305517",
-                    "delegation_rate": 10,
-                    "delegators": 18,
-                    "total_stake": "334677672930790510"
-                }
+                "public_key": "01c4dcd4f6676ea296c013c9d2ce82e78b6eff0617f061d50626748a1d9196dcfb",
+                "staked_amount": "7960933176827136",
+                "bonding_purse": "uref-e731465041b974e099779d05f28c508b15152b8e150ab07d44a4521f148b608a-007",
+                "delegatee": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c"
+            },
+            {
+                "public_key": "016a0f6e2a18688f89b4262d048d57bce3df7aad70c1f5fae7be7daee02cb0edb1",
+                "staked_amount": "2653644392275553",
+                "bonding_purse": "uref-deffca02af6c63e144cbfde233358936f00489f78406fcb09b47e18b35ce6a27-007",
+                "delegatee": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c"
+            },
+            {
+                "public_key": "0157a50432fbb567937ea38f7a4c2a4afda006021102ce6a6e936b81dc6f4e351c",
+                "staked_amount": "281613615130434",
+                "bonding_purse": "uref-0f23181838cedd505896f06586931d578ef18caf0e5b3e66a68823011d96ae30-007",
+                "delegatee": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c"
+            },
+            {
+                "public_key": "015a49934ae5414f82614cb983ee37d9781a74a7e819bab19637589e63ebe498e8",
+                "staked_amount": "167114147310423",
+                "bonding_purse": "uref-79b55d67310e349a08a6d82ee5f009c7dba6f42eb5625d9e0c7ab5f141b29316-007",
+                "delegatee": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c"
+            },
+            {
+                "public_key": "01657a8879d66b9a97a0f3cb603c6f03bf5ceede7659566ead2dd4d1cb2f3d2662",
+                "staked_amount": "165990364131026",
+                "bonding_purse": "uref-a19a807e21209e6e3e668cb77f69deae3cd0c3b62c3455afcce2fc9f996a315a-007",
+                "delegatee": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c"
+            },
+            {
+                "public_key": "01774c5e3957c6df183fed123bd9d3955d5c7158e81b121ca5140d8b3ec57ce749",
+                "staked_amount": "162210008584669",
+                "bonding_purse": "uref-1162e60f97f63426114ccfb5f166825f7eb6cae48069af25d967dc98c154a276-007",
+                "delegatee": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c"
+            },
+            {
+                "public_key": "01416bc2de2a41734f7f9af625aa44f4b286f96e00607f683de90a38f46d291197",
+                "staked_amount": "150154564307824",
+                "bonding_purse": "uref-3ab544a20e495cd5602b523d9dfd06a643d340daffafb70fea5b6695e90e1be4-007",
+                "delegatee": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c"
+            },
+            {
+                "public_key": "013682f5656c5ae7730aa84bad542241d72362ddbffdd326ec9b7a120acbd6f3f5",
+                "staked_amount": "123910642344794",
+                "bonding_purse": "uref-64f3e14f303936af0a9a67fc96433a8f941da3b8dfdc314e2621de1f62c19bcf-007",
+                "delegatee": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c"
+            },
+            {
+                "public_key": "011bd705874e263197ac6a940e8aa4773a9f6f027b742f80b3f72d6b2a0c38e381",
+                "staked_amount": "68481243951221",
+                "bonding_purse": "uref-85e91f133827263d0b0e5d9d4c9eced546e1256c5b5d966fad9a3cd6b9ce8f40-007",
+                "delegatee": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c"
+            },
+            {
+                "public_key": "01b1ceda22b17f9848ab04ea034977bffdf0b43c4afef4ec405b4bbb23fd1ef034",
+                "staked_amount": "45154269951254",
+                "bonding_purse": "uref-9da0da736ded3bc69c72e6b5eb8d02e5d545a9a92b57f141bd5b0b29187a2d87-007",
+                "delegatee": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c"
+            },
+            {
+                "public_key": "01ef5645fdbfb6b69f84daabaeaf05e9b0eef7f2653126286ead041d8a4cac0d6f",
+                "staked_amount": "40079611096686",
+                "bonding_purse": "uref-2b83e322765b0ef2666cbdb38f3390f2e5472af6da84e654635433d07b592582-007",
+                "delegatee": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c"
+            },
+            {
+                "public_key": "01c6626d121843a499b536e01f631f27a0649bbe7dd997f0eec0cfe9bb8395c528",
+                "staked_amount": "24911689448616",
+                "bonding_purse": "uref-95acaf4018527e429c351738d08629a4b3c8c8fd4f96cfade4fe22096e5556ca-007",
+                "delegatee": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c"
+            },
+            {
+                "public_key": "020230c20cfafb229e931602553c482ca0a93a57dc62a2c9e7a0996cdfbf765704f7",
+                "staked_amount": "20004287690673",
+                "bonding_purse": "uref-f7b197bdd4d97478d32e9a1355e272645b2f21272d232d834721611b7da19d4f-007",
+                "delegatee": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c"
+            },
+            {
+                "public_key": "016db713c7dd385b1f35cb68e18e4621fdd09fe4ef7a4ce60475dd1ad4aec2d149",
+                "staked_amount": "10580424413953",
+                "bonding_purse": "uref-d10531d8b5f1fe8649d9b52e112a9a5781c0d992cb5310a3d2e5e3549862cab5-007",
+                "delegatee": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c"
+            },
+            {
+                "public_key": "019d4b3cfc743ece28be983f45a783ffea6d1ee6fffa49e6239e6bf6b5308f6b4d",
+                "staked_amount": "9011981082724",
+                "bonding_purse": "uref-fb363e42ca54df5d1eb9c3bc977904b538bbdaf21e17a5f59efa4bf6fadf9e44-007",
+                "delegatee": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c"
+            },
+            {
+                "public_key": "01cec85f26557e6fd128db1573fbbed3d6b8803bf567e021722d0bcc86f6d13c7e",
+                "staked_amount": "8190996835902",
+                "bonding_purse": "uref-05656fe3bbd9471948d42200b3592da42455d1df9fa88ea98c665f05cfa4d44f-007",
+                "delegatee": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c"
+            },
+            {
+                "public_key": "01fe1f528e83343d1e32c3d7f69eb5584efc4d4668cace4ec1c5805008459895a8",
+                "staked_amount": "6370466733628",
+                "bonding_purse": "uref-89bc2a961f5a371650ec2ed88e1184c67f9888b21e192e2382964de4c85d900f-007",
+                "delegatee": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c"
+            },
+            {
+                "public_key": "01c29f0c214bfa5d33a0a93d7b56b734985c9fdc16af19fc3d1224537b025f2499",
+                "staked_amount": "6335695316164",
+                "bonding_purse": "uref-70313a28710ce9b4176e9921de457f4ca3a4d01ebc7673a1f9e29256a1ee570e-007",
+                "delegatee": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c"
+            },
+            {
+                "public_key": "016b736f641a642876a1c2cbecd7e34298405f594cf01e782b58e13f6596cd80a4",
+                "staked_amount": "6004240416584",
+                "bonding_purse": "uref-df412bda2dca1a65fe3d22adbcd1309a4dfe6212919ec9edeb5a13a36af5f2b1-007",
+                "delegatee": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c"
+            },
+            {
+                "public_key": "01cf8c3516007486b874ab1a93dbf70a5ef44f60052363d17ea6aeb50aa940cfe1",
+                "staked_amount": "6004240416584",
+                "bonding_purse": "uref-aae0dae653e0c12cc6c3150efe43deab5026691e59085bf2b70141d364d799e5-007",
+                "delegatee": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c"
+            },
+            {
+                "public_key": "017a75279f84dfa3884c64302a47ca8038a113d5d2106fed6b92b6d138f517b3d9",
+                "staked_amount": "6001543674237",
+                "bonding_purse": "uref-43c8b677b7ac3a1ae9a11e7e793acb27ebb53172c71644eda35fad72914d3b75-007",
+                "delegatee": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c"
+            },
+            {
+                "public_key": "0172917e7bc7d316a765b64090851cc3b797bef205c7cf2529a2f7a3ebfde187ac",
+                "staked_amount": "5020887248067",
+                "bonding_purse": "uref-6e47280cf55775891582a0cf33fe779c609f4d85ab682581a6721e417fb8b601-007",
+                "delegatee": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c"
+            },
+            {
+                "public_key": "0172986948019775426c430bae79e4922d0c2e186fd8d9c30bc89b07463e3d5070",
+                "staked_amount": "5006871594878",
+                "bonding_purse": "uref-3215acb14fe1adf52c8fb0b92674048ef241a58ec24587bbf9dcaa26dd21b34e-007",
+                "delegatee": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c"
+            },
+            {
+                "public_key": "019692509a1bda17f64ecb9a38487e07c56d0713b0c1278da5568aae89b3d86fcc",
+                "staked_amount": "4646634001751",
+                "bonding_purse": "uref-224cfe97461cc7c0855fac24d9ef9700c3f996d191b6efbc03fe0de47df8d2a4-007",
+                "delegatee": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c"
+            },
+            {
+                "public_key": "01b32eba49d678461154871460e513bb8041c5af65cbbf79202903915415d81daa",
+                "staked_amount": "2533915010000",
+                "bonding_purse": "uref-747f6a09af1d62b255d1cadce006ab401c550b2968608ca5a08e7716a5186527-007",
+                "delegatee": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c"
+            },
+            {
+                "public_key": "018e167b5df850e316be22bc60035ab8a9c507caceb399346ee0ad6a74998baf02",
+                "staked_amount": "950856320623",
+                "bonding_purse": "uref-ef38361ac97c931185b3f643bb7af122c469f95406442616486eddb081832904-007",
+                "delegatee": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c"
+            },
+            {
+                "public_key": "01f7c72fcd8feca77a68a1ba48a7cf9052faba6939f0a2e4929b57436bcab18cdd",
+                "staked_amount": "612109944038",
+                "bonding_purse": "uref-5dae1550bf97efff0777c71e04d3fe823e701929b327476ae5673eeda8bdc2f5-007",
+                "delegatee": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c"
+            },
+            {
+                "public_key": "0126fad2280297ece7b93ab5e4d695a62022a8af5450db145366a2409feaea4e9c",
+                "staked_amount": "599385517592",
+                "bonding_purse": "uref-70495fc8356ed1196f98cac8f35029dd1910becc19b720e99dd33c2536a438c8-007",
+                "delegatee": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c"
+            },
+            {
+                "public_key": "014e1b5ece73748ea7f7d7a3bf0484f3e806ac737831a0125885bc50d92c007d02",
+                "staked_amount": "526680968503",
+                "bonding_purse": "uref-cdd9e6b4e9cf84a0627a944bb077273e55f8d940c2c9572c28b7be8be3a7c60f-007",
+                "delegatee": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c"
+            },
+            {
+                "public_key": "01ddb41a7d5f93bf51fe298651d296320783d7c56f66115773e7f096d0aece9009",
+                "staked_amount": "250236097887",
+                "bonding_purse": "uref-690b102c3d4082783d0ed2c5eccee393820a667e7064014d81a15f6e9954ea4e-007",
+                "delegatee": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c"
+            },
+            {
+                "public_key": "01c2edd887aea802efd886efdd737dea814d47b7efc746a5679bb5e9ecd00a6d2a",
+                "staked_amount": "127322123493",
+                "bonding_purse": "uref-762ef93b39d0f273b85072db6e98d03aebc1a3c9f77b18464d977faf16d384dc-007",
+                "delegatee": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c"
+            },
+            {
+                "public_key": "01275c64f176aba54561e487a1380f7a19dba30bd2226ebdf5f30ba1e4ef9a60ba",
+                "staked_amount": "97070761791",
+                "bonding_purse": "uref-10adfb50566add2a6ca396d2e4698416f3a0a18a45f5956b8ed98fff05350503-007",
+                "delegatee": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c"
+            },
+            {
+                "public_key": "01eeb91af0a1ef241891f31258ecabe71573719aff3f440736834f36645eb2af4e",
+                "staked_amount": "27031304230",
+                "bonding_purse": "uref-29cd7bca783156288e6f88361218c803d4889bf47544547a75e3da230b8f625e-007",
+                "delegatee": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c"
+            },
+            {
+                "public_key": "01e7ddcfd7d2edf728b951cd6182e1a9fa00286db1a8762b643c810a4fd2e43484",
+                "staked_amount": "10015036091",
+                "bonding_purse": "uref-a7e9d4c018c78660fdb6925590aedaafa781ec16c612087510bc3211488f5986-007",
+                "delegatee": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c"
+            },
+            {
+                "public_key": "01649008b3ea960cee5ef072128c350177ccdc6de8d2b6feb87609bfd8c1e44a15",
+                "staked_amount": "9969406130",
+                "bonding_purse": "uref-d50beea94e5df10d79d1005069edf464d8b54282f6cc12964634308892aaf3e3-007",
+                "delegatee": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c"
+            },
+            {
+                "public_key": "01d8cce3cfb64584f4c2bd4198d66eba972e3cafe7242dabe389b9150ac0d8d575",
+                "staked_amount": "3003993679",
+                "bonding_purse": "uref-0481dff3c9dbf1e2b5b484bb94cfde21cff4549bdf4075046c6f9e1ee2bae127-007",
+                "delegatee": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c"
             }
-        ]
-    }
+        ],
+        "inactive": false,
+        "total_stake": "27925410358384596"
+    },
+    "total_reward": "29761433325232",
+    "APY": 18.759037187619697
 }
 
 ```
