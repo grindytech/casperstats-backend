@@ -211,7 +211,7 @@ const GetAPY = async () => {
 
     const total_reward_last_era = 0;
     const latest_era = await GetLatestEra();
-    const latest_total_reward = await GetTotalRewardByEra(latest_era.era_id);
+    const latest_total_reward = (await GetTotalRewardByEra(latest_era.era_id)).total_reward;
 
     let total_stake = 0;
     {
@@ -219,8 +219,9 @@ const GetAPY = async () => {
         const auction_state = auction_info.result.auction_state;
         total_stake = await GetTotalStake(auction_state, 0);
     }
-    console.log(latest_total_reward.total_reward);
-    console.log(total_stake);
+
+    const apy = (latest_total_reward * 12 * 365) / total_stake * 100;
+    return apy;
 }
 
 const GetValidatorData = async (address) => {
@@ -244,7 +245,9 @@ const GetValidatorData = async (address) => {
         const total_reward = await GetTotalRewardByPublicKey(element.public_key);
         element.total_reward = total_reward.total_reward;
         // calculate APY
-        await GetAPY();
+        const apy = await GetAPY();
+        const commission = element.bid.delegation_rate;
+        element.APY = apy - (apy * commission / 100);
 
     } else {
         throw ({
