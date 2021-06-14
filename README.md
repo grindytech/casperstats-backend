@@ -1153,7 +1153,7 @@ successResponse:
 | transfers | number | volume transfers on last 60 days (on-chain) |
 
 
-#### econimics
+#### economics
 
 ```
 url: /info/economics
