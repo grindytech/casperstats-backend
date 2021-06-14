@@ -99,6 +99,7 @@ const GetValidators = async (number_of_validator) => {
         total_stake: "",
         circulating_supply: 0,
         total_supply: 0,
+        APY: 0,
         era_validators: {}
     }
 
@@ -117,6 +118,12 @@ const GetValidators = async (number_of_validator) => {
         // total_supply
         const total_supply = await GetRecentTotalSupply();
         result.total_supply = total_supply.total_supply;
+
+        //APY
+
+          // calculate APY
+          const apy = await GetAPY();
+          result.APY = apy;
 
         // calculate total_stake
         let total_stake = 0;
@@ -244,10 +251,6 @@ const GetValidatorData = async (address) => {
         // add total rewards paid
         const total_reward = await GetTotalRewardByPublicKey(element.public_key);
         element.total_reward = total_reward.total_reward;
-        // calculate APY
-        const apy = await GetAPY();
-        element.APY = apy;
-
     } else {
         throw ({
             "code": -32000,
