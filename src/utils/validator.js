@@ -112,7 +112,7 @@ const GetValidators = async (number_of_validator) => {
         result.block_height = auction_state.block_height;
 
         //circle supply
-        const circulating_supply = await  GetRecentCirculatingSupply();
+        const circulating_supply = await GetRecentCirculatingSupply();
         result.circulating_supply = circulating_supply.circulating_supply;
 
         // total_supply
@@ -121,9 +121,9 @@ const GetValidators = async (number_of_validator) => {
 
         //APY
 
-          // calculate APY
-          const apy = await GetAPY();
-          result.APY = apy;
+        // calculate APY
+        const apy = await GetAPY();
+        result.APY = apy;
 
         // calculate total_stake
         let total_stake = 0;
@@ -250,15 +250,20 @@ const GetValidatorData = async (address) => {
         // today reward
         let last_24h_reward = 0;
         {
-            var datetime = new Date();
-            let yesterday = new Date();
-            {
-                yesterday.setDate(datetime.getDate() - 1);
-                yesterday = yesterday.toISOString();
+            try {
+                var datetime = new Date();
+                let yesterday = new Date();
+                {
+                    yesterday.setDate(datetime.getDate() - 1);
+                    yesterday = yesterday.toISOString();
+                }
+                last_24h_reward = (await GetPublicKeyTotalRewardByDate(element.public_key, datetime.toISOString(), yesterday)).total_reward;
             }
-            last_24h_reward = await GetPublicKeyTotalRewardByDate(element.public_key, datetime.toISOString(), yesterday);
+            catch (err) {
+
+            }
         }
-        element.last_24h_reward = last_24h_reward.total_reward;
+        element.last_24h_reward = last_24h_reward.toString();
 
         // add total rewards paid
         const total_reward = await GetTotalRewardByPublicKey(element.public_key);
@@ -268,7 +273,7 @@ const GetValidatorData = async (address) => {
             "code": -32000,
             "message": "validator not known",
             "data": null
-            })
+        })
     }
     return element;
 }
@@ -281,11 +286,11 @@ const GetBlocksByProposer = async (validator_address, number_of_block) => {
         let params = [{ "Height": parseInt(i) }]
         const block = await RequestRPC(RpcApiName.get_block, params);
 
-        if(block.result.block.body.proposer == validator_address) {
+        if (block.result.block.body.proposer == validator_address) {
 
             let brief_data = {
                 block_height: block.result.block.header.height,
-                era_id:  block.result.block.header.era_id,
+                era_id: block.result.block.header.era_id,
                 deploys: block.result.block.body.deploy_hashes.length,
                 transfers: block.result.block.body.transfer_hashes.length,
                 timestamp: block.result.block.header.timestamp,
@@ -293,7 +298,7 @@ const GetBlocksByProposer = async (validator_address, number_of_block) => {
             }
 
             blocks.push(brief_data);
-            if(blocks.length == number_of_block) {
+            if (blocks.length == number_of_block) {
                 break;
             }
         }
