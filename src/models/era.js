@@ -27,6 +27,23 @@ async function GetTotalRewardByPublicKey(public_key) {
     })
 }
 
+async function GetRewardByPublicKey(public_key) {
+    return new Promise((resolve, reject) => {
+
+        var sql = `SELECT CAST(SUM(CAST(era.amount AS UNSIGNED INTEGER)) as CHAR) as total_reward FROM era WHERE (validator = '${public_key}' AND delegator = "") OR delegator = '${public_key}'`;
+        pool.query(sql, function (err, result) {
+            if (err) {
+                reject(err);
+            }
+            if (result && result.length > 0) {
+                resolve(result[0]);
+            } else {
+                resolve({ total_reward: 0 })
+            }
+        });
+    })
+}
+
 async function GetTotalRewardByEra(era_id) {
     return new Promise((resolve, reject) => {
         var sql = `SELECT CAST(SUM(CAST(era.amount AS UNSIGNED INTEGER)) as CHAR) as total_reward FROM era WHERE era = '${era_id}'`;
@@ -110,5 +127,5 @@ async function GetTotalReward() {
 module.exports = {
     GetTotalRewardByPublicKey, GetTotalRewardByEra,
     GetLatestEra, GetPublicKeyTotalRewardByDate,
-    GetTotalDelegator, GetTotalReward
+    GetTotalDelegator, GetTotalReward, GetRewardByPublicKey
 }

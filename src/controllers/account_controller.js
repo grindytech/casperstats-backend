@@ -9,7 +9,7 @@ const { GetTransfersByAccountHash } = require('../models/transfer');
 const { GetDeploysByPublicKey } = require('../models/deploy');
 const { GetAccountHash, RequestRPC } = require('../utils/common');
 const { GetSwitchBlockByDate, GetBlockHashByHeight } = require('../models/block_model');
-const { GetTotalRewardByPublicKey } = require('../models/era');
+const { GetTotalRewardByPublicKey, GetRewardByPublicKey } = require('../models/era');
 
 require('dotenv').config();
 
@@ -74,7 +74,7 @@ module.exports = {
       let total_reward = 0;
       {
         if (account_data.public_key_hex) {
-          total_reward = ( await GetTotalRewardByPublicKey(account_data.public_key_hex)).total_reward;
+          total_reward = (await GetRewardByPublicKey(account_data.public_key_hex)).total_reward;
         }
       }
 
