@@ -4,7 +4,7 @@ const { RpcApiName } = require('./constant');
 const { RequestRPC, GetHeight } = require('./common')
 const math = require('mathjs');
 const { GetRecentCirculatingSupply, GetRecentTotalSupply } = require("./chain");
-const { GetTotalRewardByPublicKey, GetLatestEra, GetTotalRewardByEra, GetPublicKeyTotalRewardByDate } = require("../models/era");
+const { GetTotalRewardByPublicKey, GetLatestEra, GetTotalRewardByEra, GetPublicKeyTotalRewardByDate, GetRewardByPublicKey } = require("../models/era");
 
 
 function GetTotalBid(bids, address) {
@@ -266,8 +266,11 @@ const GetValidatorData = async (address) => {
         element.last_24h_reward = last_24h_reward.toString();
 
         // add total rewards paid
-        const total_reward = await GetTotalRewardByPublicKey(element.public_key);
+        const total_reward = await GetRewardByPublicKey(element.public_key);
         element.total_reward = total_reward.total_reward;
+
+        const total_reward_paid = await GetTotalRewardByPublicKey(element.public_key);
+        element.total_reward_paid = total_reward_paid.total_reward;
     } else {
         throw ({
             "code": -32000,
