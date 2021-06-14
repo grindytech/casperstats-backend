@@ -47,4 +47,16 @@ async function GetLatestEra() {
     })
 }
 
-module.exports = { GetTotalRewardByPublicKey, GetTotalRewardByEra, GetLatestEra }
+async function GetPublicKeyTotalRewardByDate(account, from, to) {
+    return new Promise((resolve, reject) => {
+        var sql = `SELECT CAST(SUM(CAST(era.amount AS UNSIGNED INTEGER)) as CHAR) as total_reward FROM era WHERE validator = '${account}' OR delegator = '${account}' AND timestamp BETWEEN '${from}' AND '${to}'`;
+        pool.query(sql, function (err, result) {
+            if (err) {
+                reject(err);
+            }
+            resolve(result[0]);
+        });
+    })
+}
+
+module.exports = { GetTotalRewardByPublicKey, GetTotalRewardByEra, GetLatestEra, GetPublicKeyTotalRewardByDate }

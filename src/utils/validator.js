@@ -4,7 +4,7 @@ const { RpcApiName } = require('./constant');
 const { RequestRPC, GetHeight } = require('./common')
 const math = require('mathjs');
 const { GetRecentCirculatingSupply, GetRecentTotalSupply } = require("./chain");
-const { GetTotalRewardByPublicKey, GetLatestEra, GetTotalRewardByEra } = require("../models/era");
+const { GetTotalRewardByPublicKey, GetLatestEra, GetTotalRewardByEra, GetPublicKeyTotalRewardByDate } = require("../models/era");
 
 
 function GetTotalBid(bids, address) {
@@ -246,6 +246,19 @@ const GetValidatorData = async (address) => {
             return math.compare(b.staked_amount, a.staked_amount);
         })
         element.bid.delegators = sort_value;
+
+        // today reward
+        let last_24h_reward = 0;
+        {
+            var datetime = new Date();
+            let yesterday = new Date();
+            {
+                yesterday.setDate(datetime.getDate() - 1);
+                yesterday = yesterday.toISOString();
+            }
+            last_24h_reward = await GetPublicKeyTotalRewardByDate(element.public_key, datetime.toISOString(), yesterday);
+        }
+        element.last_24h_reward = last_24h_reward.total_reward;
 
         // add total rewards paid
         const total_reward = await GetTotalRewardByPublicKey(element.public_key);
