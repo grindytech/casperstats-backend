@@ -36,6 +36,7 @@ This project provide the REST api to interact with Casper blockchain
     - [get-volume](#get-volume)
     - [get-transfer-volume](#get-transfer-volume)
     - [get-stats](#get-stats)
+    - [economics](#economics)
  
   - [State](#State)
     - [query-state](#query-state)
@@ -1151,6 +1152,30 @@ successResponse:
 | *_change | number | percentage of changes last 24 hours |
 | transfers | number | volume transfers on last 60 days (on-chain) |
 
+
+#### economics
+
+```
+url: /info/economics
+
+example: api.casperstats.io/info/economics
+
+method: GET
+
+des:  Get economics data
+successResponse:
+{
+    "block_height": 96781,
+    "total_supply": "10149193416000000000",
+    "circulating_supply": "591654542000000000",
+    "APY": 20.835474392551617,
+    "total_stake": "3705014517126291500",
+    "total_active_validators": 86,
+    "total_bid_validators": 97,
+    "total_delegators": 614,
+    "total_reward": "149193416334775682"
+}
+```
 
 ### State
 
