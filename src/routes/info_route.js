@@ -9,5 +9,6 @@ router.route("/get-supply/").get(info_controller.GetSupply);
 router.route("/get-transfer-volume/:count").get(info_controller.GetTransferVolume);
 router.route("/get-volume/:count").get(info_controller.GetVolume);
 router.route("/get-stats").get(info_controller.GetStats);
+router.route("/economics").get(info_controller.GetEconomics);
 
 module.exports = router;

@@ -307,6 +307,8 @@ const GetBlocksByProposer = async (validator_address, number_of_block) => {
 }
 
 module.exports = {
-    GetValidators, GetEraValidators, GetBids, GetValidatorData, GetBlocksByProposer
+    GetValidators, GetEraValidators, GetBids,
+    GetValidatorData, GetBlocksByProposer, GetAPY,
+    GetTotalStake
 }
 

@@ -18,10 +18,10 @@ async function GetTotalRewardByPublicKey(public_key) {
             if (err) {
                 reject(err);
             }
-            if(result && result.length > 0) {
+            if (result && result.length > 0) {
                 resolve(result[0]);
             } else {
-                resolve({total_reward: 0})
+                resolve({ total_reward: 0 })
             }
         });
     })
@@ -34,10 +34,10 @@ async function GetTotalRewardByEra(era_id) {
             if (err) {
                 reject(err);
             }
-            if(result && result.length > 0) {
+            if (result && result.length > 0) {
                 resolve(result[0]);
             } else {
-                resolve({total_reward: 0})
+                resolve({ total_reward: 0 })
             }
         });
     })
@@ -50,10 +50,10 @@ async function GetLatestEra() {
             if (err) {
                 reject(err);
             }
-            if(result && result.length > 0) {
+            if (result && result.length > 0) {
                 resolve(result[0]);
             } else {
-                resolve({era_id: null})
+                resolve({ era_id: null })
             }
         });
     })
@@ -66,13 +66,33 @@ async function GetPublicKeyTotalRewardByDate(account, from, to) {
             if (err) {
                 reject(err);
             }
-            if(result && result.length > 0) {
+            if (result && result.length > 0) {
                 resolve(result[0]);
             } else {
-                resolve({total_reward: 0})
+                resolve({ total_reward: 0 })
             }
         });
     })
 }
 
-module.exports = { GetTotalRewardByPublicKey, GetTotalRewardByEra, GetLatestEra, GetPublicKeyTotalRewardByDate }
+async function GetTotalDelegator(era) {
+    return new Promise((resolve, reject) => {
+        var sql = `SELECT COUNT(DISTINCT validator, delegator) as total_delegators from era WHERE era = ${era}`;
+        pool.query(sql, function (err, result) {
+            if (err) {
+                reject(err);
+            }
+            if (result && result.length > 0) {
+                resolve(result[0]);
+            } else {
+                resolve({ total_delegators: 0 })
+            }
+        });
+    })
+}
+
+module.exports = {
+    GetTotalRewardByPublicKey, GetTotalRewardByEra,
+    GetLatestEra, GetPublicKeyTotalRewardByDate,
+    GetTotalDelegator
+}
