@@ -18,7 +18,11 @@ async function GetTotalRewardByPublicKey(public_key) {
             if (err) {
                 reject(err);
             }
-            resolve(result[0]);
+            if(result && result.length > 0) {
+                resolve(result[0]);
+            } else {
+                resolve({total_reward: 0})
+            }
         });
     })
 }
@@ -30,7 +34,11 @@ async function GetTotalRewardByEra(era_id) {
             if (err) {
                 reject(err);
             }
-            resolve(result[0]);
+            if(result && result.length > 0) {
+                resolve(result[0]);
+            } else {
+                resolve({total_reward: 0})
+            }
         });
     })
 }
@@ -42,7 +50,11 @@ async function GetLatestEra() {
             if (err) {
                 reject(err);
             }
-            resolve(result[0]);
+            if(result && result.length > 0) {
+                resolve(result[0]);
+            } else {
+                resolve({era_id: null})
+            }
         });
     })
 }
@@ -54,7 +66,11 @@ async function GetPublicKeyTotalRewardByDate(account, from, to) {
             if (err) {
                 reject(err);
             }
-            resolve(result[0]);
+            if(result && result.length > 0) {
+                resolve(result[0]);
+            } else {
+                resolve({total_reward: 0})
+            }
         });
     })
 }
