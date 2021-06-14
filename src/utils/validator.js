@@ -257,7 +257,7 @@ const GetValidatorData = async (address) => {
                     yesterday.setDate(datetime.getDate() - 1);
                     yesterday = yesterday.toISOString();
                 }
-                last_24h_reward = (await GetPublicKeyTotalRewardByDate(element.public_key, datetime.toISOString(), yesterday)).total_reward;
+                last_24h_reward = (await GetPublicKeyTotalRewardByDate(element.public_key, yesterday,  datetime.toISOString())).total_reward;
             }
             catch (err) {
 
