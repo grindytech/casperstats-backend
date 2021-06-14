@@ -8,7 +8,7 @@ const { GetCirculatingSupply, GetTotalNumberOfAccount, GetNumberOfAccountFromDat
 const { GetNumberOfTransfersByDate, GetVolumeByDate } = require('../models/transfer');
 const CoinGecko = require('coingecko-api');
 const { GetEraValidators, GetAPY, GetTotalStake } = require('../utils/validator');
-const { GetTotalDelegator, GetLatestEra } = require('../models/era');
+const { GetTotalReward } = require('../models/era');
 const CoinGeckoClient = new CoinGecko();
 
 
@@ -279,6 +279,10 @@ module.exports = {
             total_delegators = Object.keys(counts).length
         }
         economics.total_delegators = total_delegators;
+
+        // total reward
+        let total_reward = (await GetTotalReward()).total_reward;
+        economics.total_reward = total_reward;
 
         res.json(economics);
 

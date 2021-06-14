@@ -91,8 +91,24 @@ async function GetTotalDelegator(era) {
     })
 }
 
+async function GetTotalReward() {
+    return new Promise((resolve, reject) => {
+        var sql = `SELECT CAST(SUM(CAST(era.amount AS UNSIGNED INTEGER)) as CHAR) as total_reward FROM era`;
+        pool.query(sql, function (err, result) {
+            if (err) {
+                reject(err);
+            }
+            if (result && result.length > 0) {
+                resolve(result[0]);
+            } else {
+                resolve({ total_delegators: 0 })
+            }
+        });
+    })
+}
+
 module.exports = {
     GetTotalRewardByPublicKey, GetTotalRewardByEra,
     GetLatestEra, GetPublicKeyTotalRewardByDate,
-    GetTotalDelegator
+    GetTotalDelegator, GetTotalReward
 }
