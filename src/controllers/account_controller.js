@@ -1,4 +1,4 @@
-const { Execute, RequestRPC, GetEraInfoBySwitchBlock } = require('../utils/chain');
+const { Execute, GetEraInfoBySwitchBlock } = require('../utils/chain');
 const { RpcApiName } = require('../utils/constant');
 const { GetAccountData } = require('../utils/account');
 const math = require('mathjs');
@@ -7,7 +7,7 @@ require('dotenv').config();
 const { GetHolder, GetRichAccounts, GetTotalNumberOfAccount } = require('../models/account');
 const { GetTransfersByAccountHash } = require('../models/transfer');
 const { GetDeploysByPublicKey } = require('../models/deploy');
-const { GetAccountHash } = require('../utils/common');
+const { GetAccountHash, RequestRPC } = require('../utils/common');
 const { GetSwitchBlockByDate, GetBlockHashByHeight } = require('../models/block_model');
 
 require('dotenv').config();
@@ -18,19 +18,75 @@ module.exports = {
 
     const account = req.params.account;
 
-    GetHolder(account).then(value => {
-      if (value.length == 1) {
-        res.json(value[0]);
+    try {
+
+      let account_data = await GetHolder(account);
+
+      if (account_data.length == 1) {
+        // from database
+        account_data = account_data[0];
       } else {
-        GetAccountData(account).then(acc => {
-          res.json(acc);
-        }).catch(err => {
-          res.send(err);
-        })
+        // from ledger
+        account_data = await GetAccountData(account);
       }
-    }).catch(err => {
+
+      // add more data
+
+      // Available
+      let available = 0;
+      {
+        available = account_data.balance;
+      }
+
+      // Total staked
+      let total_staked = math.bignumber("0");
+      {
+        if (account_data.public_key_hex) {
+          const auction_info = await RequestRPC(RpcApiName.get_auction_info, []);
+          const bids = auction_info.result.auction_state.bids;
+          if (bids) {
+            for (let i = 0; i < bids.length; i++) {
+              if (bids[i].public_key == account_data.public_key_hex) {
+                total_staked = math.add(total_staked, math.bignumber(bids[i].bid.staked_amount));
+              }
+              const delegators = bids[i].bid.delegators;
+              if (delegators) {
+                for (let j = 0; j < delegators.length; j++) {
+                  if (delegators[j].public_key == account_data.public_key_hex) {
+                    console.log(account_data.public_key_hex);
+                    total_staked = math.add(total_staked, math.bignumber(delegators[j].staked_amount));
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // Undonding
+      let unbonding = 0;
+      {
+
+      }
+
+      // Total reward
+      let total_reward = 0;
+      {
+        if (account_data.public_key) {
+          total_reward = await GetTotalRewardByPublicKey(account_data.public_key);
+        }
+      }
+
+      account_data.available = available;
+      account_data.total_staked = total_staked.toString();
+      account_data.unbonding = unbonding;
+      account_data.total_reward = total_reward;
+
+      res.json(account_data);
+    } catch (err) {
+      console.log(err);
       res.send(err);
-    })
+    }
   },
 
   CountHolders: async function (req, res) {
@@ -135,9 +191,9 @@ module.exports = {
     let rewards = [];
     {
       for (let i = 0; i < switch_blocks.length; i++) {
-        
+
         const switchs = switch_blocks[i].switchs;
-        
+
         let daily_rewards = math.bignumber("0");
         let validator = "";
         // calculate daily rewards
@@ -162,14 +218,14 @@ module.exports = {
             if (allocation_filter[j].Delegator) {
               const reward = math.bignumber(allocation_filter[j].Delegator.amount);
               daily_rewards = math.add(daily_rewards, reward);
-              if(validator == "") {
-                  validator = allocation_filter[j].Delegator.validator_public_key;
+              if (validator == "") {
+                validator = allocation_filter[j].Delegator.validator_public_key;
               }
 
             } else if (allocation_filter[j].Validator) {
               const reward = math.bignumber(allocation_filter[j].Validator.amount);
               daily_rewards = math.add(daily_rewards, reward);
-              if(validator == "") {
+              if (validator == "") {
                 validator = allocation_filter[j].Validator.validator_public_key;
               }
             }

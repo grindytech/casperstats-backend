@@ -2,6 +2,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 const { RpcApiName } = require('./constant');
 const common = require('./common');
+const { GetTotalRewardByPublicKey } = require("../models/era");
 
 
 async function GetAccountData(address) {
@@ -12,17 +13,18 @@ async function GetAccountData(address) {
         account_hash = address;
         public_key = null;
     } else
-    // try to get account hash if it's publickey otherwise it's an account hash
-    try {
-        account_hash = await common.GetAccountHash(address);
-        account_hash = "account-hash-" + account_hash.replace(/\n/g, '');
-        public_key = address;
-    } catch (err) {
-        account_hash = "account-hash-" + address;
-        public_key = null;
-    }
-    
+        // try to get account hash if it's publickey otherwise it's an account hash
+        try {
+            account_hash = await common.GetAccountHash(address);
+            account_hash = "account-hash-" + account_hash.replace(/\n/g, '');
+            public_key = address;
+        } catch (err) {
+            account_hash = "account-hash-" + address;
+            public_key = null;
+        }
+
     const balance = await common.GetBalanceByAccountHash(account_hash);
+
     const account = {
         "account_hash": account_hash.replace('account-hash-', ''),
         "public_key_hex": public_key,

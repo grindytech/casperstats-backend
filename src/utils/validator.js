@@ -216,7 +216,6 @@ const GetBids = async () => {
 
 const GetAPY = async () => {
 
-    const total_reward_last_era = 0;
     const latest_era = await GetLatestEra();
     const latest_total_reward = (await GetTotalRewardByEra(latest_era.era_id)).total_reward;
 
