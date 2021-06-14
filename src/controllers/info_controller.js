@@ -238,53 +238,57 @@ module.exports = {
 
         let economics = {
         }
+        try {
 
-        const supply = await GetCasperlabsSupply();
-        const auction_info = await RequestRPC(RpcApiName.get_auction_info, []);
-        const auction_state = auction_info.result.auction_state;
-        economics.block_height = auction_state.block_height;
-        economics.total_supply = supply.data.total.toString() + "000000000";
-        economics.circulating_supply = supply.data.circulating.toString() + "000000000";
+            const supply = await GetCasperlabsSupply();
+            const auction_info = await RequestRPC(RpcApiName.get_auction_info, []);
+            const auction_state = auction_info.result.auction_state;
+            economics.block_height = auction_state.block_height;
+            economics.total_supply = supply.data.total.toString() + "000000000";
+            economics.circulating_supply = supply.data.circulating.toString() + "000000000";
 
-        // calculate APY
-        const apy = await GetAPY();
-        economics.APY = apy;
+            // calculate APY
+            const apy = await GetAPY();
+            economics.APY = apy;
 
-        // calculate total_stake
-        let total_stake = 0;
-        total_stake = await GetTotalStake(auction_state, 0);
+            // calculate total_stake
+            let total_stake = 0;
+            total_stake = await GetTotalStake(auction_state, 0);
 
-        economics.total_stake = total_stake.toString();
-        economics.total_active_validators = auction_state.era_validators[0].validator_weights.length;
-        economics.total_bid_validators = auction_state.bids.length;
+            economics.total_stake = total_stake.toString();
+            economics.total_active_validators = auction_state.era_validators[0].validator_weights.length;
+            economics.total_bid_validators = auction_state.bids.length;
 
-        // delegators
-        let total_delegators = 0;
-        {
-            let bids = auction_state.bids;
-            let delegators_array = [];
-            for (let i = 0; i < bids.length; i++) {
-                delegators_array.push(bids[i].public_key);
-                let delegators = bids[i].bid.delegators;
-                for (let j = 0; j < delegators.length; j++) {
-                    delegators_array.push(delegators[j].public_key);
+            // delegators
+            let total_delegators = 0;
+            {
+                let bids = auction_state.bids;
+                let delegators_array = [];
+                for (let i = 0; i < bids.length; i++) {
+                    delegators_array.push(bids[i].public_key);
+                    let delegators = bids[i].bid.delegators;
+                    for (let j = 0; j < delegators.length; j++) {
+                        delegators_array.push(delegators[j].public_key);
+                    }
                 }
-            }
 
-            var counts = {};
-            for (var i = 0; i < delegators_array.length; i++) {
-                counts[delegators_array[i]] = 1 + (counts[delegators_array[i]] || 0);
-            }
+                var counts = {};
+                for (var i = 0; i < delegators_array.length; i++) {
+                    counts[delegators_array[i]] = 1 + (counts[delegators_array[i]] || 0);
+                }
 
-            total_delegators = Object.keys(counts).length
+                total_delegators = Object.keys(counts).length
+            }
+            economics.total_delegators = total_delegators;
+
+            // total reward
+            let total_reward = (await GetTotalReward()).total_reward;
+            economics.total_reward = total_reward;
+            res.json(economics);
+        } catch (err) {
+            res.send(err);
         }
-        economics.total_delegators = total_delegators;
 
-        // total reward
-        let total_reward = (await GetTotalReward()).total_reward;
-        economics.total_reward = total_reward;
-
-        res.json(economics);
 
     }
 };
