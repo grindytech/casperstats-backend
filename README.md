@@ -87,18 +87,21 @@ $ npm run dev
   ```
 url: /chain/get-account/:address
 
-example: https://api.casperstats.io/account/get-account/01b92e36567350dd7b339d709bfe341df6fda853e85315418f1bb3ddd414d9f5be
-
+example: api.casperstats.io/account/get-account/0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c
 method: GET
 
 des:  Get information of the account
 
 successResponse:
 {
-    "account_hash": "94664ce59fa2e6eb0cc69d270fc91dd9dd2ba02a1f7964c69f036ef4a68bb96f",
-    "public_key_hex": "01b92e36567350dd7b339d709bfe341df6fda853e85315418f1bb3ddd414d9f5be",
-    "balance": "204661364801484072",
-    "active_date": "2021-05-19T16:33:16.952Z"
+    "account_hash": "6ee862e976a99eed1c517bbf7f0d3e97f988f1cf12f3b8e347c033ac9ff745d2",
+    "public_key_hex": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c",
+    "balance": "2500000000",
+    "active_date": "2021-05-04T00:59:39.930Z",
+    "available": "2500000000",
+    "total_staked": "62053395525340",
+    "unbonding": "0",
+    "total_reward": "627492029597747"
 }
 ```
 
