@@ -168,7 +168,6 @@ module.exports = {
     })
   },
 
-
   GetRewards: async function (req, res) {
     // get params
     const account = req.query.account;
@@ -233,23 +232,24 @@ module.exports = {
           }
         }
 
-        // calculate APY
-        // let APY = 0;
-        // {
-
-        // }
-
         rewards.push({
-          "date": switch_blocks[i].date,
+          "date": (new Date(switch_blocks[i].date)).getTime(),
           "validator": validator,
-          "rewards": daily_rewards.toString(),
+          "reward": daily_rewards.toString(),
           // "APY": APY,
         })
       }
     }
 
-    // get total reward by date
-    res.json(rewards);
-  }
+    // check rewards
+    var is_valid_address = rewards.find(obj => {
+      return obj.reward !== "0";
+    })
 
+    if(is_valid_address) {
+      res.json(rewards);
+    }else {
+      res.json([]);
+    }
+  }
 };
