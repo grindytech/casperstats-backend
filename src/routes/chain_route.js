@@ -15,5 +15,6 @@ router.route("/get-latest-txs/").get(chain_controller.GetLatestTx);
 
 // blocks
 router.route("/get-proposer-blocks").get(chain_controller.GetBlocksByProposer);
+router.route("/status/").get(chain_controller.GetStatus);
 
 module.exports = router;

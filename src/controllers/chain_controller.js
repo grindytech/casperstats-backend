@@ -3,9 +3,10 @@ const { GetTotalNumberOfTransfers, GetTransfers } = require('../models/transfer'
 const {
   GetDeployhashes, GetDeploy, GetBlock,
   GetTransfersInBlock,
-  GetDeploysInBlock} = require('../utils/chain');
+  GetDeploysInBlock } = require('../utils/chain');
 const { RequestRPC, GetHeight } = require('../utils/common');
 const { RpcApiName } = require('../utils/constant');
+const request = require('request');
 
 require('dotenv').config();
 
@@ -146,9 +147,9 @@ module.exports = {
 
   CountTransfers: async function (req, res) {
     GetTotalNumberOfTransfers().then(value => {
-      if(value.length === 1) {
+      if (value.length === 1) {
         res.json(value[0]);
-      }else {
+      } else {
         res.json({});
       }
     }).catch(err => {
@@ -162,8 +163,8 @@ module.exports = {
       const count = req.query.count;
       let result = await GetTransfers(start, count);
 
-      for(let i = 0; i < result.length; i++) {
-        if(result[i].to_address === "null") {
+      for (let i = 0; i < result.length; i++) {
+        if (result[i].to_address === "null") {
           result[i].to_address = null;
         }
       }
@@ -188,7 +189,7 @@ module.exports = {
         delete data[i]["state_root_hash"];
         delete data[i]["validator"];
 
-        const  deploys = await GetDeploysInBlock(data[i].height);
+        const deploys = await GetDeploysInBlock(data[i].height);
         const transfers = await GetTransfersInBlock(data[i].height);
         data[i]["deploys"] = deploys.deploy_hashes.length + deploys.transfer_hashes.length;
         data[i]["transfers"] = transfers.transfers.length;
@@ -198,7 +199,26 @@ module.exports = {
     } catch (err) {
       res.send(err);
     }
+  },
+
+  GetStatus: async function (req, res) {
+    try {
+      let options = {
+        url: process.env.STATUS_API + "/status",
+        method: "get",
+        headers:
+        {
+          "content-type": "application/json"
+        }
+      };
+      request(options, (error, response, body) => {
+        const result = JSON.parse(body);
+        res.status(200);
+        res.json(result);
+      });
+    } catch (err) {
+      console.log(err);
+      res.send(err);
+    }
   }
-
-
 };
