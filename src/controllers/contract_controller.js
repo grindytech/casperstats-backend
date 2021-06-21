@@ -19,7 +19,7 @@ module.exports = {
                 contract_bytes = fs.readFileSync(contract_folder + 'transfer_to_account.wasm');
             }
             res.status(200);
-            res.send( contract_bytes );
+            res.send( {contract_bytes} );
         } catch (err) {
             console.log(err);
             res.send(err);
