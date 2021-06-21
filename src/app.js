@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const routes = require('./routes');
+const bodyParser = require('body-parser');
 
 require('dotenv').config();
 
@@ -10,6 +11,8 @@ const PORT = process.env.PORT || 5000;
 require('./models');
 
 app.use(cors());
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 
 /* CROS middleware */
 app.use(function (req, res, next) {
