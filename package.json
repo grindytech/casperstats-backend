@@ -20,7 +20,7 @@
   "homepage": "https://github.com/cryptoviet/casperstats-backend#readme",
   "dependencies": {
     "@open-rpc/client-js": "1.2.4",
-    "casper-client-sdk": "^1.0.40",
+    "casper-client-sdk": "^1.0.35",
     "child_process": "^1.0.2",
     "coingecko-api": "^1.0.10",
     "cors": "^2.8.5",

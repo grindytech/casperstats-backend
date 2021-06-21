@@ -2,6 +2,10 @@ require('dotenv').config();
 const path = require('path');
 const fs = require('fs');
 
+const { CasperClient, CasperServiceByJsonRPC} = require('casper-client-sdk');
+const casperClient = new CasperClient(process.env.NETWORK_RPC_API);
+const deployService = new CasperServiceByJsonRPC(process.env.NETWORK_RPC_API);
+
 module.exports = {
 
     GetContract: async function (req, res) {
@@ -19,10 +23,25 @@ module.exports = {
                 contract_bytes = fs.readFileSync(contract_folder + 'transfer_to_account.wasm');
             }
             res.status(200);
-            res.send( {contract_bytes} );
+            res.send({ contract_bytes });
+        } catch (err) {
+            console.log(err);
+            res.send(err);
+        }
+    },
+
+    DeployContract: async function (req, res) {
+        try {
+            const message = req.body.message;
+            console.log("message: ", message);
+            const result = await deployService.deploy(message);
+            console.log("result: ", result);
+            res.status(200);
+            res.send(result)
         } catch (err) {
             console.log(err);
             res.send(err);
         }
     }
+
 }
