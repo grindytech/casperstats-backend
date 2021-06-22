@@ -33,13 +33,13 @@ module.exports = {
     DeployContract: async function (req, res) {
         try {
             const message = req.body.message;
-            console.log("message: ", message);
-            const result = await deployService.deploy(message);
-            console.log("result: ", result);
+            console.log("message", message);
+            const result = await casperClient.putDeploy(message);
+            // console.log("result: ", result);
             res.status(200);
             res.send(result)
         } catch (err) {
-            console.log(err);
+            console.log("err: ", err);
             res.send(err);
         }
     }

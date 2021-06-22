@@ -81,7 +81,7 @@ module.exports = {
       account_data.available = available;
       account_data.total_staked = total_staked.toString();
       account_data.unbonding = unbonding;
-      account_data.total_reward = total_reward;
+      account_data.total_reward = total_reward.toString();
 
       res.json(account_data);
     } catch (err) {
