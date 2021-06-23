@@ -19,8 +19,8 @@ module.exports = {
                 contract_bytes = fs.readFileSync(contract_folder + 'delegate.wasm');
             } else if (name == "undelegate") {
                 contract_bytes = fs.readFileSync(contract_folder + 'undelegate.wasm');
-            } else if (name == "transfer") {
-                contract_bytes = fs.readFileSync(contract_folder + 'transfer_to_account.wasm');
+            } else if (name == "transfer_u512") {
+                contract_bytes = fs.readFileSync(contract_folder + 'transfer_to_account_u512.wasm');
             }
             res.status(200);
             res.send({ contract_bytes });
@@ -29,19 +29,5 @@ module.exports = {
             res.send(err);
         }
     },
-
-    DeployContract: async function (req, res) {
-        try {
-            const message = req.body.message;
-            console.log("message", message);
-            const result = await casperClient.putDeploy(message);
-            // console.log("result: ", result);
-            res.status(200);
-            res.send(result)
-        } catch (err) {
-            console.log("err: ", err);
-            res.send(err);
-        }
-    }
 
 }
