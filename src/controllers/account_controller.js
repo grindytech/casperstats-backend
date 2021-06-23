@@ -76,6 +76,9 @@ module.exports = {
         if (account_data.public_key_hex) {
           total_reward = (await GetRewardByPublicKey(account_data.public_key_hex)).total_reward;
         }
+        if(total_reward == null) {
+          total_reward = 0;
+        }
       }
 
       account_data.available = available;
@@ -85,7 +88,6 @@ module.exports = {
 
       res.json(account_data);
     } catch (err) {
-      console.log(err);
       res.send(err);
     }
   },
