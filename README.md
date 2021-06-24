@@ -230,7 +230,7 @@ successResponse:
   ```
 url: /account/get-rich-accounts/?start=&count=
 
-example: https://api.casperstats.io/account/get-rich-accounts/?start=1&count=4
+example: https://api.casperstats.io/account/get-rich-accounts/?start=0&count=10
 
 method: GET
 
@@ -239,22 +239,84 @@ des:  Get number of deploys of an account
 successResponse:
 [
     {
+        "account_hash": "8c15bba2d147859c7b7a8f43028eeb4d3c9571c6e36dfecc97c77463d3af08cd",
+        "public_key_hex": "02024c5e3ba7b1da49cda950319aec914cd3c720fbec3dcf25aa4add631e28f70aa9",
+        "balance": "1663678757999890000",
+        "active_date": "2021-06-23T16:21:39.967Z",
+        "transferrable": "1663678757999890000",
+        "staked_amount": "0"
+    },
+    {
+        "account_hash": "b8e119b446f65536e4cc213fba4a0e38533007ae5dea52c4618a86647ccc873a",
+        "public_key_hex": "02035c47ccbeaa32040d6904b6dc163c3b546314c52b2a78583835f54a224ab365a4",
+        "balance": "1000000002000000000",
+        "active_date": "2021-05-06T15:12:27.259Z",
+        "transferrable": "1000000002000000000",
+        "staked_amount": "0"
+    },
+    {
+        "account_hash": "762a3cc23b3b46b42bce1b503ff6b45e9c8762ffb0292a09600c5adcb9bff578",
+        "public_key_hex": "02036210c108f7e819a38ae05cc7b1dc39a2e6366f1404ce4c12e9c05b3832d811bb",
+        "balance": "800000002000000000",
+        "active_date": "2021-05-06T15:12:27.385Z",
+        "transferrable": "800000002000000000",
+        "staked_amount": "0"
+    },
+    {
+        "account_hash": "4a19db8df0a8336ec41e19e0a36e89edc40b7c8940b05c2f5e5e7015aa51ad78",
+        "public_key_hex": "0202bb1cdbec959d918875610aece2cd043ed8f1ed42461215812c5328592c7f4f58",
+        "balance": "486858336999970000",
+        "active_date": "2021-05-10T20:54:36.955Z",
+        "transferrable": "486858336999970000",
+        "staked_amount": "0"
+    },
+    {
+        "account_hash": "6ba745068f8d504783f682a90f07874160c3f061130d0dade51d911279d36359",
+        "public_key_hex": "010b24b2974ac8dd9027a06be487c383732a5e4605d254fb017d9fce388d347e77",
+        "balance": "453839647499990000",
+        "active_date": "2021-06-21T13:39:10.202Z",
+        "transferrable": "7499990000",
+        "staked_amount": "453839640000000000"
+    },
+    {
+        "account_hash": "e4642b00383352a598c3cfd37c803c0db577a3eabdef12cb0f3e362f51197373",
+        "public_key_hex": "0193b5804d28a7e1b4db58c9a2300e65cac7ddf7388cd3f7dfca0fe4943feb2ebd",
+        "balance": "313799273650349300",
+        "active_date": "2021-06-24T00:41:12.758Z",
+        "transferrable": "999937976",
+        "staked_amount": "313799272650411300"
+    },
+    {
+        "account_hash": "eb1cbc3db68fcb8ccdd303d92c38d8fd131e29b8876b65174348abc2e9328510",
+        "public_key_hex": "0186b7ca898840f945fb148110f5637d209632c312f6dc2f68eb6bb363586e2b6d",
+        "balance": "249269665013920000",
+        "active_date": "2021-06-19T17:20:38.118Z",
+        "transferrable": "249269665013920000",
+        "staked_amount": "0"
+    },
+    {
+        "account_hash": "94664ce59fa2e6eb0cc69d270fc91dd9dd2ba02a1f7964c69f036ef4a68bb96f",
+        "public_key_hex": "01b92e36567350dd7b339d709bfe341df6fda853e85315418f1bb3ddd414d9f5be",
+        "balance": "206084149994825200",
+        "active_date": "2021-06-24T07:10:27.990Z",
+        "transferrable": "206084149994825204",
+        "staked_amount": "0"
+    },
+    {
+        "account_hash": "36a53847967861e29a611465c56c3b23b46ee6b258dcb7d4f0e70327341bb11e",
+        "public_key_hex": "020228782ebc6dc9fc2fd67f08bce741bdd4892ff0c616811bc0cfeff5daf5476bd1",
+        "balance": "202271964375860000",
+        "active_date": "2021-05-12T18:57:26.058Z",
+        "transferrable": "202271964375860000",
+        "staked_amount": "0"
+    },
+    {
         "account_hash": "45f3aa6ce2a450dd5a4f2cc4cc9054aded66de6b6cfc4ad977e7251cf94b649b",
         "public_key_hex": "02029d865f743f9a67c82c84d443cbd8187bc4a08ca7b4c985f0caca1a4ee98b1f4c",
-        "balance": "156487207566812521",
-        "active_date": "2021-05-19T15:40:28.410Z"
-    },
-    {
-        "account_hash": "a616c7838d3d03fe0b45c07560ce413f23ccaf35247addc91d1cf7a788db2635",
-        "public_key_hex": "0140a48b549ae33cf28e39241a33dd5e22f491d8811f9d83981f3549d418e06da0",
-        "balance": "85770068273700210",
-        "active_date": "2021-05-19T16:28:47.542Z"
-    },
-    {
-        "account_hash": "496d542527e1a29f576ab7c3f4c947bfcdc9b4145f75f6ec40e36089432d7351",
-        "public_key_hex": "0203f3f44c9e80e2cedc1a2909631a3adea8866ee32187f74d0912387359b0ff36a2",
-        "balance": "16218427128814365",
-        "active_date": "2021-05-19T16:31:44.849Z"
+        "balance": "116747841687568370",
+        "active_date": "2021-06-24T04:10:31.189Z",
+        "transferrable": "116747841687568372",
+        "staked_amount": "0"
     }
 ]
 ```
