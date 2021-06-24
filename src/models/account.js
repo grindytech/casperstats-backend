@@ -10,6 +10,18 @@ const pool = mysql.createPool({
     debug: false
 });
 
+async function GetAccounts() {
+    return new Promise((resolve, reject) => {
+        var sql = `SELECT * FROM account`;
+        pool.query(sql, function (err, result) {
+            if (err) {
+                reject(err);
+            }
+            resolve(result);
+        });
+    })
+}
+
 
 async function GetHolder(account) {
     return new Promise((resolve, reject) => {
@@ -22,6 +34,7 @@ async function GetHolder(account) {
         });
     })
 }
+
 async function GetNumberOfAccountFromDate(date) {
     return new Promise((resolve, reject) => {
         var sql = `SELECT COUNT(*) AS number_of_holders FROM account WHERE DATE(active_date) < '${date}'`;
@@ -85,5 +98,6 @@ async function GetCirculatingSupply() {
 
 module.exports = {
     GetHolder, GetRichAccounts, GetCirculatingSupply,
-    GetTotalNumberOfAccount, GetNumberOfAccountFromDate
+    GetTotalNumberOfAccount, GetNumberOfAccountFromDate,
+    GetAccounts
 }

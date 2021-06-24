@@ -1,6 +1,6 @@
 const { Execute, GetEraInfoBySwitchBlock } = require('../utils/chain');
 const { RpcApiName } = require('../utils/constant');
-const { GetAccountData } = require('../utils/account');
+const { GetAccountData, GetRichest } = require('../utils/account');
 const math = require('mathjs');
 const mysql = require('mysql');
 require('dotenv').config();
@@ -163,9 +163,17 @@ module.exports = {
   GetRichAccounts: async function (req, res) {
     const start = req.query.start;
     const count = req.query.count;
-    GetRichAccounts(start, count).then(value => {
+    // GetRichAccounts(start, count).then(value => {
+    //   res.json(value);
+    // }).catch(err => {
+    //   res.send(err);
+    // })
+
+    GetRichest(start, count).then(value => {
+      res.status(200);
       res.json(value);
     }).catch(err => {
+      console.log(err);
       res.send(err);
     })
   },

@@ -3,6 +3,8 @@ dotenv.config();
 const { RpcApiName } = require('./constant');
 const common = require('./common');
 const { GetTotalRewardByPublicKey } = require("../models/era");
+const { GetAccounts } = require("../models/account");
+const math = require('mathjs');
 
 
 async function GetAccountData(address) {
@@ -34,7 +36,62 @@ async function GetAccountData(address) {
     return account;
 }
 
+async function GetRichest(start, count) {
+
+    let result = [];
+    {
+        // get all accounts
+        const accounts = await GetAccounts();
+        let stakers = []; // stake order
+        {
+            // get all staking accounts
+            const auction_info = (await common.RequestRPC(RpcApiName.get_auction_info, [])).result;
+
+            // get total bid
+            let bids = auction_info.auction_state.bids;
+
+            for (let i = 0; i < bids.length; i++) {
+                const bid = bids[i].bid;
+                stakers.push({
+                    "public_key_hex": bids[i].public_key,
+                    "staked_amount": bid.staked_amount,
+                })
+
+                const delegators = bid.delegators;
+                for (let j = 0; j < delegators.length; j++) {
+                    stakers.push({
+                        "public_key_hex": delegators[j].public_key,
+                        "staked_amount": delegators[j].staked_amount,
+                    })
+                }
+            }
+        }
+
+        for (let i = 0; i < accounts.length; i++) {
+            const public_key_hex = accounts[i].public_key_hex;
+            let staked_amount = 0;
+            const transferrable = accounts[i].balance === null ? 0 : accounts[i].balance;
+            const filter_pk = stakers.filter(value => {
+                return value.public_key_hex == public_key_hex;
+            })
+
+            for (let j = 0; j < filter_pk.length; j++) {
+                staked_amount += Number(filter_pk[j].staked_amount);
+            }
+            accounts[i].balance = (Number(transferrable) + Number(staked_amount)).toString();
+            accounts[i].transferrable = transferrable.toString();
+            accounts[i].staked_amount = staked_amount.toString();
+        }
+        result = accounts;
+    }
+
+    result.sort((a, b) => {
+        return math.compare(b.balance, a.balance);
+    })
+    return result.slice(start, start + count);
+}
+
 module.exports = {
-    GetAccountData
+    GetAccountData, GetRichest
 }
 
