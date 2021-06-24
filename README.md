@@ -97,12 +97,12 @@ successResponse:
 {
     "account_hash": "6ee862e976a99eed1c517bbf7f0d3e97f988f1cf12f3b8e347c033ac9ff745d2",
     "public_key_hex": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c",
-    "balance": "2500000000",
+    "balance": "78126879201062",
     "active_date": "2021-05-04T00:59:39.930Z",
-    "available": "2500000000",
-    "total_staked": "62053395525340",
+    "transferrable": "2500000000",
+    "total_staked": "78124379201062",
     "unbonding": "0",
-    "total_reward": "627492029597747"
+    "total_reward": "78123379201062"
 }
 ```
 
