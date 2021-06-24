@@ -34,9 +34,9 @@ module.exports = {
       // add more data
 
       // Available
-      let available = 0;
+      let transferrable = 0;
       {
-        available = account_data.balance;
+        transferrable = account_data.balance;
       }
 
       // Total staked
@@ -81,9 +81,10 @@ module.exports = {
         }
       }
 
-      account_data.available = available;
+      account_data.balance = (Number(transferrable) + Number(total_staked)).toString();
+      account_data.transferrable = transferrable.toString();
       account_data.total_staked = total_staked.toString();
-      account_data.unbonding = unbonding;
+      account_data.unbonding = unbonding.toString();
       account_data.total_reward = total_reward.toString();
 
       res.json(account_data);
