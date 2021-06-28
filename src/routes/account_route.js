@@ -8,5 +8,6 @@ router.route("/get-deploys/").get(account_controller.GetAccountDeploys);
 router.route("/get-rich-accounts/").get(account_controller.GetRichAccounts);
 router.route("/count-holders/").get(account_controller.CountHolders);
 router.route("/get-rewards").get(account_controller.GetRewards);
+router.route("/get-daily-reward").get(account_controller.GetDailyReward);
 
 module.exports = router;

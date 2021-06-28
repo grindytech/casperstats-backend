@@ -9,7 +9,7 @@ const { GetTransfersByAccountHash } = require('../models/transfer');
 const { GetDeploysByPublicKey } = require('../models/deploy');
 const { GetAccountHash, RequestRPC } = require('../utils/common');
 const { GetSwitchBlockByDate, GetBlockHashByHeight } = require('../models/block_model');
-const { GetTotalRewardByPublicKey, GetRewardByPublicKey } = require('../models/era');
+const { GetTotalRewardByPublicKey, GetRewardByPublicKey, GetPublicKeyTotalRewardByDate } = require('../models/era');
 
 require('dotenv').config();
 
@@ -76,7 +76,7 @@ module.exports = {
         if (account_data.public_key_hex) {
           total_reward = (await GetRewardByPublicKey(account_data.public_key_hex)).total_reward;
         }
-        if(total_reward == null) {
+        if (total_reward == null) {
           total_reward = 0;
         }
       }
@@ -257,10 +257,48 @@ module.exports = {
       return obj.reward !== "0";
     })
 
-    if(is_valid_address) {
+    if (is_valid_address) {
       res.json(rewards);
-    }else {
+    } else {
       res.json([]);
+    }
+  },
+
+  GetDailyReward: async function (req, res) {
+    const count = req.query.count;
+    const account = req.query.account;
+
+    try {
+      let result = [];
+      {
+        const the_time = new Date();
+
+        let mark_time = new Date();
+        mark_time.setDate(the_time.getDate());
+        mark_time = mark_time.toISOString().slice(0, 10);
+
+        for (let i = 0; i < count; i++) {
+          let the_date = new Date();
+          the_date.setDate(the_time.getDate() - i);
+          the_date = the_date.toISOString().slice(0, 10);
+          let reward = (await GetPublicKeyTotalRewardByDate(account, the_date, mark_time)).total_reward;
+
+          if (reward == null) {
+            reward = 0;
+          }
+
+          result.push([
+            Math.floor(new Date(mark_time).getTime()),
+            reward.toString()
+          ])
+
+          mark_time = the_date;
+        }
+        res.status(200);
+        res.json(result);
+      }
+    } catch (err) {
+      res.send(err);
     }
   }
 };
