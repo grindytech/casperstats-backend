@@ -9,7 +9,7 @@ const { GetTransfersByAccountHash } = require('../models/transfer');
 const { GetDeploysByPublicKey } = require('../models/deploy');
 const { GetAccountHash, RequestRPC } = require('../utils/common');
 const { GetSwitchBlockByDate, GetBlockHashByHeight } = require('../models/block_model');
-const { GetRewardByPublicKey, GetPublicKeyRewardByDate } = require('../models/era');
+const { GetRewardByPublicKey, GetPublicKeyRewardByDate, GetLatestEra, GetPublicKeyRewardByEra, GetTimestampByEra } = require('../models/era');
 
 require('dotenv').config();
 
@@ -264,35 +264,26 @@ module.exports = {
     }
   },
 
-  GetDailyReward: async function (req, res) {
+  GetEraReward: async function (req, res) {
     const count = req.query.count;
     const account = req.query.account;
-
+    const last_era = (await GetLatestEra()).era_id;
     try {
       let result = [];
       {
-        const the_time = new Date();
-
-        let mark_time = new Date();
-        mark_time.setDate(the_time.getDate() + 1); // tomorrow
-        mark_time = mark_time.toISOString().slice(0, 10);
-
         for (let i = 0; i < count; i++) {
-          let the_date = new Date();
-          the_date.setDate(the_time.getDate() - i);
-          the_date = the_date.toISOString().slice(0, 10);
-          let reward = (await GetPublicKeyRewardByDate(account, the_date, mark_time)).total_reward;
-
-          if (reward == null) {
-            reward = 0;
+          const index_era = Number(last_era) - Number(i);
+          // get reward by era
+          let era_reward = (await GetPublicKeyRewardByEra(account, index_era)).reward;
+          if(era_reward == null) {
+            era_reward = 0;
           }
-
+          const timestamp = (await GetTimestampByEra(index_era)).timestamp;
           result.push([
-            Math.floor(new Date(mark_time).getTime()),
-            reward.toString()
+            (new Date(timestamp).getTime()),
+            era_reward.toString(),
+            index_era,
           ])
-
-          mark_time = the_date;
         }
         res.status(200);
         res.json(result);
