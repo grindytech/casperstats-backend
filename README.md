@@ -16,6 +16,7 @@ This project provide the REST api to interact with Casper blockchain
     - [get-rich-accounts](#get-rich-accounts)
     - [count-holders](#count-holders)
     - [get-rewards](#get-rewards)
+    - [get-daily-reward](#get-daily-reward)
 
   - [Chain](#Chain)
     - [get-block](#get-block)
@@ -390,6 +391,67 @@ successResponse:
 | start | number | start from today| Yes |
 | count | number | number of day | Yes |
 
+
+#### get-rewards
+  
+  ```
+url: /account/get-rewards?account=&count=
+
+example: api.casperstats.io/account/get-daily-reward?account=0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c&count=10
+
+method: GET
+
+des:  Get daily reward 
+
+successResponse:
+[
+    [
+        1624924800000,
+        "640017590252"
+    ],
+    [
+        1624838400000,
+        "1535110232193"
+    ],
+    [
+        1624752000000,
+        "1532182752738"
+    ],
+    [
+        1624665600000,
+        "1525794788757"
+    ],
+    [
+        1624579200000,
+        "1521749680986"
+    ],
+    [
+        1624492800000,
+        "1529908201183"
+    ],
+    [
+        1624406400000,
+        "1531995870749"
+    ],
+    [
+        1624320000000,
+        "1530001666524"
+    ],
+    [
+        1624233600000,
+        "1531647047893"
+    ],
+    [
+        1624147200000,
+        "1530903084865"
+    ]
+]
+```
+
+| Params  | Type | Description | Required |
+| ------------- | ------------- | ------------- |------------- |
+| account | string | account| Yes |
+| count | number | number of day started from now | Yes |
 
 
 ### Chain
