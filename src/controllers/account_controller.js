@@ -274,7 +274,7 @@ module.exports = {
         const the_time = new Date();
 
         let mark_time = new Date();
-        mark_time.setDate(the_time.getDate());
+        mark_time.setDate(the_time.getDate() + 1); // tomorrow
         mark_time = mark_time.toISOString().slice(0, 10);
 
         for (let i = 0; i < count; i++) {
