@@ -392,7 +392,7 @@ successResponse:
 | count | number | number of day | Yes |
 
 
-#### get-rewards
+#### get-daily-reward
   
   ```
 url: /account/get-rewards?account=&count=
