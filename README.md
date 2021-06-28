@@ -16,7 +16,7 @@ This project provide the REST api to interact with Casper blockchain
     - [get-rich-accounts](#get-rich-accounts)
     - [count-holders](#count-holders)
     - [get-rewards](#get-rewards)
-    - [get-daily-reward](#get-daily-reward)
+    - [get-era-reward](#get-era-reward)
 
   - [Chain](#Chain)
     - [get-block](#get-block)
@@ -392,12 +392,12 @@ successResponse:
 | count | number | number of day | Yes |
 
 
-#### get-daily-reward
+#### get-era-reward
   
   ```
-url: /account/get-rewards?account=&count=
+url: /account/get-era-reward?account=&count=
 
-example: api.casperstats.io/account/get-daily-reward?account=0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c&count=10
+example: api.casperstats.io/account/get-era-reward?account=0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c&count=10
 
 method: GET
 
@@ -406,44 +406,54 @@ des:  Get daily reward
 successResponse:
 [
     [
-        1624924800000,
-        "640017590252"
+        1624874090496,
+        "128011628486",
+        1063
     ],
     [
-        1624838400000,
-        "1535110232193"
+        1624866881536,
+        "128011606019",
+        1062
     ],
     [
-        1624752000000,
-        "1532182752738"
+        1624859672576,
+        "128000043550",
+        1061
     ],
     [
-        1624665600000,
-        "1525794788757"
+        1624852463616,
+        "128001043783",
+        1060
     ],
     [
-        1624579200000,
-        "1521749680986"
+        1624845254656,
+        "127993268414",
+        1059
     ],
     [
-        1624492800000,
-        "1529908201183"
+        1624838045696,
+        "127999398477",
+        1058
     ],
     [
-        1624406400000,
-        "1531995870749"
+        1624830836736,
+        "127989925118",
+        1057
     ],
     [
-        1624320000000,
-        "1530001666524"
+        1624823627776,
+        "127982364709",
+        1056
     ],
     [
-        1624233600000,
-        "1531647047893"
+        1624816418816,
+        "127968794095",
+        1055
     ],
     [
-        1624147200000,
-        "1530903084865"
+        1624809209856,
+        "127963795555",
+        1054
     ]
 ]
 ```
@@ -452,6 +462,12 @@ successResponse:
 | ------------- | ------------- | ------------- |------------- |
 | account | string | account| Yes |
 | count | number | number of day started from now | Yes |
+
+| ResponseField  | Type | Description |
+| ------------- | ------------- | ------------- |
+| first | Number | timestamp of the era |
+| second | String | reward of era |
+| third | Number | era id |
 
 
 ### Chain
@@ -504,10 +520,7 @@ successResponse:
 | id | number | JSON-RPC identifier, applied to the request and returned in the response. If not provided, a random integer will be assigned |
 | b | string, number |  Hex-encoded block hash or height of the block. If not given, the last block added to the chain as known at the given node will be used |
 
-| ResponseField  | Type | Description |
-| ------------- | ------------- | ------------- |
-|  |  |  |
-|  |  |  |
+
 
 #### get-block-tranfers
 
