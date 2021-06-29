@@ -5,7 +5,7 @@ const account_fn = require('./account');
 const { GetHeight, RequestRPC, GetAccountHash, GetBalanceByAccountHash, Execute } = require("./common");
 const request = require('request');
 const { GetNumberOfTransfersByDate } = require("../models/transfer");
-const { GetLatestEra, GetTotalRewardByEra } = require("../models/era");
+const { GetBlockHeight } = require("../models/block_model");
 
 
 const GetTxhashes = async (block) => {
@@ -214,26 +214,26 @@ const GetLatestTx = async (number_of_tx) => {
 
 
 async function IsBlockHeight(param) {
-    try {
-        if (!isNaN(param)) { //block height
-            let params = [{ "Height": parseInt(param) }]
-            await RequestRPC(RpcApiName.get_block, params);
-            return true;
-        }
-    } catch (err) {
 
+    if (isNaN(param) == false) {
+        const height = await GetBlockHeight();
+        if (param < 0 || param > height) {
+            return false;
+        }
+        return true;
     }
-    return false
+    return false;
 }
 
 async function IsBlockHash(param) {
     if (param.length == 64) {  //block hash
         // check block hash
+        let params = [{ "Hash": param }]
         try {
-            let params = [{ "Hash": param }]
             await RequestRPC(RpcApiName.get_block, params);
             return true;
         } catch (err) { }
+
     }
     return false;
 }
@@ -241,8 +241,8 @@ async function IsBlockHash(param) {
 async function IsDeployHash(param) {
     if (param.length == 64) {
         try {
-            let deploy_info = await GetDeploy(param);
-            if (deploy_info.deploy.header.type == "deploy") {
+            const value = await GetDeploy(param);
+            if (value.deploy.header.type == "deploy") {
                 return true;
             }
         } catch (err) { }
@@ -264,11 +264,14 @@ async function IsTransferHash(param) {
 
 async function IsValidatorAddress(param) {
     try {
-        const auction_info = await (RequestRPC(RpcApiName.get_auction_info, []));
-        const current_validator_weights = auction_info.result.auction_state.era_validators[0].validator_weights;
-        let element = current_validator_weights.find(el => el.public_key == param);
-        if (element) {
-            return true;
+        const is_pk = await IsPublicKeyHex(param);
+        if (is_pk) {
+            const auction_info = await (RequestRPC(RpcApiName.get_auction_info, []));
+            const current_validator_weights = auction_info.result.auction_state.era_validators[0].validator_weights;
+            let element = current_validator_weights.find(el => el.public_key == param);
+            if (element) {
+                return true;
+            }
         }
     } catch (err) { }
     return false;
@@ -276,12 +279,9 @@ async function IsValidatorAddress(param) {
 
 async function IsAccountHash(param) {
     try {
-        if (param.includes('account-hash-')) {
+        if (param.length == 64) {
             return true;
         }
-        let account_hash = "account-hash-" + param;
-        await GetBalanceByAccountHash(account_hash);
-        return true;
     } catch (err) { }
     return false;
 }
@@ -297,67 +297,66 @@ async function IsPublicKeyHex(param) {
 const GetType = async (param) => {
 
     // clean the input
-    param = param.replace(/\s+/g, '');
+    const imput = param.replace(/\s+/g, '');
 
-    const is_blockheight = await IsBlockHeight(param);
+    const is_blockheight = await IsBlockHeight(imput);
     if (is_blockheight) {
         return {
-            value: param,
+            value: imput,
             type: ELEMENT_TYPE.BLOCK_HEIGHT,
         };
     }
 
-    const is_block_hash = await IsBlockHash(param);
+    const is_block_hash = await IsBlockHash(imput);
     if (is_block_hash) {
         return {
-            value: param,
+            value: imput,
             type: ELEMENT_TYPE.BLOCK_HASH,
         };
     }
 
-    const is_deploy_hash = await IsDeployHash(param);
+    const is_deploy_hash = await IsDeployHash(imput);
     if (is_deploy_hash) {
         return {
-            value: param,
+            value: imput,
             type: ELEMENT_TYPE.DEPLOY_HEX,
         }
     }
 
-    const is_transfer_hash = await IsTransferHash(param);
+    const is_transfer_hash = await IsTransferHash(imput);
     if (is_transfer_hash) {
         return {
-            value: param,
+            value: imput,
             type: ELEMENT_TYPE.TRANSFER_HEX,
         }
     }
 
-    const is_validator_address = await IsValidatorAddress(param);
+    const is_validator_address = await IsValidatorAddress(imput);
     if (is_validator_address) {
         return {
-            value: param,
+            value: imput,
             type: ELEMENT_TYPE.VALIDATOR,
         }
     }
 
-    const is_account_hash = await IsAccountHash(param);
+    const is_account_hash = await IsAccountHash(imput);
     if (is_account_hash) {
         return {
-            value: param,
+            value: imput,
             type: ELEMENT_TYPE.PUBLIC_KEY_HASH,
         }
     }
 
-
-    const is_pk_hex = await IsPublicKeyHex(param);
+    const is_pk_hex = await IsPublicKeyHex(imput);
     if (is_pk_hex) {
         return {
-            value: param,
+            value: imput,
             type: ELEMENT_TYPE.PUBLIC_KEY_HEX,
         }
     }
 
     return {
-        value: param,
+        value: imput,
         type: ELEMENT_TYPE.UNKNOWN,
     }
 }

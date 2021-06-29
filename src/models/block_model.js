@@ -53,4 +53,21 @@ async function GetBlockHashByHeight(height) {
     })
 }
 
-module.exports = { GetBlocksByValidator, GetSwitchBlockByDate,GetBlockHashByHeight } 
+
+async function GetBlockHeight() {
+    return new Promise((resolve, reject) => {
+        var sql = `SELECT height FROM block WHERE height = (SELECT MAX(height) FROM block)`;
+        pool.query(sql, function (err, result, fields) {
+            if(err) resolve(false);
+            if(result != undefined && result.length > 0) {
+                const height = result[0].height;
+                resolve(height);
+            } else {
+                resolve(-1);
+            }
+        });
+
+    })
+}
+
+module.exports = { GetBlocksByValidator, GetSwitchBlockByDate,GetBlockHashByHeight, GetBlockHeight } 
