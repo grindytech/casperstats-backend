@@ -4,12 +4,13 @@ const { GetAccountData, GetRichest } = require('../utils/account');
 const math = require('mathjs');
 const mysql = require('mysql');
 require('dotenv').config();
-const { GetHolder, GetRichAccounts, GetTotalNumberOfAccount } = require('../models/account');
+const { GetHolder, GetTotalNumberOfAccount } = require('../models/account');
 const { GetTransfersByAccountHash } = require('../models/transfer');
 const { GetDeploysByPublicKey } = require('../models/deploy');
 const { GetAccountHash, RequestRPC } = require('../utils/common');
-const { GetSwitchBlockByDate, GetBlockHashByHeight } = require('../models/block_model');
-const { GetRewardByPublicKey, GetPublicKeyRewardByDate, GetLatestEra, GetPublicKeyRewardByEra, GetTimestampByEra } = require('../models/era');
+const { GetRewardByPublicKey, GetPublicKeyRewardByDate, GetLatestEra,
+  GetPublicKeyRewardByEra, GetTimestampByEra, GetLatestEraByDate,
+  GetEraValidatorOfPublicKey } = require('../models/era');
 
 require('dotenv').config();
 
@@ -179,88 +180,125 @@ module.exports = {
     })
   },
 
+  // GetRewards: async function (req, res) {
+  //   // get params
+  //   const account = req.query.account;
+  //   const start = req.query.start;
+  //   const count = req.query.count;
+
+  //   // Get block switch from the_date to the_date - count
+  //   let switch_blocks = [];
+  //   {
+  //     const the_time = new Date();
+  //     for (let i = 0; i < count; i++) {
+  //       let the_date = new Date();
+  //       the_date.setDate(the_time.getDate() - (Number(start) + i));
+  //       the_date = the_date.toISOString().slice(0, 10);
+  //       const switchs = await GetSwitchBlockByDate(the_date);
+  //       switch_blocks.push({ "date": the_date, "switchs": switchs });
+  //     }
+  //   }
+
+  //   // get rewards
+  //   let rewards = [];
+  //   {
+  //     for (let i = 0; i < switch_blocks.length; i++) {
+
+  //       const switchs = switch_blocks[i].switchs;
+
+  //       let daily_rewards = math.bignumber("0");
+  //       let validator = "";
+  //       // calculate daily rewards
+  //       for (let ii = 0; ii < switchs.length; ii++) {
+  //         const height = switchs[ii].height;
+  //         const hash = await GetBlockHashByHeight(height);
+  //         const era_info = await GetEraInfoBySwitchBlock(hash.hash);
+  //         // make sure block is the last switch block of the day
+  //         if (era_info.era_summary == null) {
+  //           continue;
+  //         }
+  //         const seigniorage_allocations = era_info.era_summary.stored_value.EraInfo.seigniorage_allocations;
+  //         const allocation_filter = seigniorage_allocations.filter(function (element) {
+  //           if (element.Delegator) {
+  //             return element.Delegator.delegator_public_key == account;
+  //           } else if (element.Validator) {
+  //             return element.Validator.validator_public_key == account;
+  //           }
+  //         })
+
+  //         for (let j = 0; j < allocation_filter.length; j++) {
+  //           if (allocation_filter[j].Delegator) {
+  //             const reward = math.bignumber(allocation_filter[j].Delegator.amount);
+  //             daily_rewards = math.add(daily_rewards, reward);
+  //             if (validator == "") {
+  //               validator = allocation_filter[j].Delegator.validator_public_key;
+  //             }
+
+  //           } else if (allocation_filter[j].Validator) {
+  //             const reward = math.bignumber(allocation_filter[j].Validator.amount);
+  //             daily_rewards = math.add(daily_rewards, reward);
+  //             if (validator == "") {
+  //               validator = allocation_filter[j].Validator.validator_public_key;
+  //             }
+  //           }
+  //         }
+  //       }
+
+  //       rewards.push({
+  //         "date": (new Date(switch_blocks[i].date)).getTime(),
+  //         "validator": validator,
+  //         "reward": daily_rewards.toString(),
+  //         // "APY": APY,
+  //       })
+  //     }
+  //   }
+
   GetRewards: async function (req, res) {
     // get params
     const account = req.query.account;
-    const start = req.query.start;
-    const count = req.query.count;
+    const start = Number(req.query.start);
+    const count = Number(req.query.count);
 
-    // Get block switch from the_date to the_date - count
-    let switch_blocks = [];
-    {
-      const the_time = new Date();
-      for (let i = 0; i < count; i++) {
-        let the_date = new Date();
-        the_date.setDate(the_time.getDate() - (Number(start) + i));
-        the_date = the_date.toISOString().slice(0, 10);
-        const switchs = await GetSwitchBlockByDate(the_date);
-        switch_blocks.push({ "date": the_date, "switchs": switchs });
-      }
-    }
+    try {
+      // get rewards
+      let rewards = [];
+      {
 
-    // get rewards
-    let rewards = [];
-    {
-      for (let i = 0; i < switch_blocks.length; i++) {
+        const the_time = new Date();
+        let mark_date = new Date();
+        mark_date.setDate(the_time.getDate() + (1 - start)); // next day
+        mark_date = mark_date.toISOString().slice(0, 10);
 
-        const switchs = switch_blocks[i].switchs;
 
-        let daily_rewards = math.bignumber("0");
-        let validator = "";
-        // calculate daily rewards
-        for (let ii = 0; ii < switchs.length; ii++) {
-          const height = switchs[ii].height;
-          const hash = await GetBlockHashByHeight(height);
-          const era_info = await GetEraInfoBySwitchBlock(hash.hash);
-          // make sure block is the last switch block of the day
-          if (era_info.era_summary == null) {
-            continue;
+        for (let i = 0; i < count; i++) {
+          let the_date = new Date();
+          the_date.setDate(the_time.getDate() - (start + i));
+          the_date = the_date.toISOString().slice(0, 10);
+
+          let reward = (await GetPublicKeyRewardByDate(account, the_date, mark_date)).reward;
+          if (reward == null) {
+            reward = 0;
           }
-          const seigniorage_allocations = era_info.era_summary.stored_value.EraInfo.seigniorage_allocations;
-          const allocation_filter = seigniorage_allocations.filter(function (element) {
-            if (element.Delegator) {
-              return element.Delegator.delegator_public_key == account;
-            } else if (element.Validator) {
-              return element.Validator.validator_public_key == account;
-            }
+
+          let validator = "";
+          {
+            const latest_date_era = (await GetLatestEraByDate(the_date, mark_date)).era_id;
+            validator = (await GetEraValidatorOfPublicKey(account, latest_date_era)).validator;
+          }
+
+          rewards.push({
+            "date": (new Date(the_date).getTime()),
+            "validator": validator,
+            "reward": reward.toString(),
           })
-
-          for (let j = 0; j < allocation_filter.length; j++) {
-            if (allocation_filter[j].Delegator) {
-              const reward = math.bignumber(allocation_filter[j].Delegator.amount);
-              daily_rewards = math.add(daily_rewards, reward);
-              if (validator == "") {
-                validator = allocation_filter[j].Delegator.validator_public_key;
-              }
-
-            } else if (allocation_filter[j].Validator) {
-              const reward = math.bignumber(allocation_filter[j].Validator.amount);
-              daily_rewards = math.add(daily_rewards, reward);
-              if (validator == "") {
-                validator = allocation_filter[j].Validator.validator_public_key;
-              }
-            }
-          }
+          mark_date = the_date;
         }
 
-        rewards.push({
-          "date": (new Date(switch_blocks[i].date)).getTime(),
-          "validator": validator,
-          "reward": daily_rewards.toString(),
-          // "APY": APY,
-        })
       }
-    }
-
-    // check rewards
-    var is_valid_address = rewards.find(obj => {
-      return obj.reward !== "0";
-    })
-
-    if (is_valid_address) {
+      res.status(200);
       res.json(rewards);
-    } else {
-      res.json([]);
+    } catch (err) {
+      res.send(err);
     }
   },
 
@@ -275,7 +313,7 @@ module.exports = {
           const index_era = Number(last_era) - Number(i);
           // get reward by era
           let era_reward = (await GetPublicKeyRewardByEra(account, index_era)).reward;
-          if(era_reward == null) {
+          if (era_reward == null) {
             era_reward = 0;
           }
           const timestamp = (await GetTimestampByEra(index_era)).timestamp;
