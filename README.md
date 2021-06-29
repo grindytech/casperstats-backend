@@ -111,6 +111,18 @@ successResponse:
 | ------------- | ------------- | ------------- |------------- |
 | account | string | public_key or account_hash | Yes |
 
+| ResponseField  | Type | Description |
+| ------------- | ------------- | ------------- |
+| account_hash | String | account hash |
+| public_key_hex | String | public key |
+| balance | String | Total balance inclued locked and unlocked |
+| balance | String | Total balance inclued locked and unlocked |
+| active_date | String | The date account join network |
+| transferrable | String | The available amount can be trasfer |
+| total_staked | String | Staked amount |
+| unbonding | String | Unboding amount |
+| total_reward | String | Total staking reward |
+
   #### get-transfers
   
   ```
@@ -120,7 +132,7 @@ example: https://api.casperstats.io/account/get-transfers/?account=45f3aa6ce2a45
 
 method: GET
 
-des:  Get number of transfers of account
+des:  Get transfer history of an account
 
 
 successResponse:
@@ -181,7 +193,7 @@ successResponse:
 | Params  | Type | Description | Required |
 | ------------- | ------------- | ------------- |------------- |
 | account | string | public_key or account_hash | Yes |
-| start | number | start tranfers | Yes |
+| start | number | index | Yes |
 | count | number | number of transfers will be return | Yes |
 
 
@@ -194,7 +206,7 @@ example: https://api.casperstats.io/account/get-deploys/?account=02029d865f743f9
 
 method: GET
 
-des:  Get number of deploys of an account
+des:  Get deploy history of an account
 
 successResponse:
 [
@@ -235,7 +247,7 @@ example: https://api.casperstats.io/account/get-rich-accounts/?start=0&count=10
 
 method: GET
 
-des:  Get number of deploys of an account
+des:  Richest list
 
 successResponse:
 [
@@ -324,6 +336,7 @@ successResponse:
 
 | Params  | Type | Description | Required |
 | ------------- | ------------- | ------------- |------------- |
+| start | number | index | Yes |
 | count | number | number of richest accounts| Yes |
 
 
@@ -353,7 +366,7 @@ example: api.casperstats.io/account/get-rewards?account=0107c39ec309b16b2e9244f6
 
 method: GET
 
-des:  Get number of deploys of an account
+des:  Get account daily reward
 
 successResponse:
 [
@@ -387,8 +400,8 @@ successResponse:
 
 | Params  | Type | Description | Required |
 | ------------- | ------------- | ------------- |------------- |
-| account | string | account| Yes |
-| start | number | start from today| Yes |
+| account | string | account | Yes |
+| start | number | index date | Yes |
 | count | number | number of day | Yes |
 
 
@@ -401,7 +414,7 @@ example: api.casperstats.io/account/get-era-reward?account=0167e08c3b05017d32944
 
 method: GET
 
-des:  Get daily reward 
+des:  Get daily reward for charts
 
 successResponse:
 [
@@ -642,11 +655,6 @@ successResponse: block data
 | num | number | Number of last block you wanna get | Yes |
 
 
-| ResponseField  | Type | Description |
-| ------------- | ------------- | ------------- |
-|  |  |  |
-|  |  |  |
-
 #### get-block-transfers
 
 ```
@@ -698,11 +706,6 @@ successResponse:
 | ------------- | ------------- | ------------- |------------- |
 | b | string, number |  Hex-encoded block hash or height of the block. If not given, the last block added to the chain as known at the given node will be used | Optional |
 
-| ResponseField  | Type | Description |
-| ------------- | ------------- | ------------- |
-|  |  |  |
-|  |  |  |
-
 
 #### get-block-deploy
 
@@ -723,11 +726,6 @@ localhost:3031/chain/get-block-deploy/11661
 | Params  | Type | Description | Required |
 | ------------- | ------------- | ------------- |------------- |
 | b | string, number |  Hex-encoded block hash or height of the block. If not given, the last block added to the chain as known at the given node will be used | Optional |
-
-| ResponseField  | Type | Description |
-| ------------- | ------------- | ------------- |
-|  |  |  |
-|  |  |  |
 
 
 #### get-range-block
@@ -881,11 +879,6 @@ successResponse:
 | start | number | start | Yes |
 | end | number, number |  end | Yes |
 
-| ResponseField  | Type | Description |
-| ------------- | ------------- | ------------- |
-|  |  |  |
-|  |  |  |
-
 
 #### get-latest-tx
 
@@ -938,11 +931,6 @@ successResponse:
 | ------------- | ------------- | ------------- |------------- |
 | start | number | start | Yes |
 | end | number, number |  end | Yes |
-
-| ResponseField  | Type | Description |
-| ------------- | ------------- | ------------- |
-|  |  |  |
-|  |  |  |
 
 
 ### get-proposer-blocks
@@ -1111,11 +1099,6 @@ successResponse:
 | ------------- | ------------- | ------------- |
 | id | number | JSON-RPC identifier, applied to the request and returned in the response. If not provided, a random integer will be assigned |
 | b | string, number |  Hex-encoded block hash or height of the block. If not given, the last block added to the chain as known at the given node will be used |
-
-| ResponseField  | Type | Description |
-| ------------- | ------------- | ------------- |
-|  |  |  |
-|  |  |  |
 
 
 #### get-type
@@ -1367,10 +1350,6 @@ successResponse:
          transfer-0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20    # Key::Transfer
          deploy-0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20      # Key::DeployInfo  |
 
-| ResponseField  | Type | Description |
-| ------------- | ------------- | ------------- |
-|  |  |  |
-|  |  |  |
 
 #### get-balance
 
@@ -1410,12 +1389,6 @@ successResponse:
 | s | string | Hex-encoded hash of the state root  |
 | p | string |  The URef under which the purse is stored. This must be a properly formatted URef "uref-<HEX STRING>-<THREE DIGIT INTEGER>" |
 
-| ResponseField  | Type | Description |
-| ------------- | ------------- | ------------- |
-|  |  |  |
-|  |  |  |
-
-
 #### get-auction-info
 
 ```
@@ -1441,17 +1414,6 @@ successResponse:
 }
 
 ```
-
-| Params  | Type | Description |
-| ------------- | ------------- | ------------- |
-|  |  |  |
-|  |  |  |
-
-
-| ResponseField  | Type | Description |
-| ------------- | ------------- | ------------- |
-|  |  |  |
-|  |  |  |
 
 
 #### get-validators
