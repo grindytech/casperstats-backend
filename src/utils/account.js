@@ -58,19 +58,20 @@ async function GetRichest(start, count) {
                 const bid = bids[i].bid;
                 stakers.push({
                     "public_key_hex": bids[i].public_key,
-                    "staked_amount": bid.staked_amount,
+                    "staked_amount": bid.staked_amount.toString(),
                 })
 
                 const delegators = bid.delegators;
                 for (let j = 0; j < delegators.length; j++) {
                     stakers.push({
                         "public_key_hex": delegators[j].public_key,
-                        "staked_amount": delegators[j].staked_amount,
+                        "staked_amount": delegators[j].staked_amount.toString(),
                     })
                 }
             }
         }
 
+        // merge stakers to accounts
         for (let i = 0; i < accounts.length; i++) {
             const public_key_hex = accounts[i].public_key_hex;
             let staked_amount = 0;
@@ -82,17 +83,49 @@ async function GetRichest(start, count) {
             for (let j = 0; j < filter_pk.length; j++) {
                 staked_amount += Number(filter_pk[j].staked_amount);
             }
-            accounts[i].balance = (Number(transferrable) + Number(staked_amount)).toString();
+            let total_balance = (Number(transferrable) + Number(staked_amount));
+            if (!total_balance) {
+                total_balance = 0;
+            }
+            accounts[i].balance = total_balance.toString();
             accounts[i].transferrable = transferrable.toString();
             accounts[i].staked_amount = staked_amount.toString();
+
+            // remove account that just merge from stakers
+            stakers = stakers.filter(value => {
+                return value.public_key_hex != public_key_hex;
+            })
         }
-        result = accounts;
+        result = accounts.concat(stakers);
     }
 
-    result.sort((a, b) => {
-        return math.compare(b.balance, a.balance);
+    result.sort((first, second) => {
+        let first_balance = first.balance;
+        if (!first_balance) {
+            first_balance = first.staked_amount;
+        }
+
+        let second_balance = second.balance;
+        if (!second_balance) {
+            second_balance = second.staked_amount;
+        }
+        return math.compare(second_balance, first_balance);
     })
-    return result.slice(start, start + count);
+
+    result = result.slice(start, start + count);
+    // add more information
+    {
+        for (let i = 0; i < result.length; i++) {
+            if(result[i].account_hash == undefined) {
+                result[i].account_hash = await common.GetAccountHash(result[i].public_key_hex);
+            
+                result[i].balance = result[i].staked_amount;
+                result[i].active_date = "";
+                result[i].transferrable = "0";
+            }
+        }
+    }
+    return result;
 }
 
 module.exports = {

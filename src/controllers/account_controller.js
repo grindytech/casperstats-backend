@@ -176,7 +176,6 @@ module.exports = {
       res.status(200);
       res.json(value);
     }).catch(err => {
-      console.log(err);
       res.send(err);
     })
   },
