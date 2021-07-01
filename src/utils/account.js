@@ -25,12 +25,16 @@ async function GetAccountData(address) {
             public_key = null;
         }
 
-    const balance = await common.GetBalanceByAccountHash(account_hash);
-
+    let balance = 0;
+    try {
+        balance = (await common.GetBalanceByAccountHash(account_hash)).balance_value;
+    } catch (err) {
+        balance = 0;
+    }
     const account = {
         "account_hash": account_hash.replace('account-hash-', ''),
         "public_key_hex": public_key,
-        "balance": balance.balance_value,
+        "balance": balance,
         "active_date": "",
     }
     return account;
