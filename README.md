@@ -17,6 +17,7 @@ This project provide the REST api to interact with Casper blockchain
     - [count-holders](#count-holders)
     - [get-rewards](#get-rewards)
     - [get-era-reward](#get-era-reward)
+    - [undelegate](#undelegate)
 
   - [Chain](#Chain)
     - [get-block](#get-block)
@@ -481,6 +482,70 @@ successResponse:
 | first | Number | timestamp of the era |
 | second | String | reward of era |
 | third | Number | era id |
+
+
+#### undelegate
+  
+  ```
+url: /account/undelegate?account=
+
+example: api.casperstats.io/account/undelegate?account=01c4dcd4f6676ea296c013c9d2ce82e78b6eff0617f061d50626748a1d9196dcfb
+
+method: GET
+
+des:  Get undelegating transactions
+
+successResponse:
+[
+    {
+        "public_key": "01bd63f88cc9282d7225b32e9a9945feb092b0f4fc5b6cfc659aeffacce2c76615",
+        "validator": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c",
+        "era_of_creation": 1095,
+        "amount": "20167950000000"
+    },
+    {
+        "public_key": "01c29f0c214bfa5d33a0a93d7b56b734985c9fdc16af19fc3d1224537b025f2499",
+        "validator": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c",
+        "era_of_creation": 1099,
+        "amount": "6391350000000"
+    },
+    {
+        "public_key": "012325dc6969af448e93fe5299571ae6b4f0ad87b0a51df9f34225b242116416d1",
+        "validator": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c",
+        "era_of_creation": 1100,
+        "amount": "461538000000000"
+    },
+    {
+        "public_key": "012325dc6969af448e93fe5299571ae6b4f0ad87b0a51df9f34225b242116416d1",
+        "validator": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c",
+        "era_of_creation": 1100,
+        "amount": "110000000000000"
+    },
+    {
+        "public_key": "01c4dcd4f6676ea296c013c9d2ce82e78b6eff0617f061d50626748a1d9196dcfb",
+        "validator": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c",
+        "era_of_creation": 1100,
+        "amount": "109675000000000"
+    },
+    {
+        "public_key": "01c4dcd4f6676ea296c013c9d2ce82e78b6eff0617f061d50626748a1d9196dcfb",
+        "validator": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c",
+        "era_of_creation": 1090,
+        "amount": "329026000000000"
+    }
+]
+```
+
+| Params  | Type | Description | Required |
+| ------------- | ------------- | ------------- |------------- |
+| account | string | account| Yes |
+
+| ResponseField  | Type | Description |
+| ------------- | ------------- | ------------- |
+| public_key | String | delegator |
+| validator | Number | validator |
+| era_of_creation | Number | the era at the time undelegated and then will take 7 eras period to fully unlock|
+| amount | String | amount of token undelegated |
 
 
 ### Chain
