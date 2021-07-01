@@ -298,8 +298,8 @@ module.exports = {
           const write_withdraws = success_withdraws[i].transform.WriteWithdraw;
           for (let j = 0; j < write_withdraws.length; j++) {
             result.push({
-              "validator_public_key": write_withdraws[j].validator_public_key,
-              "unbonder_public_key": write_withdraws[j].unbonder_public_key,
+              "public_key": write_withdraws[j].unbonder_public_key,
+              "validator": write_withdraws[j].validator_public_key,
               "era_of_creation": write_withdraws[j].era_of_creation,
               "amount": write_withdraws[j].amount,
             })
