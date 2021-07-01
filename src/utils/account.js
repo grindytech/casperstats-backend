@@ -23,18 +23,10 @@ async function GetAccountData(address) {
         } catch (err) {
             account_hash = "account-hash-" + address;
             public_key = null;
-        }
-
-    let balance = 0;
-    try {
-        balance = (await common.GetBalanceByAccountHash(account_hash)).balance_value;
-    } catch (err) {
-        balance = 0;
-    }
+        }  
     const account = {
         "account_hash": account_hash.replace('account-hash-', ''),
         "public_key_hex": public_key,
-        "balance": balance,
         "active_date": "",
     }
     return account;

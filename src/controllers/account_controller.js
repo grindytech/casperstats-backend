@@ -7,7 +7,7 @@ require('dotenv').config();
 const { GetHolder, GetTotalNumberOfAccount } = require('../models/account');
 const { GetTransfersByAccountHash } = require('../models/transfer');
 const { GetDeploysByPublicKey } = require('../models/deploy');
-const { GetAccountHash, RequestRPC } = require('../utils/common');
+const { GetAccountHash, RequestRPC, GetBalance, GetBalanceByAccountHash } = require('../utils/common');
 const { GetRewardByPublicKey, GetPublicKeyRewardByDate, GetLatestEra,
   GetPublicKeyRewardByEra, GetTimestampByEra, GetLatestEraByDate,
   GetEraValidatorOfPublicKey } = require('../models/era');
@@ -34,6 +34,10 @@ module.exports = {
       }
 
       // add more data
+      // BALANCE
+      {
+        account_data.balance = (await GetBalanceByAccountHash("account-hash-" + account_data.account_hash)).balance_value;
+      }
 
       // Available
       let transferrable = 0;
