@@ -297,11 +297,19 @@ module.exports = {
         for (let i = 0; i < success_withdraws.length; i++) {
           const write_withdraws = success_withdraws[i].transform.WriteWithdraw;
           for (let j = 0; j < write_withdraws.length; j++) {
+
+            let release_timestamp = 0;
+            {
+              const era_timestamp = (await GetTimestampByEra(write_withdraws[j].era_of_creation)).timestamp;
+              release_timestamp = Number(new Date(era_timestamp).getTime()) + 3600000 * 16;
+            }
+
             result.push({
               "public_key": write_withdraws[j].unbonder_public_key,
               "validator": write_withdraws[j].validator_public_key,
               "era_of_creation": write_withdraws[j].era_of_creation,
               "amount": write_withdraws[j].amount,
+              "release_timestamp": release_timestamp,
             })
           }
         }
