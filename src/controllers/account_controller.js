@@ -6,12 +6,11 @@ const mysql = require('mysql');
 require('dotenv').config();
 const { GetHolder, GetTotalNumberOfAccount } = require('../models/account');
 const { GetTransfersByAccountHash } = require('../models/transfer');
-const { GetDeploysByPublicKey } = require('../models/deploy');
+const { GetDeploysByPublicKey, GetAllDeployByPublicKey } = require('../models/deploy');
 const { GetAccountHash, RequestRPC, GetBalance, GetBalanceByAccountHash } = require('../utils/common');
 const { GetRewardByPublicKey, GetPublicKeyRewardByDate, GetLatestEra,
   GetPublicKeyRewardByEra, GetTimestampByEra, GetLatestEraByDate,
   GetEraValidatorOfPublicKey } = require('../models/era');
-const { GetSwitchBlockByDate, GetBlockHashByHeight } = require('../models/block_model');
 
 require('dotenv').config();
 
@@ -260,5 +259,59 @@ module.exports = {
     } catch (err) {
       res.send(err);
     }
+  },
+
+  GetUndelegate: async function (req, res) {
+    const account = req.query.account;
+
+    try {
+
+      // get all deploy
+      const deploys = await GetAllDeployByPublicKey(account);
+
+      // filter undelegate deploy
+      let success_withdraws = [];
+      {
+        for (let i = 0; i < deploys.length; i++) {
+          let params = [deploys[i].deploy_hash];
+          let deploy_data = await RequestRPC(RpcApiName.get_deploy, params);
+
+          const execution_results = deploy_data.result.execution_results;
+          {
+            for (let j = 0; j < execution_results.length; j++) {
+              try {
+                const transforms = execution_results[j].result.Success.effect.transforms;
+                const withdraws = transforms.filter(value => {
+                  return value.key.includes("withdraw");
+                })
+                success_withdraws.push(...withdraws);
+              } catch (err) { }
+            }
+          }
+
+        }
+      }
+      // parser data
+      let result = [];
+      {
+        for (let i = 0; i < success_withdraws.length; i++) {
+          const write_withdraws = success_withdraws[i].transform.WriteWithdraw;
+          for (let j = 0; j < write_withdraws.length; j++) {
+            result.push({
+              "validator_public_key": write_withdraws[j].validator_public_key,
+              "unbonder_public_key": write_withdraws[j].unbonder_public_key,
+              "era_of_creation": write_withdraws[j].era_of_creation,
+              "amount": write_withdraws[j].amount,
+            })
+          }
+        }
+      }
+
+      res.status(200);
+      res.json(result);
+    } catch (err) {
+      res.send(err);
+    }
+
   }
 };
