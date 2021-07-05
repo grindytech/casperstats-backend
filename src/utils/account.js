@@ -175,6 +175,11 @@ async function GetUndelegating(account) {
             }
         }
     }
+
+    // filter only undelegating for publickey
+    result = result.filter(value => {
+        return value.public_key = account;
+    })
     return result;
 }
 
