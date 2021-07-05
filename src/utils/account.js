@@ -23,7 +23,7 @@ async function GetAccountData(address) {
         } catch (err) {
             account_hash = "account-hash-" + address;
             public_key = null;
-        }  
+        }
     const account = {
         "account_hash": account_hash.replace('account-hash-', ''),
         "public_key_hex": public_key,
@@ -108,9 +108,9 @@ async function GetRichest(start, count) {
     // add more information
     {
         for (let i = 0; i < result.length; i++) {
-            if(result[i].account_hash == undefined) {
+            if (result[i].account_hash == undefined) {
                 result[i].account_hash = await common.GetAccountHash(result[i].public_key_hex);
-            
+
                 result[i].balance = result[i].staked_amount;
                 result[i].active_date = "";
                 result[i].transferrable = "0";
@@ -120,7 +120,60 @@ async function GetRichest(start, count) {
     return result;
 }
 
+async function GetUndelegating(account) {
+    // get all deploy
+    const deploys = await GetAllDeployByPublicKey(account);
+
+    // filter undelegate deploy
+    let success_withdraws = [];
+    {
+        for (let i = 0; i < deploys.length; i++) {
+            let params = [deploys[i].deploy_hash];
+            let deploy_data = await RequestRPC(RpcApiName.get_deploy, params);
+
+            const execution_results = deploy_data.result.execution_results;
+            {
+                for (let j = 0; j < execution_results.length; j++) {
+                    try {
+                        const transforms = execution_results[j].result.Success.effect.transforms;
+                        const withdraws = transforms.filter(value => {
+                            return value.key.includes("withdraw");
+                        })
+                        success_withdraws.push(...withdraws);
+                    } catch (err) { }
+                }
+            }
+
+        }
+    }
+    // parser data
+    let result = [];
+    {
+        for (let i = 0; i < success_withdraws.length; i++) {
+            const write_withdraws = success_withdraws[i].transform.WriteWithdraw;
+            for (let j = 0; j < write_withdraws.length; j++) {
+
+                let release_timestamp = 0;
+                {
+                    const era_timestamp = (await GetTimestampByEra(write_withdraws[j].era_of_creation)).timestamp;
+                    release_timestamp = Number(new Date(era_timestamp).getTime()) + 3600000 * 16;
+                }
+
+                result.push({
+                    "public_key": write_withdraws[j].unbonder_public_key,
+                    "validator": write_withdraws[j].validator_public_key,
+                    "era_of_creation": write_withdraws[j].era_of_creation,
+                    "amount": write_withdraws[j].amount,
+                    "release_timestamp": release_timestamp,
+                })
+            }
+        }
+    }
+    return result;
+}
+
+
 module.exports = {
-    GetAccountData, GetRichest
+    GetAccountData, GetRichest, GetUndelegating
 }
 

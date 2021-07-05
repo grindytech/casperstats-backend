@@ -1,6 +1,6 @@
 const { Execute, GetEraInfoBySwitchBlock } = require('../utils/chain');
 const { RpcApiName } = require('../utils/constant');
-const { GetAccountData, GetRichest } = require('../utils/account');
+const { GetAccountData, GetRichest, GetUndelegating } = require('../utils/account');
 const math = require('mathjs');
 const mysql = require('mysql');
 require('dotenv').config();
@@ -69,9 +69,15 @@ module.exports = {
       }
 
       // Undonding
-      let unbonding = "0";
+      let unbonding = 0;
       {
-
+        const result = await GetUndelegating(account);
+        const the_date = new Date();
+        for (let i = 0; i < result.length; i++) {
+          if(result[i].release_timestamp < the_date.getTime()) {
+            unbonding += Number(result[i].amount);
+          }
+        }
       }
 
       // Total reward
@@ -258,63 +264,12 @@ module.exports = {
 
   GetUndelegate: async function (req, res) {
     const account = req.query.account;
-
     try {
-
-      // get all deploy
-      const deploys = await GetAllDeployByPublicKey(account);
-
-      // filter undelegate deploy
-      let success_withdraws = [];
-      {
-        for (let i = 0; i < deploys.length; i++) {
-          let params = [deploys[i].deploy_hash];
-          let deploy_data = await RequestRPC(RpcApiName.get_deploy, params);
-
-          const execution_results = deploy_data.result.execution_results;
-          {
-            for (let j = 0; j < execution_results.length; j++) {
-              try {
-                const transforms = execution_results[j].result.Success.effect.transforms;
-                const withdraws = transforms.filter(value => {
-                  return value.key.includes("withdraw");
-                })
-                success_withdraws.push(...withdraws);
-              } catch (err) { }
-            }
-          }
-
-        }
-      }
-      // parser data
-      let result = [];
-      {
-        for (let i = 0; i < success_withdraws.length; i++) {
-          const write_withdraws = success_withdraws[i].transform.WriteWithdraw;
-          for (let j = 0; j < write_withdraws.length; j++) {
-
-            let release_timestamp = 0;
-            {
-              const era_timestamp = (await GetTimestampByEra(write_withdraws[j].era_of_creation)).timestamp;
-              release_timestamp = Number(new Date(era_timestamp).getTime()) + 3600000 * 16;
-            }
-
-            result.push({
-              "public_key": write_withdraws[j].unbonder_public_key,
-              "validator": write_withdraws[j].validator_public_key,
-              "era_of_creation": write_withdraws[j].era_of_creation,
-              "amount": write_withdraws[j].amount,
-              "release_timestamp": release_timestamp,
-            })
-          }
-        }
-      }
-
+      const result = await GetUndelegating(account);
       res.status(200);
       res.json(result);
     } catch (err) {
       res.send(err);
     }
-
   }
 };
