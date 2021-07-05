@@ -9,8 +9,33 @@ router.route("/query-state/:key").get(state_controller.QueryState);
 // Auction and staking
 router.route("/get-auction-info").get(state_controller.GetAuctionInfo);
 router.route("/get-era-validators").get(state_controller.GetEraValidators);
-router.route('/get-bids').get(state_controller.GetBids);
-router.route("/get-validators/:number").get(state_controller.GetValidators);
+
+// cache for get-bids
+const verifyGetBids = (req, res, next) => {
+    try {
+        if (state_controller.get_bids_cache.has("get-bids")) {
+            return res.status(200).json(state_controller.get_bids_cache.get("get-bids"));
+        }
+        return next();
+    } catch (err) {
+        throw new Error(err);
+    }
+};
+router.route('/get-bids').get(verifyGetBids, state_controller.GetBids);
+
+// cache for get-validators
+const verifyGetValidators = (req, res, next) => {
+    try {
+        const number = req.params.number;
+        if (state_controller.get_validators_cache.has(number)) {
+            return res.status(200).json(state_controller.get_validators_cache.get(number));
+        }
+        return next();
+    } catch (err) {
+        throw new Error(err);
+    }
+};
+router.route("/get-validators/:number").get(verifyGetValidators, state_controller.GetValidators);
 router.route("/get-validator/:address").get(state_controller.GetValidator);
 
 module.exports = router;

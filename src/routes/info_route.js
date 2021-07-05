@@ -8,7 +8,31 @@ router.route("/get-circulating-supply/").get(info_controller.GetCirculatingSuppl
 router.route("/get-supply/").get(info_controller.GetSupply);
 router.route("/get-transfer-volume/:count").get(info_controller.GetTransferVolume);
 router.route("/get-volume/:count").get(info_controller.GetVolume);
-router.route("/get-stats").get(info_controller.GetStats);
-router.route("/economics").get(info_controller.GetEconomics);
+
+// cache for get-stats
+const verifyGetStats = (req, res, next) => {
+    try {
+        if (info_controller.get_stats_cache.has("get-stats")) {
+            return res.status(200).json(info_controller.get_stats_cache.get("get-stats"));
+        }
+        return next();
+    } catch (err) {
+        throw new Error(err);
+    }
+};
+router.route("/get-stats").get(verifyGetStats, info_controller.GetStats);
+
+// cache for economics
+const verifyEconomics = (req, res, next) => {
+    try {
+        if (info_controller.economics_cache.has("economics")) {
+            return res.status(200).json(info_controller.economics_cache.get("economics"));
+        }
+        return next();
+    } catch (err) {
+        throw new Error(err);
+    }
+};
+router.route("/economics").get(verifyEconomics, info_controller.GetEconomics);
 
 module.exports = router;

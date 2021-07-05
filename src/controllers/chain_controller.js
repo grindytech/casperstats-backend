@@ -9,12 +9,12 @@ const { RpcApiName } = require('../utils/constant');
 const request = require('request');
 
 const NodeCache = require("node-cache");
-const cache = new NodeCache({ stdTTL: 15 });
+const get_block_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_BLOCK || 20 });
 
 require('dotenv').config();
 
 module.exports = {
-  cache,
+  get_block_cache,
   GetBlock: async function (req, res) {
     const b = req.params.block; // Hex-encoded block hash or height of the block. If not given, the last block added to the chain as known at the given node will be used
 
@@ -48,7 +48,7 @@ module.exports = {
     RequestRPC(RpcApiName.get_block, params).then(value => {
       value.result["current_height"] = height;
 
-      cache.set(b, value);
+      get_block_cache.set(b, value);
       res.status(200).json(value);
     }).catch(err => {
       res.send(err);

@@ -11,8 +11,14 @@ const { GetEraValidators, GetAPY, GetTotalStake } = require('../utils/validator'
 const { GetTotalReward } = require('../models/era');
 const CoinGeckoClient = new CoinGecko();
 
+const NodeCache = require("node-cache");
+const get_stats_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_STATS || 1800 });
+const economics_cache = new NodeCache({ stdTTL: process.env.CACHE_ECONOMICS || 3600 });
 
 module.exports = {
+    get_stats_cache,
+    economics_cache,
+
     GetDeploy: async function (req, res) {
         let hex = req.params.hex; // Hex-encoded deploy hash
 
@@ -133,7 +139,7 @@ module.exports = {
             transactions_change: 0, // last 24 hours
             transfers: [], // last 60 days transfer
         }
-
+        try{
         // holder
         {
             var datetime = new Date();
@@ -167,22 +173,18 @@ module.exports = {
 
         // price + marketcap 
         {
-            {
-                const params = {
-                    tickers: false,
-                    community_data: false,
-                    developer_data: false,
-                    localization: false,
-
-                }
-                let data = await CoinGeckoClient.coins.fetch('casper-network', params);
-                stats.price = data.data.market_data.current_price.usd;
-                stats.price_change = data.data.market_data.price_change_percentage_24h;
-                stats.marketcap = data.data.market_data.market_cap.usd;
-                stats.marketcap_change = data.data.market_data.market_cap_change_percentage_24h;
+            const params = {
+                tickers: false,
+                community_data: false,
+                developer_data: false,
+                localization: false,
 
             }
-
+            let data = await CoinGeckoClient.coins.fetch('casper-network', params);
+            stats.price = data.data.market_data.current_price.usd;
+            stats.price_change = data.data.market_data.price_change_percentage_24h;
+            stats.marketcap = data.data.market_data.market_cap.usd;
+            stats.marketcap_change = data.data.market_data.market_cap_change_percentage_24h;
         }
 
         // volume
@@ -229,9 +231,12 @@ module.exports = {
             const data = await GetTransfersVolume(count);
             stats.transfers = data;
         }
-
-
+        get_stats_cache.set("get-stats", stats);
         res.json(stats);
+    }catch(err) {
+        res.send(err);
+    }
+
     },
 
     GetEconomics: async function (req, res) {
@@ -284,11 +289,10 @@ module.exports = {
             // total reward
             let total_reward = (await GetTotalReward()).total_reward;
             economics.total_reward = total_reward;
-            res.json(economics);
+            economics_cache.set("economics", economics);
+            res.status(200).json(economics);
         } catch (err) {
             res.send(err);
         }
-
-
     }
 };

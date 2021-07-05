@@ -4,8 +4,14 @@ const { RpcApiName } = require('../utils/constant');
 
 require('dotenv').config();
 
-module.exports = {
+const NodeCache = require("node-cache");
+const get_validators_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_VALIDATORS || 60 });
+const get_bids_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_BIDS || 60 });
 
+module.exports = {
+    get_validators_cache,
+    get_bids_cache,
+    
     GetBalanceAccountHash: async function (req, res) {
         const account_hash = req.params.account_hash;
         try {  
@@ -60,9 +66,8 @@ module.exports = {
         const number = req.params.number;
         try {
             const validators = await GetValidators(number);
-            res.status(200);
-            res.json(validators);
-
+            get_validators_cache.set(number, validators);
+            res.status(200).json(validators);
         } catch (err) {
             res.send(err);
         }
@@ -83,8 +88,8 @@ module.exports = {
     GetBids: async function (req, res) {
         try {
             const bids = await GetBids();
-            res.status(200);
-            res.json(bids);
+            get_bids_cache.set("get-bids", bids);
+            res.status(200).json(bids);
 
         } catch (err) {
             res.send(err);

@@ -4,8 +4,8 @@ const chain_controller = require('../controllers/chain_controller');
 const verifyBlock = (req, res, next) => {
     try {
         const block = req.params.block
-        if (chain_controller.cache.has(block)) {
-            return res.status(200).json(chain_controller.cache.get(block));
+        if (chain_controller.get_block_cache.has(block)) {
+            return res.status(200).json(chain_controller.get_block_cache.get(block));
         }
         return next();
     } catch (err) {
