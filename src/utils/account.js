@@ -2,9 +2,10 @@ const dotenv = require("dotenv");
 dotenv.config();
 const { RpcApiName } = require('./constant');
 const common = require('./common');
-const { GetTotalRewardByPublicKey } = require("../models/era");
+const { GetTotalRewardByPublicKey, GetTimestampByEra } = require("../models/era");
 const { GetAccounts } = require("../models/account");
 const math = require('mathjs');
+const { GetAllDeployByPublicKey } = require("../models/deploy");
 
 
 async function GetAccountData(address) {
@@ -129,7 +130,7 @@ async function GetUndelegating(account) {
     {
         for (let i = 0; i < deploys.length; i++) {
             let params = [deploys[i].deploy_hash];
-            let deploy_data = await RequestRPC(RpcApiName.get_deploy, params);
+            let deploy_data = await common.RequestRPC(RpcApiName.get_deploy, params);
 
             const execution_results = deploy_data.result.execution_results;
             {
