@@ -257,11 +257,14 @@ const GetValidatorData = async (address) => {
                     yesterday.setDate(datetime.getDate() - 1);
                     yesterday = yesterday.toISOString();
                 }
-                last_24h_reward = (await GetPublicKeyTotalRewardByDate(element.public_key, yesterday,  datetime.toISOString())).total_reward;
+                last_24h_reward = (await GetPublicKeyTotalRewardByDate(element.public_key, yesterday, datetime.toISOString())).total_reward;
             }
             catch (err) {
 
             }
+        }
+        if (last_24h_reward == null) {
+            last_24h_reward = 0;
         }
         element.last_24h_reward = last_24h_reward.toString();
 
