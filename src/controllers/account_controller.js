@@ -74,7 +74,7 @@ module.exports = {
         const result = await GetUndelegating(account);
         const the_date = new Date();
         for (let i = 0; i < result.length; i++) {
-          if(result[i].release_timestamp < the_date.getTime()) {
+          if(result[i].release_timestamp > the_date.getTime()) {
             unbonding += Number(result[i].amount);
           }
         }
