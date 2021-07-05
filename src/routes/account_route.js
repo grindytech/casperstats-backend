@@ -5,7 +5,22 @@ router.route("/get-account/:account").get(account_controller.GetAccount);
 // router.route("/get-holder/:account").get(account_controller.GetHolder);
 router.route("/get-transfers").get(account_controller.GetAccountTransfers);
 router.route("/get-deploys/").get(account_controller.GetAccountDeploys);
-router.route("/get-rich-accounts/").get(account_controller.GetRichAccounts);
+
+
+// cache for get-bids
+const verifyRichAccount = (req, res, next) => {
+    try {
+        const start = req.query.start;
+        const count = req.query.count;
+        if (account_controller.get_rich_accounts_cache.has(`start: ${start} count ${count}`)) {
+            return res.status(200).json(account_controller.get_rich_accounts_cache.get(`start: ${start} count ${count}`));
+        }
+        return next();
+    } catch (err) {
+        throw new Error(err);
+    }
+};
+router.route("/get-rich-accounts/").get(verifyRichAccount, account_controller.GetRichAccounts);
 router.route("/count-holders/").get(account_controller.CountHolders);
 router.route("/get-rewards").get(account_controller.GetRewards);
 router.route("/get-era-reward").get(account_controller.GetEraReward);

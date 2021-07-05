@@ -14,16 +14,16 @@ const { GetRewardByPublicKey, GetPublicKeyRewardByDate, GetLatestEra,
 
 require('dotenv').config();
 
+const NodeCache = require("node-cache");
+const get_rich_accounts_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_RICH_ACCOUNTS || 60 });
+
 module.exports = {
+  get_rich_accounts_cache,
 
   GetAccount: async function (req, res) {
-
     const account = req.params.account;
-
     try {
-
       let account_data = await GetHolder(account);
-
       if (account_data.length == 1) {
         // from database
         account_data = account_data[0];
@@ -31,7 +31,6 @@ module.exports = {
         // from ledger
         account_data = await GetAccountData(account);
       }
-
       // add more data
       // BALANCE
       {
@@ -169,13 +168,9 @@ module.exports = {
   GetRichAccounts: async function (req, res) {
     const start = req.query.start;
     const count = req.query.count;
-    // GetRichAccounts(start, count).then(value => {
-    //   res.json(value);
-    // }).catch(err => {
-    //   res.send(err);
-    // })
 
     GetRichest(start, count).then(value => {
+      get_rich_accounts_cache.set(`start: ${start} count ${count}`, value);
       res.status(200);
       res.json(value);
     }).catch(err => {
