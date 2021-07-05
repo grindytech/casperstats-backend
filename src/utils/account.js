@@ -159,7 +159,7 @@ async function GetUndelegating(account) {
                     let era_timestamp = (await GetTimestampByEra(write_withdraws[j].era_of_creation)).timestamp;
                     if (era_timestamp == null) {
                         era_timestamp = (await GetTimestampByEra(Number(write_withdraws[j].era_of_creation) - 1)).timestamp;
-                        release_timestamp = Number(new Date(era_timestamp).getTime()) + 3600000 * 18;
+                        release_timestamp = Number(new Date(era_timestamp).getTime()) + 3600000 * 14;
                     } else {
                         release_timestamp = Number(new Date(era_timestamp).getTime()) + 3600000 * 16;
                     }
