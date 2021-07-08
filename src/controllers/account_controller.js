@@ -250,7 +250,7 @@ module.exports = {
           const timestamp = (await GetTimestampByEra(index_era)).timestamp;
           result.push([
             (new Date(timestamp).getTime()),
-            era_reward.toString(),
+            Number(era_reward),
             index_era,
           ])
         }
