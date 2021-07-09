@@ -1,6 +1,6 @@
 const { Execute, GetEraInfoBySwitchBlock } = require('../utils/chain');
 const { RpcApiName } = require('../utils/constant');
-const { GetAccountData, GetRichest, GetAllUndelegating, GetValidUndelegating } = require('../utils/account');
+const { GetAccountData, GetRichest, GetAllUndelegating, GetValidUndelegating, GetDelegating } = require('../utils/account');
 const math = require('mathjs');
 const mysql = require('mysql');
 require('dotenv').config();
@@ -74,7 +74,7 @@ module.exports = {
         const result = await GetValidUndelegating(account);
         const the_date = new Date();
         for (let i = 0; i < result.length; i++) {
-          if(result[i].release_timestamp > the_date.getTime()) {
+          if (result[i].release_timestamp > the_date.getTime()) {
             unbonding += Number(result[i].amount);
           }
         }
@@ -265,6 +265,17 @@ module.exports = {
     const account = req.query.account;
     try {
       const result = await GetAllUndelegating(account);
+      res.status(200);
+      res.json(result);
+    } catch (err) {
+      res.send(err);
+    }
+  },
+
+  GetDelegate: async function (req, res) {
+    const account = req.query.account;
+    try {
+      const result = await GetDelegating(account);
       res.status(200);
       res.json(result);
     } catch (err) {

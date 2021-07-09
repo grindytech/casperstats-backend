@@ -25,5 +25,6 @@ router.route("/count-holders/").get(account_controller.CountHolders);
 router.route("/get-rewards").get(account_controller.GetRewards);
 router.route("/get-era-reward").get(account_controller.GetEraReward);
 router.route("/undelegate/").get(account_controller.GetUndelegate);
+router.route("/delegate/").get(account_controller.GetDelegate);
 
 module.exports = router;
