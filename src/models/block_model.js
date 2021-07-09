@@ -72,11 +72,11 @@ async function GetBlockHeight() {
 
 async function GetEraByBlockHash(hash) {
     return new Promise((resolve, reject) => {
-        var sql = `SELECT era FROM block WHERE hash = ${hash}`;
+        var sql = `SELECT era FROM block WHERE hash = '${hash}'`;
         pool.query(sql, function (err, result, fields) {
             if(err) resolve(false);
             if(result != undefined && result.length > 0) {
-                const era = result[0];
+                const era = result[0].era;
                 resolve(era);
             } else {
                 resolve(-1);
