@@ -17,6 +17,7 @@ This project provide the REST api to interact with Casper blockchain
     - [count-holders](#count-holders)
     - [get-rewards](#get-rewards)
     - [get-era-reward](#get-era-reward)
+    - [delegate](#delegate)
     - [undelegate](#undelegate)
 
   - [Chain](#Chain)
@@ -484,12 +485,12 @@ successResponse:
 | third | Number | era id |
 
 
-#### undelegate
+#### delegate
   
   ```
-url: /account/undelegate?account=
+url: /account/delegate?account=
 
-example: api.casperstats.io/account/undelegate?account=01c4dcd4f6676ea296c013c9d2ce82e78b6eff0617f061d50626748a1d9196dcfb
+example: api.casperstats.io/account/delegate?account=019d4b3cfc743ece28be983f45a783ffea6d1ee6fffa49e6239e6bf6b5308f6b4d
 
 method: GET
 
@@ -498,46 +499,28 @@ des:  Get undelegating transactions
 successResponse:
 [
     {
-        "public_key": "01bd63f88cc9282d7225b32e9a9945feb092b0f4fc5b6cfc659aeffacce2c76615",
+        "delegator": "019d4b3cfc743ece28be983f45a783ffea6d1ee6fffa49e6239e6bf6b5308f6b4d",
         "validator": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c",
-        "era_of_creation": 1095,
-        "amount": "20167950000000",
-        "release_timestamp": 1625162377216
+        "amount": "55000000000000",
+        "status": true
     },
     {
-        "public_key": "01c29f0c214bfa5d33a0a93d7b56b734985c9fdc16af19fc3d1224537b025f2499",
+        "delegator": "019d4b3cfc743ece28be983f45a783ffea6d1ee6fffa49e6239e6bf6b5308f6b4d",
         "validator": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c",
-        "era_of_creation": 1099,
-        "amount": "6391350000000",
-        "release_timestamp": 1625191213056
+        "amount": "145000000000000",
+        "status": true
     },
     {
-        "public_key": "012325dc6969af448e93fe5299571ae6b4f0ad87b0a51df9f34225b242116416d1",
+        "delegator": "019d4b3cfc743ece28be983f45a783ffea6d1ee6fffa49e6239e6bf6b5308f6b4d",
         "validator": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c",
-        "era_of_creation": 1100,
-        "amount": "461538000000000",
-        "release_timestamp": 1625198422016
+        "amount": "111000000000000",
+        "status": true
     },
     {
-        "public_key": "012325dc6969af448e93fe5299571ae6b4f0ad87b0a51df9f34225b242116416d1",
+        "delegator": "019d4b3cfc743ece28be983f45a783ffea6d1ee6fffa49e6239e6bf6b5308f6b4d",
         "validator": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c",
-        "era_of_creation": 1100,
-        "amount": "110000000000000",
-        "release_timestamp": 1625198422016
-    },
-    {
-        "public_key": "01c4dcd4f6676ea296c013c9d2ce82e78b6eff0617f061d50626748a1d9196dcfb",
-        "validator": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c",
-        "era_of_creation": 1100,
-        "amount": "109675000000000",
-        "release_timestamp": 1625198422016
-    },
-    {
-        "public_key": "01c4dcd4f6676ea296c013c9d2ce82e78b6eff0617f061d50626748a1d9196dcfb",
-        "validator": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c",
-        "era_of_creation": 1090,
-        "amount": "329026000000000",
-        "release_timestamp": 1625126332416
+        "amount": "10000000000000",
+        "status": true
     }
 ]
 ```
@@ -548,12 +531,95 @@ successResponse:
 
 | ResponseField  | Type | Description |
 | ------------- | ------------- | ------------- |
-| public_key | String | delegator |
+| delegator | String | delegator |
 | validator | Number | validator |
-| era_of_creation | Number | the era at the time undelegated and then will take 7 eras period to fully unlock|
 | amount | String | amount of token undelegated |
-| release_timestamp | Number | the exact time when delegator received their token |
+| status | bool | status |
 
+#### undelegate
+  
+  ```
+url: /account/undelegate?account=
+
+example: api.casperstats.io/account/undelegate?account=0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c
+
+method: GET
+
+des:  Get undelegating transactions
+
+successResponse:
+[
+    {
+        "delegator": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c",
+        "validator": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c",
+        "amount": "6850000000000",
+        "timestamp": "2021-07-07T15:54:56.443Z",
+        "release_timestamp": 1625731885056,
+        "status": true
+    },
+    {
+        "delegator": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c",
+        "validator": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c",
+        "amount": "5000000000",
+        "timestamp": "2021-07-06T03:39:32.952Z",
+        "release_timestamp": 1625602123776,
+        "status": true
+    },
+    {
+        "delegator": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c",
+        "validator": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c",
+        "amount": "5000000000",
+        "timestamp": "2021-07-05T11:03:57.914Z",
+        "release_timestamp": 1625544452096,
+        "status": true
+    },
+    {
+        "delegator": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c",
+        "validator": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c",
+        "amount": "6850000000000",
+        "timestamp": "2021-07-02T03:21:39.952Z",
+        "release_timestamp": 1625256093696,
+        "status": true
+    },
+    {
+        "delegator": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c",
+        "validator": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c",
+        "amount": "89000000000000",
+        "timestamp": "2021-07-02T03:16:49.068Z",
+        "release_timestamp": null,
+        "status": false
+    },
+    {
+        "delegator": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c",
+        "validator": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c",
+        "amount": "1000000000",
+        "timestamp": "2021-07-01T02:37:41.880Z",
+        "release_timestamp": 1625169586176,
+        "status": true
+    },
+    {
+        "delegator": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c",
+        "validator": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c",
+        "amount": "1000000000",
+        "timestamp": "2021-07-01T02:33:41.829Z",
+        "release_timestamp": null,
+        "status": false
+    }
+]
+```
+
+| Params  | Type | Description | Required |
+| ------------- | ------------- | ------------- |------------- |
+| account | string | account| Yes |
+
+| ResponseField  | Type | Description |
+| ------------- | ------------- | ------------- |
+| delegator | String | delegator |
+| validator | String | validator |
+| amount | String | amount of token undelegated |
+| timestamp | String | timestamp undelegate |
+| release_timestamp | Number | the exact time when delegator received their token |
+| status | bool | status |
 
 ### Chain
 
