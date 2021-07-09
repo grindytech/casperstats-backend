@@ -1,6 +1,6 @@
 const { Execute, GetEraInfoBySwitchBlock } = require('../utils/chain');
 const { RpcApiName } = require('../utils/constant');
-const { GetAccountData, GetRichest, GetUndelegating , GetValidUndelegating, GetDelegating } = require('../utils/account');
+const { GetAccountData, GetRichest, GetUndelegating, GetDelegating } = require('../utils/account');
 const math = require('mathjs');
 const mysql = require('mysql');
 require('dotenv').config();

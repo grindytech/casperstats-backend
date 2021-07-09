@@ -70,4 +70,20 @@ async function GetBlockHeight() {
     })
 }
 
-module.exports = { GetBlocksByValidator, GetSwitchBlockByDate,GetBlockHashByHeight, GetBlockHeight } 
+async function GetEraByBlockHash(hash) {
+    return new Promise((resolve, reject) => {
+        var sql = `SELECT era FROM block WHERE hash = ${hash}`;
+        pool.query(sql, function (err, result, fields) {
+            if(err) resolve(false);
+            if(result != undefined && result.length > 0) {
+                const era = result[0];
+                resolve(era);
+            } else {
+                resolve(-1);
+            }
+        });
+    })
+}
+
+module.exports = { GetBlocksByValidator, GetSwitchBlockByDate,
+    GetBlockHashByHeight, GetBlockHeight, GetEraByBlockHash } 

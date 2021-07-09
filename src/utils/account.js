@@ -6,6 +6,7 @@ const { GetTotalRewardByPublicKey, GetTimestampByEra } = require("../models/era"
 const { GetAccounts } = require("../models/account");
 const math = require('mathjs');
 const { GetAllDeployByPublicKey } = require("../models/deploy");
+const { GetEraByBlockHash } = require("../models/block_model");
 
 
 async function GetAccountData(address) {
@@ -121,194 +122,63 @@ async function GetRichest(start, count) {
     return result;
 }
 
-async function GetAllUndelegating(account) {
-    // get all deploy
-    const deploys = await GetAllDeployByPublicKey(account);
-
-    // filter undelegate deploy
-    let success_withdraws = [];
-    {
-        for (let i = 0; i < deploys.length; i++) {
-            let params = [deploys[i].deploy_hash];
-            let deploy_data = await common.RequestRPC(RpcApiName.get_deploy, params);
-
-            const execution_results = deploy_data.result.execution_results;
-            {
-                for (let j = 0; j < execution_results.length; j++) {
-                    try {
-                        const transforms = execution_results[j].result.Success.effect.transforms;
-                        const withdraws = transforms.filter(value => {
-                            return value.key.includes("withdraw");
-                        })
-                        success_withdraws.push(...withdraws);
-                    } catch (err) { }
-                }
-            }
-
-        }
-    }
-    // parser data
-    let result = [];
-    {
-        for (let i = 0; i < success_withdraws.length; i++) {
-            const write_withdraws = success_withdraws[i].transform.WriteWithdraw;
-            for (let j = 0; j < write_withdraws.length; j++) {
-
-                let release_timestamp = 0;
-                {
-                    let era_timestamp = (await GetTimestampByEra(write_withdraws[j].era_of_creation)).timestamp;
-                    if (era_timestamp == null) {
-                        era_timestamp = (await GetTimestampByEra(Number(write_withdraws[j].era_of_creation) - 1)).timestamp;
-                        release_timestamp = Number(new Date(era_timestamp).getTime()) + 3600000 * 14;
-                    } else {
-                        release_timestamp = Number(new Date(era_timestamp).getTime()) + 3600000 * 16;
-                    }
-                }
-
-                result.push({
-                    "public_key": write_withdraws[j].unbonder_public_key,
-                    "validator": write_withdraws[j].validator_public_key,
-                    "era_of_creation": write_withdraws[j].era_of_creation,
-                    "amount": write_withdraws[j].amount,
-                    "release_timestamp": release_timestamp,
-                })
-            }
-        }
-    }
-
-    // filter only undelegating for publickey
-    result = result.filter(value => {
-        return value.public_key == account;
-    })
-    return result;
-}
-
-async function GetValidUndelegating(account) {
-    // get all deploy
-    let deploys = await GetAllDeployByPublicKey(account);
-
-    // filter valid undelegating deploys
-    {
-        const the_time = new Date();
-        deploys = deploys.filter(value => {
-            // timestamp must less than 16 hours
-            const timestamp = Number(new Date(value.timestamp).getTime()) + (3600000 * 16);
-            return timestamp > the_time.getTime();
-        })
-    }
-
-    // filter undelegate deploy
-    let success_withdraws = [];
-    {
-        for (let i = 0; i < deploys.length; i++) {
-            let params = [deploys[i].deploy_hash];
-            let deploy_data = await common.RequestRPC(RpcApiName.get_deploy, params);
-
-            const execution_results = deploy_data.result.execution_results;
-            {
-                for (let j = 0; j < execution_results.length; j++) {
-                    try {
-                        const transforms = execution_results[j].result.Success.effect.transforms;
-                        const withdraws = transforms.filter(value => {
-                            return value.key.includes("withdraw");
-                        })
-                        success_withdraws.push(...withdraws);
-                    } catch (err) { }
-                }
-            }
-
-        }
-    }
-    // parser data
-    let result = [];
-    {
-        for (let i = 0; i < success_withdraws.length; i++) {
-            const write_withdraws = success_withdraws[i].transform.WriteWithdraw;
-            for (let j = 0; j < write_withdraws.length; j++) {
-
-                let release_timestamp = 0;
-                {
-                    let era_timestamp = (await GetTimestampByEra(write_withdraws[j].era_of_creation)).timestamp;
-                    if (era_timestamp == null) {
-                        era_timestamp = (await GetTimestampByEra(Number(write_withdraws[j].era_of_creation) - 1)).timestamp;
-                        release_timestamp = Number(new Date(era_timestamp).getTime()) + 3600000 * 14;
-                    } else {
-                        release_timestamp = Number(new Date(era_timestamp).getTime()) + 3600000 * 16;
-                    }
-                }
-
-                result.push({
-                    "public_key": write_withdraws[j].unbonder_public_key,
-                    "validator": write_withdraws[j].validator_public_key,
-                    "era_of_creation": write_withdraws[j].era_of_creation,
-                    "amount": write_withdraws[j].amount,
-                    "release_timestamp": release_timestamp,
-                })
-            }
-        }
-    }
-
-    // filter only undelegating for publickey
-    result = result.filter(value => {
-        return value.public_key == account;
-    })
-    return result;
-}
-
 async function GetDelegating(account) {
     // get all deploy
     const deploys = await GetAllDeployByPublicKey(account);
 
     // filter delegate deploy
-    let contracts = [];
+    let result = [];
     {
         for (let i = 0; i < deploys.length; i++) {
             let params = [deploys[i].deploy_hash];
             let deploy_data = await common.RequestRPC(RpcApiName.get_deploy, params);
-            let storedContractByHash = deploy_data.result.deploy.session.StoredContractByHash;
 
-            if (storedContractByHash) {
-                let status = true;
-                // check status
-                try {
-                    deploy_data.result.execution_results[0].result.Success;
-                } catch (err) {
-                    status = false;
-                }
-                storedContractByHash.status = status;
+            let value = undefined;
+
+            // incase undelegate
+            try {
+                const storedContractByHash = deploy_data.result.deploy.session.StoredContractByHash;
                 if (storedContractByHash.entry_point == "delegate") {
-                    contracts.push(storedContractByHash);
+                    const args = storedContractByHash.args;
+
+                    const delegator = args.filter(value => {
+                        return value[0].toString() == "delegator";
+                    })[0][1].parsed;
+
+                    const validator = args.filter(value => {
+                        return value[0].toString() == "validator";
+                    })[0][1].parsed;
+
+                    const amount = args.filter(value => {
+                        return value[0].toString() == "amount";
+                    })[0][1].parsed;
+
+                    value = {
+                        delegator,
+                        validator,
+                        amount
+                    };
                 }
+            } catch (err) { }
+            // incase unbonding
+            {
+
+            }
+
+            if (value) {
+                // add status
+                let status = false;
+                try {
+                    if (deploy_data.result.execution_results[0].result.Success)
+                        status = true;
+                } catch (err) { }
+
+                value.status = status;
+                result.push(value);
             }
         }
     }
-
     //parser result
-    let result = [];
-    {
-        for (let i = 0; i < contracts.length; i++) {
-            const args = contracts[i].args;
-            const delegator = args.filter(value => {
-                return value[0].toString() == "delegator";
-            })[0][1].bytes;
-
-            const validator = args.filter(value => {
-                return value[0].toString() == "validator";
-            })[0][1].bytes;
-
-            const amount = args.filter(value => {
-                return value[0].toString() == "amount";
-            })[0][1].bytes;
-
-            const status = contracts[i].status;
-            result.push({
-                delegator,
-                validator,
-                amount,
-                status
-            })
-        }
-    }
     return result;
 }
 
@@ -316,67 +186,106 @@ async function GetUndelegating(account) {
     // get all deploy
     const deploys = await GetAllDeployByPublicKey(account);
 
-    // filter delegate deploy
-    let contracts = [];
+    let result = [];
     {
         for (let i = 0; i < deploys.length; i++) {
             let params = [deploys[i].deploy_hash];
             let deploy_data = await common.RequestRPC(RpcApiName.get_deploy, params);
-            let storedContractByHash = deploy_data.result.deploy.session.StoredContractByHash;
-            if (storedContractByHash) {
-                let status = true;
-                // check status
-                try {
-                    deploy_data.result.execution_results[0].result.Success;
-                } catch (err) {
-                    status = false;
-                }
-                storedContractByHash.status = status;
+            let value = undefined;
+
+            // incase undelegate
+            try {
+                const storedContractByHash = deploy_data.result.deploy.session.StoredContractByHash;
                 if (storedContractByHash.entry_point == "undelegate") {
-                    contracts.push(storedContractByHash);
+                    const args = storedContractByHash.args;
+
+                    const delegator = args.filter(value => {
+                        return value[0].toString() == "delegator";
+                    })[0][1].parsed;
+
+                    const validator = args.filter(value => {
+                        return value[0].toString() == "validator";
+                    })[0][1].parsed;
+
+                    const amount = args.filter(value => {
+                        return value[0].toString() == "amount";
+                    })[0][1].parsed;
+
+                    value = {
+                        delegator,
+                        validator,
+                        amount
+                    };
                 }
+            } catch (err) { }
+
+            // incase unbonding for validator
+            try {
+                const args = deploy_data.result.deploy.session.ModuleBytes.args;
+
+                const if_unbond = args.filter(value => {
+                    return value[0].toString() == "unbond_purse";
+                });
+
+                if (if_unbond) {
+                    const delegator = args.filter(value => {
+                        return value[0].toString() == "public_key";
+                    })[0][1].parsed;
+
+                    const validator = delegator;
+
+                    const amount = args.filter(value => {
+                        return value[0].toString() == "amount";
+                    })[0][1].parsed;
+
+                    value = {
+                        delegator,
+                        validator,
+                        amount
+                    };
+                }
+
+            } catch (err) { }
+
+            if (value) {
+                // add status
+                let status = false;
+                try {
+                    if (deploy_data.result.execution_results[0].result.Success)
+                        status = true;
+                } catch (err) { }
+
+                // timestamp
+                value.timestamp = deploy_data.result.deploy.header.timestamp;
+
+
+                // calculate exact time receive token
+                if (status) {
+                    let release_timestamp = null;
+                    const era = await GetEraByBlockHash(deploy_data.result.execution_results[0].block_hash.toString());
+                    if (era) {
+                        let era_timestamp = (await GetTimestampByEra(era)).timestamp;
+                        if (era_timestamp == null) {
+                            era_timestamp = (await GetTimestampByEra(Number(era) - 1)).timestamp;
+                            release_timestamp = Number(new Date(era_timestamp).getTime()) + 3600000 * 14;
+                        } else {
+                            release_timestamp = Number(new Date(era_timestamp).getTime()) + 3600000 * 16;
+                        }
+                    }
+                    value.release_timestamp = release_timestamp;
+                }
+
+                value.status = status;
+                result.push(value);
             }
         }
     }
-
     //parser result
-    let result = [];
-    {
-        for (let i = 0; i < contracts.length; i++) {
-            const args = contracts[i].args;
-            const delegator = args.filter(value => {
-                return value[0].toString() == "delegator";
-            })[0][1].bytes;
-
-            const validator = args.filter(value => {
-                return value[0].toString() == "validator";
-            })[0][1].bytes;
-
-            const amount = args.filter(value => {
-                return value[0].toString() == "amount";
-            })[0][1].bytes;
-
-            const era_of_creation = 0;
-
-            const release_timestamp = 0;
-
-            const status = contracts[i].status;
-            result.push({
-                delegator,
-                validator,
-                era_of_creation,
-                amount,
-                status,
-                release_timestamp,
-            })
-        }
-    }
     return result;
 }
 
 module.exports = {
     GetAccountData, GetRichest,
-    GetAllUndelegating, GetValidUndelegating,
     GetDelegating, GetUndelegating
 }
 
