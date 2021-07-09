@@ -1,6 +1,6 @@
 const { Execute, GetEraInfoBySwitchBlock } = require('../utils/chain');
 const { RpcApiName } = require('../utils/constant');
-const { GetAccountData, GetRichest, GetAllUndelegating, GetValidUndelegating, GetDelegating } = require('../utils/account');
+const { GetAccountData, GetRichest, GetUndelegating , GetValidUndelegating, GetDelegating } = require('../utils/account');
 const math = require('mathjs');
 const mysql = require('mysql');
 require('dotenv').config();
@@ -264,10 +264,11 @@ module.exports = {
   GetUndelegate: async function (req, res) {
     const account = req.query.account;
     try {
-      const result = await GetAllUndelegating(account);
+      const result = await GetUndelegating(account);
       res.status(200);
       res.json(result);
     } catch (err) {
+      console.log(err);
       res.send(err);
     }
   },

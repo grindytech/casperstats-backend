@@ -83,7 +83,6 @@ const GetDeploy = async (deployhash) => {
     if (result.deploy.session.Transfer) {
         result.deploy.header["type"] = "transfer";
     } else {
-        delete result.deploy.session;
         result.deploy.header["type"] = "deploy";
     }
 

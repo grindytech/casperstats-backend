@@ -267,17 +267,18 @@ async function GetDelegating(account) {
             let deploy_data = await common.RequestRPC(RpcApiName.get_deploy, params);
             let storedContractByHash = deploy_data.result.deploy.session.StoredContractByHash;
 
-            let status = true;
-            // check status
-            try {
-                console.log(deploy_data.result.execution_results);
-                deploy_data.result.execution_results[0].result.Success;
-            } catch (err) {
-                status = false;
-            }
-            storedContractByHash.status = status;
-            if (storedContractByHash.entry_point == "delegate") {
-                contracts.push(storedContractByHash);
+            if (storedContractByHash) {
+                let status = true;
+                // check status
+                try {
+                    deploy_data.result.execution_results[0].result.Success;
+                } catch (err) {
+                    status = false;
+                }
+                storedContractByHash.status = status;
+                if (storedContractByHash.entry_point == "delegate") {
+                    contracts.push(storedContractByHash);
+                }
             }
         }
     }
@@ -311,9 +312,71 @@ async function GetDelegating(account) {
     return result;
 }
 
+async function GetUndelegating(account) {
+    // get all deploy
+    const deploys = await GetAllDeployByPublicKey(account);
+
+    // filter delegate deploy
+    let contracts = [];
+    {
+        for (let i = 0; i < deploys.length; i++) {
+            let params = [deploys[i].deploy_hash];
+            let deploy_data = await common.RequestRPC(RpcApiName.get_deploy, params);
+            let storedContractByHash = deploy_data.result.deploy.session.StoredContractByHash;
+            if (storedContractByHash) {
+                let status = true;
+                // check status
+                try {
+                    deploy_data.result.execution_results[0].result.Success;
+                } catch (err) {
+                    status = false;
+                }
+                storedContractByHash.status = status;
+                if (storedContractByHash.entry_point == "undelegate") {
+                    contracts.push(storedContractByHash);
+                }
+            }
+        }
+    }
+
+    //parser result
+    let result = [];
+    {
+        for (let i = 0; i < contracts.length; i++) {
+            const args = contracts[i].args;
+            const delegator = args.filter(value => {
+                return value[0].toString() == "delegator";
+            })[0][1].bytes;
+
+            const validator = args.filter(value => {
+                return value[0].toString() == "validator";
+            })[0][1].bytes;
+
+            const amount = args.filter(value => {
+                return value[0].toString() == "amount";
+            })[0][1].bytes;
+
+            const era_of_creation = 0;
+
+            const release_timestamp = 0;
+
+            const status = contracts[i].status;
+            result.push({
+                delegator,
+                validator,
+                era_of_creation,
+                amount,
+                status,
+                release_timestamp,
+            })
+        }
+    }
+    return result;
+}
+
 module.exports = {
     GetAccountData, GetRichest,
     GetAllUndelegating, GetValidUndelegating,
-    GetDelegating
+    GetDelegating, GetUndelegating
 }
 
