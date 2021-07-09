@@ -258,7 +258,7 @@ async function GetUndelegating(account) {
                 value.timestamp = deploy_data.result.deploy.header.timestamp;
                 // calculate exact time receive token
                 let release_timestamp = null;
-                {
+                if (status) {
                     const era = await GetEraByBlockHash(deploy_data.result.execution_results[0].block_hash.toString());
                     if (era) {
                         let era_timestamp = (await GetTimestampByEra(era)).timestamp;

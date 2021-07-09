@@ -71,7 +71,7 @@ module.exports = {
       // Undonding
       let unbonding = 0;
       {
-        const result = await GetValidUndelegating(account);
+        const result = await GetUndelegating(account);
         const the_date = new Date();
         for (let i = 0; i < result.length; i++) {
           if (result[i].release_timestamp > the_date.getTime()) {
@@ -99,6 +99,7 @@ module.exports = {
 
       res.json(account_data);
     } catch (err) {
+      console.log(err)
       res.send(err);
     }
   },
