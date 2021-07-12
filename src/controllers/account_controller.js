@@ -10,7 +10,9 @@ const { GetDeploysByPublicKey, GetAllDeployByPublicKey } = require('../models/de
 const { GetAccountHash, RequestRPC, GetBalance, GetBalanceByAccountHash } = require('../utils/common');
 const { GetRewardByPublicKey, GetPublicKeyRewardByDate, GetLatestEra,
   GetPublicKeyRewardByEra, GetTimestampByEra, GetLatestEraByDate,
-  GetEraValidatorOfPublicKey } = require('../models/era');
+  GetEraValidatorOfPublicKey,
+  GetTotalRewardByPublicKey,
+  GetLatestTimestampByPublicKey } = require('../models/era');
 
 require('dotenv').config();
 
@@ -192,19 +194,27 @@ module.exports = {
     const count = Number(req.query.count);
 
     try {
+      // Get the last date that account has reward
+      const last_date = (await GetLatestTimestampByPublicKey(account)).timestamp;
+
+      // return if account never stake
+      if (last_date == null) {
+        res.status(200);
+        res.json([]);
+        return;
+      }
+
       // get rewards
       let rewards = [];
       {
-
-        const the_time = new Date();
+        const start_date = new Date(last_date);
         let mark_date = new Date();
-        mark_date.setDate(the_time.getDate() + (1 - start)); // next day
+        mark_date.setDate(start_date.getDate() + (1 - start)); // next day
         mark_date = mark_date.toISOString().slice(0, 10);
-
 
         for (let i = 0; i < count; i++) {
           let the_date = new Date();
-          the_date.setDate(the_time.getDate() - (start + i));
+          the_date.setDate(start_date.getDate() - (start + i));
           the_date = the_date.toISOString().slice(0, 10);
 
           let reward = (await GetPublicKeyRewardByDate(account, the_date, mark_date)).reward;
@@ -225,7 +235,6 @@ module.exports = {
           })
           mark_date = the_date;
         }
-
       }
       res.status(200);
       res.json(rewards);

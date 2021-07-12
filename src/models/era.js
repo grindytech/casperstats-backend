@@ -204,11 +204,27 @@ async function GetEraValidatorOfPublicKey(public_key, era) {
     })
 }
 
+async function GetLatestTimestampByPublicKey(public_key) {
+    return new Promise((resolve, reject) => {
+        var sql = `SELECT timestamp FROM era WHERE (validator = '${public_key}' OR delegator = '${public_key}') ORDER BY timestamp LIMIT 1`;
+        pool.query(sql, function (err, result) {
+            if (err) {
+                reject(err);
+            }
+            if (result && result.length > 0) {
+                resolve(result[0]);
+            } else {
+                resolve({timestamp: null})
+            }
+        });
+    })
+}
 
 module.exports = {
     GetTotalRewardByPublicKey, GetTotalRewardByEra,
     GetLatestEra, GetPublicKeyTotalRewardByDate,
     GetTotalDelegator, GetTotalReward, GetRewardByPublicKey,
     GetPublicKeyRewardByDate, GetPublicKeyRewardByEra,
-    GetTimestampByEra, GetLatestEraByDate, GetEraValidatorOfPublicKey
+    GetTimestampByEra, GetLatestEraByDate, GetEraValidatorOfPublicKey,
+    GetLatestTimestampByPublicKey
 }

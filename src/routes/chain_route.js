@@ -14,12 +14,10 @@ const verifyBlock = (req, res, next) => {
 };
 
 router.route("/get-block/:block").get(verifyBlock, chain_controller.GetBlock);
-
 router.route("/get-latest-blocks/:number").get(chain_controller.GetLatestBlocks);
 router.route("/get-block-transfers/:block").get(chain_controller.GetBlockTx);
 router.route("/get-state-root-hash/:block").get(chain_controller.GetStateRootHash);
 router.route("/get-range-block").get(chain_controller.GetRangeBlock);
-
 router.route("/get-block-deploy/:block").get(chain_controller.GetBlockDeployTx);
 
 // router for transaction
