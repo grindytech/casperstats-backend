@@ -206,7 +206,7 @@ async function GetEraValidatorOfPublicKey(public_key, era) {
 
 async function GetLatestTimestampByPublicKey(public_key) {
     return new Promise((resolve, reject) => {
-        var sql = `SELECT timestamp FROM era WHERE (validator = '${public_key}' OR delegator = '${public_key}') ORDER BY timestamp LIMIT 1`;
+        var sql = `SELECT timestamp FROM era WHERE (validator = '${public_key}' OR delegator = '${public_key}') ORDER BY timestamp DESC LIMIT 1`;
         pool.query(sql, function (err, result) {
             if (err) {
                 reject(err);
