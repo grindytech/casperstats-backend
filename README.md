@@ -17,6 +17,7 @@ This project provide the REST api to interact with Casper blockchain
     - [count-holders](#count-holders)
     - [get-rewards](#get-rewards)
     - [get-era-reward](#get-era-reward)
+    - [staking](#staking)
     - [delegate](#delegate)
     - [undelegate](#undelegate)
 
@@ -483,6 +484,59 @@ successResponse:
 | first | Number | timestamp of the era |
 | second | String | reward of era |
 | third | Number | era id |
+
+
+#### staking
+  
+  ```
+url: /account/staking?account=
+
+example: api.casperstats.io/account/staking?account=019d4b3cfc743ece28be983f45a783ffea6d1ee6fffa49e6239e6bf6b5308f6b4d
+
+method: GET
+
+des:  Merge API delegate + undelegate below
+
+successResponse:
+{
+    "delegate": [
+        {
+            "delegator": "019d4b3cfc743ece28be983f45a783ffea6d1ee6fffa49e6239e6bf6b5308f6b4d",
+            "validator": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c",
+            "amount": "55000000000000",
+            "status": true
+        },
+        {
+            "delegator": "019d4b3cfc743ece28be983f45a783ffea6d1ee6fffa49e6239e6bf6b5308f6b4d",
+            "validator": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c",
+            "amount": "145000000000000",
+            "status": true
+        },
+        {
+            "delegator": "019d4b3cfc743ece28be983f45a783ffea6d1ee6fffa49e6239e6bf6b5308f6b4d",
+            "validator": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c",
+            "amount": "111000000000000",
+            "status": true
+        },
+        {
+            "delegator": "019d4b3cfc743ece28be983f45a783ffea6d1ee6fffa49e6239e6bf6b5308f6b4d",
+            "validator": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c",
+            "amount": "10000000000000",
+            "status": true
+        }
+    ],
+    "undelegate": [
+        {
+            "delegator": "019d4b3cfc743ece28be983f45a783ffea6d1ee6fffa49e6239e6bf6b5308f6b4d",
+            "validator": "0167e08c3b05017d329444dc7d22518ba652cecb2c54669a69e5808ebcab25e42c",
+            "amount": "1000000000000",
+            "timestamp": "2021-06-10T09:43:20.195Z",
+            "release_timestamp": 1623381764096,
+            "status": true
+        }
+    ]
+}
+```
 
 
 #### delegate
