@@ -284,5 +284,21 @@ module.exports = {
       console.log(err);
       res.send(err);
     }
+  },
+
+  GetStaking: async function (req, res) {
+    const account = req.query.account;
+    try {
+      const delegate = await GetDelegating(account);
+      const undelegate = await GetUndelegating(account);
+      res.status(200);
+      res.json({
+        delegate,
+        undelegate
+      });
+    } catch (err) {
+      console.log(err);
+      res.send(err);
+    }
   }
 };
