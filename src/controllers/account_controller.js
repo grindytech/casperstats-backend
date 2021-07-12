@@ -260,7 +260,7 @@ module.exports = {
           const timestamp = (await GetTimestampByEra(index_era)).timestamp;
           result.push([
             (new Date(timestamp).getTime()),
-            (Number(era_reward) / 1000000000).toFixed(2), //convert to CSPR
+            Number((Number(era_reward) / 1000000000).toFixed(2)), //convert to CSPR
           ])
         }
         res.status(200);
