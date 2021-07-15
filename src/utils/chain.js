@@ -278,9 +278,12 @@ async function IsValidatorAddress(param) {
 
 async function IsAccountHash(param) {
     try {
-        if (param.length == 64) {
-            return true;
-        }
+        if (param.includes("account-hash-")) {
+            return true
+        } else
+            if (param.length == 64) {
+                return true;
+            }
     } catch (err) { }
     return false;
 }
