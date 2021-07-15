@@ -1,6 +1,6 @@
 # casperstats-backend
 
-This project provide the REST api to interact with Casper blockchain
+casperstats-backend provides REST API to fetch data from Casper Network, this project is under development so we are very welcome to anyone who gives us contributions, feedback, ideas. We are happy to build with you.
 
 # Table of contents
 
@@ -118,7 +118,6 @@ successResponse:
 | ------------- | ------------- | ------------- |
 | account_hash | String | account hash |
 | public_key_hex | String | public key |
-| balance | String | Total balance inclued locked and unlocked |
 | balance | String | Total balance inclued locked and unlocked |
 | active_date | String | The date account join network |
 | transferrable | String | The available amount can be trasfer |
