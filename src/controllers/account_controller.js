@@ -23,8 +23,15 @@ module.exports = {
   get_rich_accounts_cache,
 
   GetAccount: async function (req, res) {
-    const account = req.params.account;
+    let account = req.params.account;
     try {
+
+      // modify param
+      {
+        account = account.replace("/\n/g", '');
+        account = account.replace("account-hash-", '');
+      }
+
       let account_data = await GetHolder(account);
       if (account_data.length == 1) {
         // from database
