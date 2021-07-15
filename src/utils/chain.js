@@ -368,7 +368,7 @@ const GetRecentCirculatingSupply = async () => {
     // const block_height = latest_block.result.block.header.height;
     // const timestamp = latest_block.result.block.header.timestamp;
     let options = {
-        url: `https://api.cspr.live/supply`,
+        url: process.env.TOKEN_METRICS_URL,
         method: "get",
         headers:
         {
@@ -396,7 +396,7 @@ const GetRecentTotalSupply = async () => {
     // const block_height = latest_block.result.block.header.height;
     // const timestamp = latest_block.result.block.header.timestamp;
     let options = {
-        url: `https://api.cspr.live/supply`,
+        url: process.env.TOKEN_METRICS_URL,
         method: "get",
         headers:
         {
@@ -419,7 +419,7 @@ const GetRecentTotalSupply = async () => {
 
 const GetCasperlabsSupply = async () => {
     let options = {
-        url: `https://api.cspr.live/supply`,
+        url: process.env.TOKEN_METRICS_URL,
         method: "get",
         headers:
         {
