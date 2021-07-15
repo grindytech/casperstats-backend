@@ -95,9 +95,25 @@ async function GetCirculatingSupply() {
     })
 }
 
+async function GetPublicKeyByAccountHash(account_hash) {
+    return new Promise((resolve, reject) => {
+        var sql = `SELECT public_key_hex FROM account WHERE account_hash = '${account_hash}'`;
+        pool.query(sql, function (err, result) {
+            if (err) {
+                reject(err);
+            }
+            if (result.length > 0) {
+                resolve(result[0]);
+            } else {
+                resolve(null);
+            }
+        });
+    })
+}
+
 
 module.exports = {
     GetHolder, GetRichAccounts, GetCirculatingSupply,
     GetTotalNumberOfAccount, GetNumberOfAccountFromDate,
-    GetAccounts
+    GetAccounts, GetPublicKeyByAccountHash
 }

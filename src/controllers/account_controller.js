@@ -4,7 +4,7 @@ const { GetAccountData, GetRichest, GetUndelegating, GetDelegating } = require('
 const math = require('mathjs');
 const mysql = require('mysql');
 require('dotenv').config();
-const { GetHolder, GetTotalNumberOfAccount } = require('../models/account');
+const { GetHolder, GetTotalNumberOfAccount, GetPublicKeyByAccountHash } = require('../models/account');
 const { GetTransfersByAccountHash } = require('../models/transfer');
 const { GetDeploysByPublicKey, GetAllDeployByPublicKey } = require('../models/deploy');
 const { GetAccountHash, RequestRPC, GetBalance, GetBalanceByAccountHash } = require('../utils/common');
@@ -115,7 +115,7 @@ module.exports = {
 
   CountHolders: async function (req, res) {
     const account = req.params.account;
-
+    
     GetTotalNumberOfAccount().then(value => {
       res.json(value);
     }).catch(err => {
@@ -197,12 +197,21 @@ module.exports = {
   GetRewards: async function (req, res) {
     // get params
     const account = req.query.account;
+
+    let public_key = account;
+    {
+      const public_key_hex = await GetPublicKeyByAccountHash(account);
+      if(public_key_hex != null) {
+        public_key = public_key_hex.public_key_hex;
+      }
+    }
+
     const start = Number(req.query.start);
     const count = Number(req.query.count);
 
     try {
       // Get the last date that account has reward
-      const last_date = (await GetLatestTimestampByPublicKey(account)).timestamp;
+      const last_date = (await GetLatestTimestampByPublicKey(public_key)).timestamp;
 
       // return if account never stake
       if (last_date == null) {
@@ -224,7 +233,7 @@ module.exports = {
           the_date.setDate(start_date.getDate() - (start + i));
           the_date = the_date.toISOString().slice(0, 10);
 
-          let reward = (await GetPublicKeyRewardByDate(account, the_date, mark_date)).reward;
+          let reward = (await GetPublicKeyRewardByDate(public_key, the_date, mark_date)).reward;
           if (reward == null) {
             reward = 0;
           }
@@ -232,7 +241,7 @@ module.exports = {
           let validator = "";
           {
             const latest_date_era = (await GetLatestEraByDate(the_date, mark_date)).era_id;
-            validator = (await GetEraValidatorOfPublicKey(account, latest_date_era)).validator;
+            validator = (await GetEraValidatorOfPublicKey(public_key, latest_date_era)).validator;
           }
 
           rewards.push({
@@ -253,6 +262,15 @@ module.exports = {
   GetEraReward: async function (req, res) {
     const count = req.query.count;
     const account = req.query.account;
+
+    let public_key = account;
+    {
+      const public_key_hex = await GetPublicKeyByAccountHash(account);
+      if(public_key_hex != null) {
+        public_key = public_key_hex.public_key_hex;
+      }
+    }
+
     const last_era = (await GetLatestEra()).era_id;
     try {
       let result = [];
@@ -260,7 +278,7 @@ module.exports = {
         for (let i = 0; i < count; i++) {
           const index_era = Number(last_era) - Number(i);
           // get reward by era
-          let era_reward = (await GetPublicKeyRewardByEra(account, index_era)).reward;
+          let era_reward = (await GetPublicKeyRewardByEra(public_key, index_era)).reward;
           if (era_reward == null) {
             era_reward = 0;
           }
@@ -280,8 +298,15 @@ module.exports = {
 
   GetUndelegate: async function (req, res) {
     const account = req.query.account;
+    let public_key = account;
+    {
+      const public_key_hex = await GetPublicKeyByAccountHash(account);
+      if(public_key_hex != null) {
+        public_key = public_key_hex.public_key_hex;
+      }
+    }
     try {
-      const result = await GetUndelegating(account);
+      const result = await GetUndelegating(public_key);
       res.status(200);
       res.json(result);
     } catch (err) {
@@ -292,8 +317,15 @@ module.exports = {
 
   GetDelegate: async function (req, res) {
     const account = req.query.account;
+    let public_key = account;
+    {
+      const public_key_hex = await GetPublicKeyByAccountHash(account);
+      if(public_key_hex != null) {
+        public_key = public_key_hex.public_key_hex;
+      }
+    }
     try {
-      const result = await GetDelegating(account);
+      const result = await GetDelegating(public_key);
       res.status(200);
       res.json(result);
     } catch (err) {
@@ -304,9 +336,16 @@ module.exports = {
 
   GetStaking: async function (req, res) {
     const account = req.query.account;
+    let public_key = account;
+    {
+      const public_key_hex = await GetPublicKeyByAccountHash(account);
+      if(public_key_hex != null) {
+        public_key = public_key_hex.public_key_hex;
+      }
+    }
     try {
-      const delegate = await GetDelegating(account);
-      const undelegate = await GetUndelegating(account);
+      const delegate = await GetDelegating(public_key);
+      const undelegate = await GetUndelegating(public_key);
       res.status(200);
       res.json({
         delegate,
