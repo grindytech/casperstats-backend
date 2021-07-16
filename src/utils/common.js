@@ -55,7 +55,7 @@ const GetBalance = async (address) => {
 
 const GetBalanceByAccountHash = async (account_hash) => {
     let s = await GetLatestStateRootHash(); //Hex-encoded hash of the state root
-    
+
     const state = await QueryState(account_hash, s);
     const main_purse = state.result.stored_value.Account.main_purse;
 
@@ -76,8 +76,8 @@ const GetBalanceByState = async (account_hash, s) => {
 }
 
 
-async function GetAccountData (address) {
- 
+async function GetAccountData(address) {
+
     const account = {}
 
     account["balance"] = await GetBalance(address);
@@ -103,6 +103,7 @@ const Execute = async (command) => {
 }
 
 const RequestRPC = async (method, params, id = undefined) => {
+    const url = await GetNetWorkRPC();
     return new Promise((resolve, reject) => {
         let body = "";
         if (id == undefined) {
@@ -111,9 +112,8 @@ const RequestRPC = async (method, params, id = undefined) => {
         } else {
             body = JSON.stringify({ "jsonrpc": "2.0", "id": id, "method": method, "params": params });
         }
-
         let options = {
-            url: process.env.NETWORK_RPC_API + "/rpc",
+            url: url + "/rpc",
             method: "post",
             headers:
             {
@@ -121,13 +121,10 @@ const RequestRPC = async (method, params, id = undefined) => {
             },
             body
         };
-
         console.log("Option: ", options)
-
         request(options, (error, response, body) => {
-            const result = JSON.parse(body);
-            if (result.error) {
-                reject(result.error);
+            if (error) {
+                reject(error);
             } else {
                 resolve(JSON.parse(body));
             }
@@ -168,11 +165,9 @@ const QueryState = async (key, state = "", id = undefined) => {
     if (state == "") {
         state = await GetLatestStateRootHash();
     }
-
+    const rpc_url = await GetNetWorkRPC();
     return new Promise((resolve, reject) => {
-
-        let command = `${process.env.CASPER_CLIENT} query-state --node-address ${process.env.NETWORK_RPC_API} -k ${key} -s ${state}`;
-
+        let command = `${process.env.CASPER_CLIENT} query-state --node-address ${rpc_url} -k ${key} -s ${state}`;
         console.log("command: ", command);
         if (id != undefined) {
             command = command + ` --id ${id}`;
@@ -194,11 +189,56 @@ const GetHeight = async () => {
     return height;
 }
 
+async function GetNetworkStatus(URL) {
+    return new Promise((resolve, reject) => {
+        const body = JSON.stringify({ "jsonrpc": "2.0", "id": 1,"method": RpcApiName.get_status, "params": [] });
+        let options = {
+            url: URL + "/rpc",
+            method: "post",
+            headers:
+            {
+                "content-type": "application/json"
+            },
+            body
+        };
+    
+        request(options, (error, response, body) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(JSON.parse(body));
+            }
+        });
+    })
+}
+
+/**
+ * GetNetWorkRPC return Network RPC URL, prevent connection lost
+ * @returns active URL string ortherwise 
+ */
+async function GetNetWorkRPC() {
+    const URLs = JSON.parse(process.env.NETWORK_RPC_URLS);
+    // check array
+    if (Array.isArray(URLs) == false) {
+        throw Error("Can not find Network RPC");
+    }
+    // check status from 0
+    for (let i = 0; i < URLs.length; i++) {
+        try {
+            const status = await GetNetworkStatus(URLs[i]);
+            if(status.result.last_added_block_info != undefined) {
+                return URLs[i];
+            }
+        } catch (err) {
+        }
+    }
+    throw Error("Can not find Network RPC");
+}
 
 module.exports = {
-    GetAccountData, GetHeight, QueryState, 
+    GetAccountData, GetHeight, QueryState,
     GetLatestStateRootHash, Execute, GetBalance,
     GetAccountHash, RequestRPC, GetBalanceByAccountHash,
-    db_config, GetBalanceByState
+    db_config, GetBalanceByState, GetNetWorkRPC
 }
 

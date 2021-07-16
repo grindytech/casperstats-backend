@@ -156,9 +156,10 @@ const GetBlock = async (block) => {
 
 
 const GetDeploysInBlock = async (block) => {
+    const rpc_url = await GetNetWorkRPC();
     return new Promise((resolve, reject) => {
 
-        let command = `${process.env.CASPER_CLIENT} list-deploys --node-address ${process.env.NETWORK_RPC_API}`;
+        let command = `${process.env.CASPER_CLIENT} list-deploys --node-address ${rpc_url}`;
 
         if (block) {
             command = command + ` -b ${block}`;

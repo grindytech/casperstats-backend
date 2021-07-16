@@ -1,7 +1,7 @@
 const { GetDeploy, GetType, GetRecentCirculatingSupply, GetCasperlabsSupply, GetTransfersVolume } = require('../utils/chain');
 
 const { RpcApiName, ELEMENT_TYPE } = require('../utils/constant');
-const { Execute, RequestRPC } = require('../utils/common');
+const { Execute, RequestRPC, GetNetWorkRPC } = require('../utils/common');
 require('dotenv').config();
 
 const { GetCirculatingSupply, GetTotalNumberOfAccount, GetNumberOfAccountFromDate } = require('../models/account');
@@ -33,8 +33,8 @@ module.exports = {
     GetListDeploys: async function (req, res) {
         let id = req.query.id; // JSON-RPC identifier, applied to the request and returned in the response. If not provided, a random integer will be assigned
         let b = req.query.b; // Hex-encoded block hash or height of the block. If not given, the last block added to the chain as known at the given node will be used
-
-        let command = `${process.env.CASPER_CLIENT} list-deploys --node-address ${process.env.NETWORK_RPC_API}`;
+        const rpc_url = await GetNetWorkRPC();
+        let command = `${process.env.CASPER_CLIENT} list-deploys --node-address ${rpc_url}`;
 
         if (id) {
             command = command + ` --id ${id}`;

@@ -4,6 +4,7 @@ const {
   GetDeployhashes, GetDeploy, GetBlock,
   GetTransfersInBlock,
   GetDeploysInBlock } = require('../utils/chain');
+const common = require('../utils/common');
 const { RequestRPC, GetHeight } = require('../utils/common');
 const { RpcApiName } = require('../utils/constant');
 const request = require('request');
@@ -207,22 +208,20 @@ module.exports = {
 
   GetStatus: async function (req, res) {
     try {
-      let options = {
-        url: process.env.STATUS_API + "/status",
-        method: "get",
-        headers:
-        {
-          "content-type": "application/json"
-        }
-      };
-      request(options, (error, response, body) => {
-        const result = JSON.parse(body);
-        res.status(200);
-        res.json(result);
-      });
+      const status = await common.RequestRPC(RpcApiName.get_status, []);
+      res.json(status).status(200);
     } catch (err) {
       console.log(err);
       res.send(err);
     }
   },
+
+  GetNetworkRPC: async function (req, res) {
+    try {
+      const rpc = await common.GetNetWorkRPC();
+      res.json(rpc);
+    } catch (err) {
+      console.log(err);
+    }
+  }
 };

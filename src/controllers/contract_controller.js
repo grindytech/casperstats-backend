@@ -1,15 +1,16 @@
 require('dotenv').config();
 const path = require('path');
 const fs = require('fs');
+const {GetNetWorkRPC} = require('../utils/common');
 
 const { CasperClient, CasperServiceByJsonRPC} = require('casper-client-sdk');
-const casperClient = new CasperClient(process.env.NETWORK_RPC_API);
-const deployService = new CasperServiceByJsonRPC(process.env.NETWORK_RPC_API);
 
 module.exports = {
-
+    
     GetContract: async function (req, res) {
-
+        const rpc_url = await GetNetWorkRPC();
+        const casperClient = new CasperClient(rpc_url);
+        const deployService = new CasperServiceByJsonRPC(rpc_url);
         try {
             const name = req.query.name;
             const contract_folder = path.join('./', 'contracts/release/');
