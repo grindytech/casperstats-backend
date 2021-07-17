@@ -49,7 +49,7 @@ async function GetTotalNumberOfTransfers() {
 
 async function GetNumberOfTransfersByDate(from, to) {
     return new Promise((resolve, reject) => {
-        var sql = `SELECT COUNT(*) AS number_of_transfers FROM transfer WHERE DATE(timestamp) BETWEEN '${from}' AND '${to}'`;
+        var sql = `SELECT COUNT(*) AS number_of_transfers FROM transfer WHERE DATE(timestamp) BETWEEN DATE('${from}') AND DATE('${to}')`;
         pool.query(sql, function (err, result) {
             if (err) {
                 reject(err);
@@ -65,7 +65,7 @@ async function GetNumberOfTransfersByDate(from, to) {
 
 async function GetVolumeByDate(from, to) {
     return new Promise((resolve, reject) => {
-        var sql = `SELECT CAST(SUM(CAST(transfer.value AS UNSIGNED INTEGER)) as CHAR) as volume FROM transfer WHERE DATE(timestamp) BETWEEN '${from}' AND '${to}'`;
+        var sql = `SELECT CAST(SUM(CAST(transfer.value AS UNSIGNED INTEGER)) as CHAR) as volume FROM transfer WHERE DATE(timestamp) BETWEEN DATE('${from}') AND DATE('${to}')`;
         pool.query(sql, function (err, result) {
             if (err) {
                 reject(err);
