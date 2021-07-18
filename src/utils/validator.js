@@ -1,7 +1,7 @@
 const dotenv = require("dotenv");
 dotenv.config();
 const { RpcApiName } = require('./constant');
-const { RequestRPC, GetHeight } = require('./common')
+const { RequestRPC, GetHeight, GetNetWorkRPC } = require('./common')
 const math = require('mathjs');
 const { GetRecentCirculatingSupply, GetRecentTotalSupply } = require("./chain");
 const { GetTotalRewardByPublicKey, GetLatestEra, GetTotalRewardByEra, GetPublicKeyTotalRewardByDate, GetRewardByPublicKey } = require("../models/era");
@@ -103,7 +103,8 @@ const GetValidators = async (number_of_validator) => {
         era_validators: {}
     }
 
-    const auction_info = await RequestRPC(RpcApiName.get_auction_info, []);
+    const url = await GetNetWorkRPC();
+    const auction_info = await RequestRPC(url, RpcApiName.get_auction_info, []);
 
     try {
 
@@ -144,8 +145,8 @@ const GetValidators = async (number_of_validator) => {
 }
 
 
-const GetEraValidators = async () => {
-    let auction_info = (await RequestRPC(RpcApiName.get_auction_info, [])).result;
+const GetEraValidators = async (url) => {
+    let auction_info = (await RequestRPC(url, RpcApiName.get_auction_info, [])).result;
 
     // get total stake
     const total_stake_current_era = await GetTotalStake(auction_info.auction_state, 0);
@@ -185,7 +186,8 @@ const GetEraValidators = async () => {
 }
 
 const GetBids = async () => {
-    const auction_info = (await RequestRPC(RpcApiName.get_auction_info, [])).result;
+    const url = await GetNetWorkRPC();
+    const auction_info = (await RequestRPC(url, RpcApiName.get_auction_info, [])).result;
 
     // get total bid
     let bids = auction_info.auction_state.bids;
@@ -214,14 +216,14 @@ const GetBids = async () => {
     return auction_info;
 }
 
-const GetAPY = async () => {
+const GetAPY = async (url) => {
 
     const latest_era = await GetLatestEra();
     const latest_total_reward = (await GetTotalRewardByEra(latest_era.era_id)).total_reward;
 
     let total_stake = 0;
     {
-        const auction_info = await RequestRPC(RpcApiName.get_auction_info, []);
+        const auction_info = await RequestRPC(url, RpcApiName.get_auction_info, []);
         const auction_state = auction_info.result.auction_state;
         total_stake = await GetTotalStake(auction_state, 0);
     }
@@ -230,8 +232,8 @@ const GetAPY = async () => {
     return apy;
 }
 
-const GetValidatorData = async (address) => {
-    const auction_info = (await RequestRPC(RpcApiName.get_auction_info, [])).result;
+const GetValidatorData = async (url, address) => {
+    const auction_info = (await RequestRPC(url, RpcApiName.get_auction_info, [])).result;
 
     // get total bid
     let bids = auction_info.auction_state.bids;
@@ -284,37 +286,9 @@ const GetValidatorData = async (address) => {
     return element;
 }
 
-const GetBlocksByProposer = async (validator_address, number_of_block) => {
-    const height = await GetHeight();
-
-    let blocks = [];
-    for (let i = height; i >= 0; i--) {
-        let params = [{ "Height": parseInt(i) }]
-        const block = await RequestRPC(RpcApiName.get_block, params);
-
-        if (block.result.block.body.proposer == validator_address) {
-
-            let brief_data = {
-                block_height: block.result.block.header.height,
-                era_id: block.result.block.header.era_id,
-                deploys: block.result.block.body.deploy_hashes.length,
-                transfers: block.result.block.body.transfer_hashes.length,
-                timestamp: block.result.block.header.timestamp,
-                block_hash: block.result.block.hash,
-            }
-
-            blocks.push(brief_data);
-            if (blocks.length == number_of_block) {
-                break;
-            }
-        }
-    }
-    return blocks;
-}
-
 module.exports = {
     GetValidators, GetEraValidators, GetBids,
-    GetValidatorData, GetBlocksByProposer, GetAPY,
+    GetValidatorData, GetAPY,
     GetTotalStake
 }
 

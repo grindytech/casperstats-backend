@@ -42,8 +42,9 @@ async function GetRichest(start, count) {
         const accounts = await GetAccounts();
         let stakers = []; // stake order
         {
+            const url = common.GetNetWorkRPC();
             // get all staking accounts
-            const auction_info = (await common.RequestRPC(RpcApiName.get_auction_info, [])).result;
+            const auction_info = (await common.RequestRPC(url, RpcApiName.get_auction_info, [])).result;
 
             // get total bid
             let bids = auction_info.auction_state.bids;
@@ -129,9 +130,10 @@ async function GetDelegating(account) {
     // filter delegate deploy
     let result = [];
     {
+        const url = await common.GetNetWorkRPC();
         for (let i = 0; i < deploys.length; i++) {
             let params = [deploys[i].deploy_hash];
-            let deploy_data = await common.RequestRPC(RpcApiName.get_deploy, params);
+            let deploy_data = await common.RequestRPC(url, RpcApiName.get_deploy, params);
 
             let value = undefined;
 
@@ -188,9 +190,10 @@ async function GetUndelegating(account) {
 
     let result = [];
     {
+        const url = await common.GetNetWorkRPC();
         for (let i = 0; i < deploys.length; i++) {
             let params = [deploys[i].deploy_hash];
-            let deploy_data = await common.RequestRPC(RpcApiName.get_deploy, params);
+            let deploy_data = await common.RequestRPC(url, RpcApiName.get_deploy, params);
             let value = undefined;
 
             // incase undelegate

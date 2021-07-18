@@ -1,4 +1,4 @@
-const { RequestRPC, QueryState, GetBalance, GetBalanceByAccountHash, GetBalanceByState} = require('../utils/common');
+const { RequestRPC, QueryState, GetBalance, GetBalanceByAccountHash, GetBalanceByState, GetNetWorkRPC} = require('../utils/common');
 const { GetValidators, GetEraValidators, GetBids, GetValidatorData } = require('../utils/validator');
 const { RpcApiName } = require('../utils/constant');
 
@@ -14,8 +14,9 @@ module.exports = {
     
     GetBalanceAccountHash: async function (req, res) {
         const account_hash = req.params.account_hash;
-        try {  
-            const balance = await GetBalanceByAccountHash(account_hash);
+        try { 
+            const url = await GetNetWorkRPC();
+            const balance = await GetBalanceByAccountHash(url, account_hash);
             res.status(200);
             res.json(balance);
         }catch(err) {
@@ -26,7 +27,8 @@ module.exports = {
     GetBalanceAddress: async function (req, res) {
         let address = req.params.address;
         try {  
-            const balance = await GetBalance(address);
+            const url = await GetNetWorkRPC();
+            const balance = await GetBalance(url, address);
             res.status(200);
             res.json(balance);
         }catch(err) {
@@ -54,7 +56,8 @@ module.exports = {
     },
 
     GetAuctionInfo: async function (req, res) {
-        RequestRPC(RpcApiName.get_auction_info, []).then(value => {
+        const url = await GetNetWorkRPC();
+        RequestRPC(url, RpcApiName.get_auction_info, []).then(value => {
             res.status(200);
             res.json(value.result);
         }).catch(err => {
@@ -99,7 +102,8 @@ module.exports = {
     GetValidator: async function (req, res) {
         try {
             const address = req.params.address;
-            const data = await GetValidatorData(address);
+            const url = await GetNetWorkRPC();
+            const data = await GetValidatorData(url, address);
             res.status(200);
             res.json(data);
         } catch(err) {
@@ -112,7 +116,8 @@ module.exports = {
         const account_hash = req.query.account_hash;
         const state = req.query.state;
         try{
-            const result = await GetBalanceByState(account_hash, state);
+            const url = await GetNetWorkRPC();
+            const result = await GetBalanceByState(url, account_hash, state);
             res.json(result);
         }catch(err) {   
             res.send(err);

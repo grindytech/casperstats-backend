@@ -1,4 +1,4 @@
-const { Execute, GetEraInfoBySwitchBlock } = require('../utils/chain');
+const { Execute } = require('../utils/chain');
 const { RpcApiName } = require('../utils/constant');
 const { GetAccountData, GetRichest, GetUndelegating, GetDelegating } = require('../utils/account');
 const math = require('mathjs');
@@ -7,7 +7,7 @@ require('dotenv').config();
 const { GetHolder, GetTotalNumberOfAccount, GetPublicKeyByAccountHash } = require('../models/account');
 const { GetTransfersByAccountHash } = require('../models/transfer');
 const { GetDeploysByPublicKey, GetAllDeployByPublicKey } = require('../models/deploy');
-const { GetAccountHash, RequestRPC, GetBalance, GetBalanceByAccountHash } = require('../utils/common');
+const { GetAccountHash, RequestRPC, GetBalance, GetBalanceByAccountHash, GetNetWorkRPC } = require('../utils/common');
 const { GetRewardByPublicKey, GetPublicKeyRewardByDate, GetLatestEra,
   GetPublicKeyRewardByEra, GetTimestampByEra, GetLatestEraByDate,
   GetEraValidatorOfPublicKey,
@@ -25,6 +25,7 @@ module.exports = {
   GetAccount: async function (req, res) {
     let account = req.params.account;
     try {
+      const url = await GetNetWorkRPC();
 
       // modify param
       {
@@ -38,12 +39,12 @@ module.exports = {
         account_data = account_data[0];
       } else {
         // from ledger
-        account_data = await GetAccountData(account);
+        account_data = await GetAccountData(url, account);
       }
       // add more data
       // BALANCE
       {
-        account_data.balance = (await GetBalanceByAccountHash("account-hash-" + account_data.account_hash)).balance_value;
+        account_data.balance = (await GetBalanceByAccountHash(url, "account-hash-" + account_data.account_hash)).balance_value;
       }
 
       // Available
@@ -56,7 +57,7 @@ module.exports = {
       let total_staked = math.bignumber("0");
       {
         if (account_data.public_key_hex) {
-          const auction_info = await RequestRPC(RpcApiName.get_auction_info, []);
+          const auction_info = await RequestRPC(url, RpcApiName.get_auction_info, []);
           const bids = auction_info.result.auction_state.bids;
           if (bids) {
             for (let i = 0; i < bids.length; i++) {

@@ -140,6 +140,7 @@ module.exports = {
             transfers: [], // last 60 days transfer
         }
         try{
+        const url = await GetNetWorkRPC();
         // holder
         {
             var datetime = new Date();
@@ -158,7 +159,7 @@ module.exports = {
 
         // validator
         {
-            const era_validators = await GetEraValidators();
+            const era_validators = await GetEraValidators(url);
             const current_validators = era_validators.auction_state.era_validators[0].validator_weights.length;
             stats.validators = current_validators;
 
@@ -246,7 +247,8 @@ module.exports = {
         try {
 
             const supply = await GetCasperlabsSupply();
-            const auction_info = await RequestRPC(RpcApiName.get_auction_info, []);
+            const url = await GetNetWorkRPC();
+            const auction_info = await RequestRPC(url, RpcApiName.get_auction_info, []);
             const auction_state = auction_info.result.auction_state;
             economics.block_height = auction_state.block_height;
             economics.total_supply = supply.data.total.toString() + "000000000";

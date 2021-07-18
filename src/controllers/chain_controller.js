@@ -5,7 +5,7 @@ const {
   GetTransfersInBlock,
   GetDeploysInBlock } = require('../utils/chain');
 const common = require('../utils/common');
-const { RequestRPC, GetHeight } = require('../utils/common');
+const { RequestRPC, GetHeight, GetNetWorkRPC } = require('../utils/common');
 const { RpcApiName } = require('../utils/constant');
 const request = require('request');
 
@@ -18,8 +18,8 @@ module.exports = {
   get_block_cache,
   GetBlock: async function (req, res) {
     const b = req.params.block; // Hex-encoded block hash or height of the block. If not given, the last block added to the chain as known at the given node will be used
-
-    const height = await GetHeight();
+    const url = GetNetWorkRPC();
+    const height = await GetHeight(url);
 
     // Check valid block input
     if (isNaN(b)) {
@@ -45,8 +45,7 @@ module.exports = {
       }
       params = [{ "Height": parseInt(b) }]
     }
-
-    RequestRPC(RpcApiName.get_block, params).then(value => {
+    RequestRPC(url, RpcApiName.get_block, params).then(value => {
       value.result["current_height"] = height;
 
       get_block_cache.set(b, value);
@@ -66,8 +65,8 @@ module.exports = {
     } else {
       params = [{ "Height": parseInt(b) }]
     }
-
-    RequestRPC(RpcApiName.get_block_transfers, params).then(value => {
+    const url = await GetNetWorkRPC();
+    RequestRPC(url, RpcApiName.get_block_transfers, params).then(value => {
       res.status(200);
       res.json(value.result.transfers);
     }).catch(err => {
@@ -86,8 +85,8 @@ module.exports = {
     } else {
       params = [{ "Height": parseInt(b) }]
     }
-
-    RequestRPC(RpcApiName.get_state_root_hash, params).then(value => {
+    const url = await GetNetWorkRPC();
+    RequestRPC(url, RpcApiName.get_state_root_hash, params).then(value => {
       res.status(200);
       res.json(value);
     }).catch(err => {
@@ -99,10 +98,11 @@ module.exports = {
     let num = req.params.number; // Number of block
 
     try {
-      let height = await GetHeight();
+      const url = await GetNetWorkRPC();
+      let height = await GetHeight(url);
       let datas = [];
       for (let i = height; i > height - num; i--) {
-        let block_data = await GetBlock(i);
+        let block_data = await GetBlock(url, i);
         datas.push(block_data.result.block);
       }
 
@@ -119,12 +119,13 @@ module.exports = {
     let end = Number(req.query.end);
 
     try {
-      let height = await GetHeight();
+      const url = await GetNetWorkRPC();
+      let height = await GetHeight(url);
       let data = {};
       data["current_height"] = height;
       data["result"] = [];
       for (let i = end; i >= start; i--) {
-        let block_data = await GetBlock(i);
+        let block_data = await GetBlock(url, i);
         data.result.push(block_data.result.block);
       }
       res.status(200);
@@ -137,10 +138,11 @@ module.exports = {
   GetBlockDeployTx: async function (req, res) {
     let b = req.params.block;
     try {
-      let deploy_hashes = await GetDeployhashes(b);
+      const url = await GetNetWorkRPC();
+      let deploy_hashes = await GetDeployhashes(url, b);
       let data = [];
       for (let i = 0; i < deploy_hashes.length; i++) {
-        let deploy_data = await GetDeploy(deploy_hashes[i]);
+        let deploy_data = await GetDeploy(url, deploy_hashes[i]);
         data.push(deploy_data);
       }
       res.status(200);
@@ -208,7 +210,8 @@ module.exports = {
 
   GetStatus: async function (req, res) {
     try {
-      const status = await common.RequestRPC(RpcApiName.get_status, []);
+      const url = await GetNetWorkRPC();
+      const status = await common.RequestRPC(url, RpcApiName.get_status, []);
       res.json(status).status(200);
     } catch (err) {
       console.log(err);

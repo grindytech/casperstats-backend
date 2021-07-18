@@ -2,13 +2,12 @@ const dotenv = require("dotenv");
 dotenv.config();
 const { RpcApiName, ELEMENT_TYPE } = require('./constant');
 const account_fn = require('./account');
-const { GetHeight, RequestRPC, GetAccountHash, GetBalanceByAccountHash, Execute } = require("./common");
+const { GetHeight, RequestRPC, GetAccountHash, Execute, GetNetWorkRPC } = require("./common");
 const request = require('request');
 const { GetNumberOfTransfersByDate } = require("../models/transfer");
 const { GetBlockHeight } = require("../models/block_model");
 
-
-const GetTxhashes = async (block) => {
+const GetDeployhashes = async (url, block) => {
     return new Promise((resolve, reject) => {
         let params;
         // check b is a number or string to change the params
@@ -17,24 +16,7 @@ const GetTxhashes = async (block) => {
         } else {
             params = [{ "Height": parseInt(block) }]
         }
-        RequestRPC(RpcApiName.get_block, params).then(value => {
-            resolve(value.result.block.body.transfer_hashes);
-        }).catch(err => {
-            reject(err);
-        })
-    })
-}
-
-const GetDeployhashes = async (block) => {
-    return new Promise((resolve, reject) => {
-        let params;
-        // check b is a number or string to change the params
-        if (isNaN(block)) {
-            params = [{ "Hash": block }]
-        } else {
-            params = [{ "Height": parseInt(block) }]
-        }
-        RequestRPC(RpcApiName.get_block, params).then(value => {
+        RequestRPC(url, RpcApiName.get_block, params).then(value => {
             resolve(value.result.block.body.deploy_hashes);
         }).catch(err => {
             reject(err);
@@ -57,10 +39,10 @@ const GetTotalDeployCost = async (execution_results) => {
     return total_cost;
 }
 
-const GetDeploy = async (deployhash) => {
+const GetDeploy = async (url, deployhash) => {
 
     let params = [deployhash];
-    let deploy_data = await RequestRPC(RpcApiName.get_deploy, params);
+    let deploy_data = await RequestRPC(url, RpcApiName.get_deploy, params);
     if (deploy_data.error) {
         throw deploy_data.error;
     }
@@ -69,7 +51,7 @@ const GetDeploy = async (deployhash) => {
     // add more common information to header
     {
         let first_block_hash = result.execution_results[0].block_hash;
-        const first_block_height = await GetBlockHeightByBlock(first_block_hash);
+        const first_block_height = await GetBlockHeightByBlock(url, first_block_hash);
         let total_cost = await GetTotalDeployCost(result.execution_results);
         let to = "unknown";
 
@@ -87,19 +69,6 @@ const GetDeploy = async (deployhash) => {
     }
 
     return result;
-}
-
-const DoesDeploySuccess = async (hash) => {
-    let params = [hash];
-
-    let value = await RequestRPC(RpcApiName.get_deploy, params);
-    const result = value.result.execution_results;
-    for (let i = 0; i < result.length; i++) {
-        if (result[i].result.Failure != undefined) {
-            return false;
-        }
-    }
-    return true;
 }
 
 const GetTransfersFromDeploy = async (deploy_hash) => {
@@ -124,16 +93,16 @@ const GetTransferDetail = async (transfer_hex) => {
     })
 }
 
-const GetBlockHeightByBlock = async (blockhash) => {
+const GetBlockHeightByBlock = async (url, blockhash) => {
     let params;
     params = [{ "Hash": blockhash }]
-    let block_data = await RequestRPC(RpcApiName.get_block, params);
+    let block_data = await RequestRPC(url, RpcApiName.get_block, params);
     const height = block_data.result.block.header.height;
     return height;
 }
 
-const GetBlock = async (block) => {
-    const height = await GetHeight();
+const GetBlock = async (url, block) => {
+    const height = await GetHeight(url);
     return new Promise((resolve, reject) => {
         let params;
         // check b is a number or string to change the params
@@ -143,7 +112,7 @@ const GetBlock = async (block) => {
             params = [{ "Height": parseInt(block) }]
         }
 
-        RequestRPC(RpcApiName.get_block, params).then(value => {
+        RequestRPC(url, RpcApiName.get_block, params).then(value => {
             // add current_height to getblock
             value.result["current_height"] = height;
             delete value.result.block.proofs;
@@ -173,7 +142,7 @@ const GetDeploysInBlock = async (block) => {
     })
 }
 
-const GetTransfersInBlock = async (block) => {
+const GetTransfersInBlock = async (url, block) => {
     return new Promise((resolve, reject) => {
         let params;
         // check block is a number or string to change the params
@@ -183,35 +152,13 @@ const GetTransfersInBlock = async (block) => {
             params = [{ "Height": parseInt(block) }]
         }
 
-        RequestRPC(RpcApiName.get_block_transfers, params).then(value => {
+        RequestRPC(url, RpcApiName.get_block_transfers, params).then(value => {
             resolve(value.result);
         }).catch(err => {
             reject(err);
         })
     })
 }
-
-const GetLatestTx = async (number_of_tx) => {
-
-    // get current block_height
-    const block_height = await GetHeight();
-
-    let result = [];
-    // get list txhash
-    let i = block_height;
-    while (true) {
-        let transfer = await GetTransfersInBlock(i);
-        result.push(...transfer.transfers);
-        if (result.length >= number_of_tx) {
-            break;
-        }
-        i--;
-    }
-    // query tx information
-    return result;
-}
-
-
 
 async function IsBlockHeight(param) {
 
@@ -225,12 +172,12 @@ async function IsBlockHeight(param) {
     return false;
 }
 
-async function IsBlockHash(param) {
+async function IsBlockHash(url, param) {
     if (param.length == 64) {  //block hash
         // check block hash
         let params = [{ "Hash": param }]
         try {
-            await RequestRPC(RpcApiName.get_block, params);
+            await RequestRPC(url, RpcApiName.get_block, params);
             return true;
         } catch (err) { }
 
@@ -238,10 +185,10 @@ async function IsBlockHash(param) {
     return false;
 }
 
-async function IsDeployHash(param) {
+async function IsDeployHash(url, param) {
     if (param.length == 64) {
         try {
-            const value = await GetDeploy(param);
+            const value = await GetDeploy(url, param);
             if (value.deploy.header.type == "deploy") {
                 return true;
             }
@@ -250,10 +197,10 @@ async function IsDeployHash(param) {
     return false;
 }
 
-async function IsTransferHash(param) {
+async function IsTransferHash(url, param) {
     if (param.length == 64) {
         try {
-            let deploy_info = await GetDeploy(param);
+            let deploy_info = await GetDeploy(url, param);
             if (deploy_info.deploy.header.type == "transfer") {
                 return true;
             }
@@ -262,11 +209,11 @@ async function IsTransferHash(param) {
     return false;
 }
 
-async function IsValidatorAddress(param) {
+async function IsValidatorAddress(url, param) {
     try {
         const is_pk = await IsPublicKeyHex(param);
         if (is_pk) {
-            const auction_info = await (RequestRPC(RpcApiName.get_auction_info, []));
+            const auction_info = await (RequestRPC(url, RpcApiName.get_auction_info, []));
             const current_validator_weights = auction_info.result.auction_state.era_validators[0].validator_weights;
             let element = current_validator_weights.find(el => el.public_key == param);
             if (element) {
@@ -301,6 +248,7 @@ const GetType = async (param) => {
 
     // clean the input
     const imput = param.replace(/\s+/g, '');
+    const url = await GetNetWorkRPC();
 
     const is_blockheight = await IsBlockHeight(imput);
     if (is_blockheight) {
@@ -310,7 +258,7 @@ const GetType = async (param) => {
         };
     }
 
-    const is_block_hash = await IsBlockHash(imput);
+    const is_block_hash = await IsBlockHash(url, imput);
     if (is_block_hash) {
         return {
             value: imput,
@@ -318,7 +266,7 @@ const GetType = async (param) => {
         };
     }
 
-    const is_deploy_hash = await IsDeployHash(imput);
+    const is_deploy_hash = await IsDeployHash(url, imput);
     if (is_deploy_hash) {
         return {
             value: imput,
@@ -326,7 +274,7 @@ const GetType = async (param) => {
         }
     }
 
-    const is_transfer_hash = await IsTransferHash(imput);
+    const is_transfer_hash = await IsTransferHash(url, imput);
     if (is_transfer_hash) {
         return {
             value: imput,
@@ -334,7 +282,7 @@ const GetType = async (param) => {
         }
     }
 
-    const is_validator_address = await IsValidatorAddress(imput);
+    const is_validator_address = await IsValidatorAddress(url, imput);
     if (is_validator_address) {
         return {
             value: imput,
@@ -366,11 +314,6 @@ const GetType = async (param) => {
 
 const GetRecentCirculatingSupply = async () => {
 
-    // const latest_block = await RequestRPC(RpcApiName.get_block, []);
-
-    // const eraID = latest_block.result.block.header.era_id;
-    // const block_height = latest_block.result.block.header.height;
-    // const timestamp = latest_block.result.block.header.timestamp;
     let options = {
         url: process.env.TOKEN_METRICS_URL,
         method: "get",
@@ -394,11 +337,6 @@ const GetRecentCirculatingSupply = async () => {
 }
 
 const GetRecentTotalSupply = async () => {
-    // const latest_block = await RequestRPC(RpcApiName.get_block, []);
-
-    // const eraID = latest_block.result.block.header.era_id;
-    // const block_height = latest_block.result.block.header.height;
-    // const timestamp = latest_block.result.block.header.timestamp;
     let options = {
         url: process.env.TOKEN_METRICS_URL,
         method: "get",
@@ -461,20 +399,11 @@ const GetTransfersVolume = async (count) => {
     return result;
 }
 
-const GetEraInfoBySwitchBlock = async (hash) => {
-    let params = [{ "Hash": hash }]
-    const result = await RequestRPC(RpcApiName.get_era_info_by_switch_block, params);
-    return result.result;
-}
-
-
-
 module.exports = {
-    GetTxhashes, GetDeployhashes,
-    GetDeploy, DoesDeploySuccess, GetTransfersFromDeploy,
-    GetTransferDetail, GetBlock, GetLatestTx,
+    GetDeployhashes,
+    GetDeploy, GetTransfersFromDeploy,
+    GetTransferDetail, GetBlock,
     GetTransfersInBlock, GetType, GetDeploysInBlock,
     GetRecentCirculatingSupply, GetRecentTotalSupply,
-    GetCasperlabsSupply, GetTransfersVolume,
-    GetEraInfoBySwitchBlock
+    GetCasperlabsSupply, GetTransfersVolume
 }
