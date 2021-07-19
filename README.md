@@ -846,58 +846,6 @@ successResponse: block data
 | num | number | Number of last block you wanna get | Yes |
 
 
-#### get-block-transfers
-
-```
-url: /chain/get-block-transfers/:block
-
-example: https://api.casperstats.io/chain/get-block-transfers/11661
-
-method: GET
-
-des: get the information the transfer on the block
-
-successResponse:
-[
-    {
-        "amount": "98000000000",
-        "deploy_hash": "db5f69c51ddacaeab0bee5c7e5665313489d99ffbbadd9208ff45092ee85476f",
-        "from": "account-hash-5861c4bbab2992d44f035c6db5ffff925c40e50c10df564f0c896435807dac9f",
-        "gas": "0",
-        "id": null,
-        "source": "uref-01eb60dabf2d4cf399561e874ed24c1556332ed0ae9b1064c125aa284aad5f39-007",
-        "target": "uref-e81b4fffcd8fd5ff94bf22fb80667522504b23ec8e0a3d8db1ca0515b43b554f-004",
-        "to": "account-hash-edb9b5d9590bb1d48bd13d178dc7cf3b385f10986754865441e0e957be20eaed"
-    },
-    {
-        "amount": "98000000000",
-        "deploy_hash": "4af6e98ae14f91e121ef925eb89e21719e80ca00e3bab255132f6a69e15ebd60",
-        "from": "account-hash-6a9b128359f8429cb63d11a99862382bc7ef43ae5c550168f557e75a151f9e05",
-        "gas": "0",
-        "id": null,
-        "source": "uref-b8f2e9b3fbd1dbd20c1e95b4566d5810c95de8faf387c34099f8413dc23e0f7a-007",
-        "target": "uref-e81b4fffcd8fd5ff94bf22fb80667522504b23ec8e0a3d8db1ca0515b43b554f-004",
-        "to": "account-hash-edb9b5d9590bb1d48bd13d178dc7cf3b385f10986754865441e0e957be20eaed"
-    },
-    {
-        "amount": "98000000000",
-        "deploy_hash": "18c5e7600669d0d141c082fac26a0fe6ef197bc7476d88198143f215fcd48db2",
-        "from": "account-hash-036a53c38dd3eaa082b8f17c049e2092b0b9d8c75301f198409533c4a62cbe4f",
-        "gas": "0",
-        "id": null,
-        "source": "uref-7d87c7e2677eec2414260e8d31d5302ee1ab0beef623e39b3cf3f00cb75c9265-007",
-        "target": "uref-e81b4fffcd8fd5ff94bf22fb80667522504b23ec8e0a3d8db1ca0515b43b554f-004",
-        "to": "account-hash-edb9b5d9590bb1d48bd13d178dc7cf3b385f10986754865441e0e957be20eaed"
-    }
-]
-
-```
-
-| Params  | Type | Description | Required |
-| ------------- | ------------- | ------------- |------------- |
-| b | string, number |  Hex-encoded block hash or height of the block. If not given, the last block added to the chain as known at the given node will be used | Optional |
-
-
 #### get-block-deploy
 
 ```
