@@ -26,7 +26,6 @@ casperstats-backend provides REST API to fetch data from Casper Network, this pr
     - [get-block-tranfers](#get-block-tranfers)
     - [get-state-root-hash](#get-state-root-hash)
     - [get-latest-blocks](#get-latest-blocks)
-    - [get-block-transfers](#get-block-transfer)
     - [get-block-deploy](#get-block-deploy)
     - [get-range-block](#get-range-block)
     - [get-latest-tx](#get-latest-tx)
