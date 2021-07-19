@@ -256,7 +256,7 @@ module.exports = {
             economics.circulating_supply = supply.data.circulating.toString() + "000000000";
 
             // calculate APY
-            const apy = await GetAPY();
+            const apy = await GetAPY(url);
             economics.APY = apy;
 
             // calculate total_stake
