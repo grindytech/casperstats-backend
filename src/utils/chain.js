@@ -160,10 +160,10 @@ const GetTransfersInBlock = async (url, block) => {
     })
 }
 
-async function IsBlockHeight(param) {
+async function IsBlockHeight(url, param) {
 
     if (isNaN(param) == false) {
-        const height = await GetBlockHeight();
+        const height = await GetHeight(url);
         if (param < 0 || param > height) {
             return false;
         }
@@ -177,8 +177,9 @@ async function IsBlockHash(url, param) {
         // check block hash
         let params = [{ "Hash": param }]
         try {
-            await RequestRPC(url, RpcApiName.get_block, params);
-            return true;
+            const block_data = await RequestRPC(url, RpcApiName.get_block, params);
+            if (block_data.error == undefined || block_data.error == null)
+                return true;
         } catch (err) { }
 
     }
@@ -250,7 +251,7 @@ const GetType = async (param) => {
     const imput = param.replace(/\s+/g, '');
     const url = await GetNetWorkRPC();
 
-    const is_blockheight = await IsBlockHeight(imput);
+    const is_blockheight = await IsBlockHeight(url, imput);
     if (is_blockheight) {
         return {
             value: imput,

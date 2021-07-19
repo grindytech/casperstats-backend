@@ -123,7 +123,7 @@ const GetValidators = async (number_of_validator) => {
         //APY
 
         // calculate APY
-        const apy = await GetAPY();
+        const apy = await GetAPY(url);
         result.APY = apy;
 
         // calculate total_stake

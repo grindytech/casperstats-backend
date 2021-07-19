@@ -21,11 +21,12 @@ module.exports = {
 
     GetDeploy: async function (req, res) {
         let hex = req.params.hex; // Hex-encoded deploy hash
-
-        GetDeploy(hex).then(value => {
+        const url = await GetNetWorkRPC();
+        GetDeploy(url, hex).then(value => {
             res.status(200);
             res.json(value);
         }).catch(err => {
+            console.log(err);
             res.send(err)
         })
     },

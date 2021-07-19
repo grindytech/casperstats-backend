@@ -42,7 +42,7 @@ async function GetRichest(start, count) {
         const accounts = await GetAccounts();
         let stakers = []; // stake order
         {
-            const url = common.GetNetWorkRPC();
+            const url = await common.GetNetWorkRPC();
             // get all staking accounts
             const auction_info = (await common.RequestRPC(url, RpcApiName.get_auction_info, [])).result;
 

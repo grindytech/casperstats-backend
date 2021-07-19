@@ -6,7 +6,11 @@
   "scripts": {
     "start": "node src/app.js",
     "dev": "nodemon src/app.js",
-    "test": "mocha 'src/test/**/*.js' --recursive --timeout 60000 --exit"
+    "test": "mocha 'src/test/**/*.js' --recursive --timeout 60000 --exit",
+    "test-chain": "mocha 'src/test/chain/**/*.js' --recursive --timeout 60000 --exit",
+    "test-info": "mocha 'src/test/info/**/*.js' --recursive --timeout 60000 --exit",
+    "test-state": "mocha 'src/test/state/**/*.js' --recursive --timeout 60000 --exit"
+    
   },
   "repository": {
     "type": "git",

@@ -18,7 +18,7 @@ module.exports = {
   get_block_cache,
   GetBlock: async function (req, res) {
     const b = req.params.block; // Hex-encoded block hash or height of the block. If not given, the last block added to the chain as known at the given node will be used
-    const url = GetNetWorkRPC();
+    const url = await GetNetWorkRPC();
     const height = await GetHeight(url);
 
     // Check valid block input
@@ -189,6 +189,7 @@ module.exports = {
     const count = req.query.count;
 
     try {
+      const url = await GetNetWorkRPC();
       let data = await GetBlocksByValidator(validator, start, count);
 
       for (let i = 0; i < data.length; i++) {
@@ -197,13 +198,14 @@ module.exports = {
         delete data[i]["validator"];
 
         const deploys = await GetDeploysInBlock(data[i].height);
-        const transfers = await GetTransfersInBlock(data[i].height);
+        const transfers = await GetTransfersInBlock(url, data[i].height);
         data[i]["deploys"] = deploys.deploy_hashes.length + deploys.transfer_hashes.length;
         data[i]["transfers"] = transfers.transfers.length;
       }
       res.status(200);
       res.json(data);
     } catch (err) {
+      console.log(err);
       res.send(err);
     }
   },

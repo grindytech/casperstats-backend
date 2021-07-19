@@ -79,7 +79,8 @@ module.exports = {
     GetEraValidators: async function (req, res) {
 
         try {
-            const era_validators = await GetEraValidators();
+            const url = await GetNetWorkRPC();
+            const era_validators = await GetEraValidators(url);
             res.status(200);
             res.json(era_validators);
         } catch (err) {

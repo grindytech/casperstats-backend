@@ -155,6 +155,7 @@ module.exports = {
       }
       res.json(value);
     }).catch(err => {
+      console.log(err);
       res.send(err);
     })
   },
