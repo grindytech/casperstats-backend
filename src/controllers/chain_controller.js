@@ -105,7 +105,6 @@ module.exports = {
         let block_data = await GetBlock(url, i);
         datas.push(block_data.result.block);
       }
-
       res.status(200);
       res.json(datas);
 

@@ -39,12 +39,16 @@ module.exports = {
         account_data = account_data[0];
       } else {
         // from ledger
-        account_data = await GetAccountData(url, account);
+        account_data = await GetAccountData(account);
       }
       // add more data
       // BALANCE
       {
-        account_data.balance = (await GetBalanceByAccountHash(url, "account-hash-" + account_data.account_hash)).balance_value;
+        try {
+          account_data.balance = (await GetBalanceByAccountHash(url, "account-hash-" + account_data.account_hash)).balance_value;
+        } catch (err) {
+          account_data.balance = 0;
+        }
       }
 
       // Available
@@ -55,7 +59,7 @@ module.exports = {
 
       // Total staked
       let total_staked = math.bignumber("0");
-      {
+      try {
         if (account_data.public_key_hex) {
           const auction_info = await RequestRPC(url, RpcApiName.get_auction_info, []);
           const bids = auction_info.result.auction_state.bids;
@@ -76,11 +80,13 @@ module.exports = {
             }
           }
         }
+      } catch (err) {
+        total_staked = math.bignumber("0");
       }
 
       // Undonding
       let unbonding = 0;
-      {
+      try {
         const result = await GetUndelegating(account);
         const the_date = new Date();
         for (let i = 0; i < result.length; i++) {
@@ -88,17 +94,21 @@ module.exports = {
             unbonding += Number(result[i].amount);
           }
         }
+      } catch (err) {
+        unbonding = 0;
       }
 
       // Total reward
       let total_reward = 0;
-      {
+      try {
         if (account_data.public_key_hex) {
           total_reward = (await GetRewardByPublicKey(account_data.public_key_hex)).total_reward;
         }
         if (total_reward == null) {
           total_reward = 0;
         }
+      } catch (err) {
+        total_reward = 0;
       }
 
       account_data.balance = (Number(transferrable) + Number(total_staked)).toString();
@@ -116,7 +126,7 @@ module.exports = {
 
   CountHolders: async function (req, res) {
     const account = req.params.account;
-    
+
     GetTotalNumberOfAccount().then(value => {
       res.json(value);
     }).catch(err => {
@@ -203,7 +213,7 @@ module.exports = {
     let public_key = account;
     {
       const public_key_hex = await GetPublicKeyByAccountHash(account);
-      if(public_key_hex != null) {
+      if (public_key_hex != null) {
         public_key = public_key_hex.public_key_hex;
       }
     }
@@ -268,7 +278,7 @@ module.exports = {
     let public_key = account;
     {
       const public_key_hex = await GetPublicKeyByAccountHash(account);
-      if(public_key_hex != null) {
+      if (public_key_hex != null) {
         public_key = public_key_hex.public_key_hex;
       }
     }
@@ -303,7 +313,7 @@ module.exports = {
     let public_key = account;
     {
       const public_key_hex = await GetPublicKeyByAccountHash(account);
-      if(public_key_hex != null) {
+      if (public_key_hex != null) {
         public_key = public_key_hex.public_key_hex;
       }
     }
@@ -322,7 +332,7 @@ module.exports = {
     let public_key = account;
     {
       const public_key_hex = await GetPublicKeyByAccountHash(account);
-      if(public_key_hex != null) {
+      if (public_key_hex != null) {
         public_key = public_key_hex.public_key_hex;
       }
     }
@@ -341,7 +351,7 @@ module.exports = {
     let public_key = account;
     {
       const public_key_hex = await GetPublicKeyByAccountHash(account);
-      if(public_key_hex != null) {
+      if (public_key_hex != null) {
         public_key = public_key_hex.public_key_hex;
       }
     }
