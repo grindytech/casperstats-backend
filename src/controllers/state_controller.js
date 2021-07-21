@@ -1,5 +1,5 @@
 const { RequestRPC, QueryState, GetBalance, GetBalanceByAccountHash, GetBalanceByState, GetNetWorkRPC} = require('../utils/common');
-const { GetValidators, GetEraValidators, GetBids, GetValidatorData } = require('../utils/validator');
+const { GetValidators, GetEraValidators, GetBids, GetValidatorData, GetValidatorInformation } = require('../utils/validator');
 const { RpcApiName } = require('../utils/constant');
 
 require('dotenv').config();
@@ -104,7 +104,12 @@ module.exports = {
         try {
             const address = req.params.address;
             const url = await GetNetWorkRPC();
-            const data = await GetValidatorData(url, address);
+            let data = await GetValidatorData(url, address);
+
+            // add additonal information
+            const information = await GetValidatorInformation(address);
+            data.information = information;
+
             res.status(200);
             res.json(data);
         } catch(err) {

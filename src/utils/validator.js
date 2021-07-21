@@ -5,6 +5,7 @@ const { RequestRPC, GetHeight, GetNetWorkRPC } = require('./common')
 const math = require('mathjs');
 const { GetRecentCirculatingSupply, GetRecentTotalSupply } = require("./chain");
 const { GetTotalRewardByPublicKey, GetLatestEra, GetTotalRewardByEra, GetPublicKeyTotalRewardByDate, GetRewardByPublicKey } = require("../models/era");
+const { GetValidator } = require("../models/validator");
 
 
 function GetTotalBid(bids, address) {
@@ -68,6 +69,11 @@ async function GetTopValidators(auction_state, era_index, number_of_validator) {
             delete element.bid["bonding_purse"];
             element.bid["delegators"] = number_delegators;
             delete element.bid["inactive"];
+
+            // add information to top validators
+            const information = await GetValidatorInformation(element.public_key);
+            element.information = information;
+
             top_validators.push(element);
         }
     }
@@ -286,9 +292,41 @@ const GetValidatorData = async (url, address) => {
     return element;
 }
 
+async function GetValidatorInformation(address) {
+    const information = {
+        name: "",
+        email: "",
+        icon: "",
+        websites: [],
+        links: [],
+        details: ""
+    }
+
+    const validator = await GetValidator(address);
+    if (validator == null)
+        return null;
+
+    information.name = validator.name;
+    information.email = validator.email;
+    information.icon = validator.icon;
+    {
+        let websites = validator.websites;
+        websites = websites.replace(/\s/g, '');
+        information.websites = websites.split(',');
+    }
+    {
+        let links = validator.links;
+        links = links.replace(/\s/g, '');
+        information.links = links.split(',');
+    }
+    information.details = validator.details;
+
+    return information
+}
+
 module.exports = {
     GetValidators, GetEraValidators, GetBids,
     GetValidatorData, GetAPY,
-    GetTotalStake
+    GetTotalStake, GetValidatorInformation
 }
 

@@ -1,15 +1,18 @@
 const validator_db = require('../models/validator');
+const { GetValidatorInformation } = require('../utils/validator');
 require('dotenv').config();
 
 module.exports = {
 
     GetValidator: async function (req, res) {
         const public_key = req.params.address;
-        validator_db.GetValidator(public_key).then(value => {
-            res.status(200).json(value);
-        }).catch(err => {
-            res.json(err);
-        })
+       GetValidatorInformation(public_key).then(value => {
+           res.status(200).json(value);
+       }).catch(err => {
+           console.log(err);
+           res.status(500).json(err);
+       })
+
     },
 
     AddValidator: async function (req, res) {
