@@ -1,4 +1,4 @@
-const { RequestRPC, QueryState, GetBalance, GetBalanceByAccountHash, GetBalanceByState, GetNetWorkRPC} = require('../utils/common');
+const { RequestRPC, QueryState, GetBalance, GetBalanceByAccountHash, GetBalanceByState, GetNetWorkRPC } = require('../utils/common');
 const { GetValidators, GetEraValidators, GetBids, GetValidatorData, GetValidatorInformation } = require('../utils/validator');
 const { RpcApiName } = require('../utils/constant');
 
@@ -11,27 +11,27 @@ const get_bids_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_BIDS || 60 
 module.exports = {
     get_validators_cache,
     get_bids_cache,
-    
+
     GetBalanceAccountHash: async function (req, res) {
         const account_hash = req.params.account_hash;
-        try { 
+        try {
             const url = await GetNetWorkRPC();
             const balance = await GetBalanceByAccountHash(url, account_hash);
             res.status(200);
             res.json(balance);
-        }catch(err) {
+        } catch (err) {
             res.send(err);
         }
     },
 
     GetBalanceAddress: async function (req, res) {
         let address = req.params.address;
-        try {  
+        try {
             const url = await GetNetWorkRPC();
             const balance = await GetBalance(url, address);
             res.status(200);
             res.json(balance);
-        }catch(err) {
+        } catch (err) {
             res.send(err);
         }
     },
@@ -107,12 +107,15 @@ module.exports = {
             let data = await GetValidatorData(url, address);
 
             // add additonal information
-            const information = await GetValidatorInformation(address);
-            data.information = information;
+            try {
+                data.information = await GetValidatorInformation(address);
+            } catch (err) {
+                data.information = null;
+            }
 
             res.status(200);
             res.json(data);
-        } catch(err) {
+        } catch (err) {
             console.log(err);
             res.send(err);
         }
@@ -121,11 +124,11 @@ module.exports = {
     GetBalanceState: async function (req, res) {
         const account_hash = req.query.account_hash;
         const state = req.query.state;
-        try{
+        try {
             const url = await GetNetWorkRPC();
             const result = await GetBalanceByState(url, account_hash, state);
             res.json(result);
-        }catch(err) {   
+        } catch (err) {
             res.send(err);
         }
     }

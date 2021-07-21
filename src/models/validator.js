@@ -28,6 +28,8 @@ async function InsertValidator(public_key, name, email, icon, websites, links, d
         var sql = `INSERT INTO validator (public_key, name, email, icon, websites, links, details)
          VALUES ('${public_key}', '${name}', '${email}', '${icon}', '${websites}', '${links}', '${details}')`;
         validator_pool.query(sql, function (err, result) {
+            console.log("err: ", err);
+            console.log("result: ", result);
             if (err) {
                 reject(err);
             };

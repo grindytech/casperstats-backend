@@ -71,8 +71,12 @@ async function GetTopValidators(auction_state, era_index, number_of_validator) {
             delete element.bid["inactive"];
 
             // add information to top validators
-            const information = await GetValidatorInformation(element.public_key);
-            element.information = information;
+            try {
+                const information = await GetValidatorInformation(element.public_key);
+                element.information = information;
+            } catch (err) { 
+                element.information = null;
+            }
 
             top_validators.push(element);
         }
