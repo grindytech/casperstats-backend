@@ -302,9 +302,10 @@ async function GetValidatorInformation(address) {
         details: ""
     }
 
-    const validator = await GetValidator(address);
-    if (validator == null)
+    let validator = await GetValidator(address);
+    if (validator == undefined || validator == null || validator.length < 1)
         return null;
+    validator = validator[0];
 
     information.name = validator.name;
     information.email = validator.email;

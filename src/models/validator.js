@@ -27,12 +27,12 @@ async function InsertValidator(public_key, name, email, icon, websites, links, d
     return new Promise((resolve, reject) => {
         var sql = `INSERT INTO validator (public_key, name, email, icon, websites, links, details)
          VALUES ('${public_key}', '${name}', '${email}', '${icon}', '${websites}', '${links}', '${details}')`;
-            validator_pool.query(sql, function (err, result) {
-                if (err) {
-                    reject(err);
-                };
-                resolve(result);
-            });
+        validator_pool.query(sql, function (err, result) {
+            if (err) {
+                reject(err);
+            };
+            resolve(result);
+        });
     })
 }
 
@@ -55,11 +55,7 @@ async function GetValidator(public_key) {
             if (err) {
                 reject(err);
             }
-            if (result.length > 0) {
-                resolve(result[0]);
-            } else {
-                resolve(null);
-            }
+            resolve(result);
         });
     })
 }
@@ -69,7 +65,7 @@ async function DropValidator() {
         var sql = "DROP TABLE validator";
         validator_pool.query(sql, function (err, result) {
             if (err) resolve(false);
-            resolve(true);
+            resolve(result);
         });
 
     })
