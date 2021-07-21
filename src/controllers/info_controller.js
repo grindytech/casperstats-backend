@@ -15,10 +15,15 @@ const NodeCache = require("node-cache");
 const get_stats_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_STATS || 1800 });
 const economics_cache = new NodeCache({ stdTTL: process.env.CACHE_ECONOMICS || 3600 });
 
+const transfer_volume_cache = new NodeCache({ stdTTL: process.env.CACHE_TRANSFER_VOLUME || 1800 });
+const get_volume_cache = new NodeCache({ stdTTL: process.env.CACHE_VOLUME || 1800 });
+
 module.exports = {
     get_stats_cache,
     economics_cache,
-
+    transfer_volume_cache,
+    get_volume_cache,
+    
     GetDeploy: async function (req, res) {
         let hex = req.params.hex; // Hex-encoded deploy hash
         const url = await GetNetWorkRPC();
@@ -88,6 +93,7 @@ module.exports = {
         try {
             const count = req.params.count;
             const result = await GetTransfersVolume(count);
+            transfer_volume_cache.set(`transfer-volume-${count}`, result);
             res.json(result);
         } catch (err) {
             res.send(err);
@@ -116,6 +122,7 @@ module.exports = {
 
                 result.push(paser_data);
             }
+            get_volume_cache.set(`get-volume-${count}`, result);
             res.json(result);
         } catch (err) {
             res.send(err);
