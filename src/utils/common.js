@@ -230,10 +230,15 @@ async function GetNetWorkRPC() {
     throw Error("Can not find Network RPC");
 }
 
+const auth = (user, password) => {
+    return user == process.env.API_USER && password == process.env.API_PASSWORD;
+}
+
+
 module.exports = {
     GetAccountData, GetHeight, QueryState,
     GetLatestStateRootHash, Execute, GetBalance,
     GetAccountHash, RequestRPC, GetBalanceByAccountHash,
-    db_config, GetBalanceByState, GetNetWorkRPC
+    db_config, GetBalanceByState, GetNetWorkRPC, auth
 }
 
