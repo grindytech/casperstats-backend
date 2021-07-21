@@ -111,7 +111,7 @@ module.exports = {
 
                 const paser_data = [
                     Math.floor(new Date(the_date).getTime()),
-                    data.volume,
+                    Number((Number(data.volume) / 1000000000).toFixed(2))
                 ]
 
                 result.push(paser_data);
