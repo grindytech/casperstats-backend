@@ -102,7 +102,6 @@ const GetBlockHeightByBlock = async (url, blockhash) => {
 }
 
 const GetBlock = async (url, block) => {
-    const height = await GetHeight(url);
     return new Promise((resolve, reject) => {
         let params;
         // check b is a number or string to change the params
@@ -114,7 +113,6 @@ const GetBlock = async (url, block) => {
 
         RequestRPC(url, RpcApiName.get_block, params).then(value => {
             // add current_height to getblock
-            value.result["current_height"] = height;
             delete value.result.block.proofs;
             resolve(value);
         }).catch(err => {
