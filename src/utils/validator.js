@@ -313,7 +313,7 @@ async function GetValidatorInformation(address) {
 
     information.name = validator.name;
     information.email = validator.email;
-    information.icon = process.env.ICON_IMAGE_URL + validator.icon;
+    information.icon = process.env.ICON_IMAGE_URL + validator.icon + "?raw=true";
     {
         let websites = validator.websites;
         websites = websites.replace(/\s/g, '');
