@@ -6,6 +6,7 @@ const { GetHeight, RequestRPC, GetAccountHash, Execute, GetNetWorkRPC } = requir
 const request = require('request');
 const { GetNumberOfTransfersByDate } = require("../models/transfer");
 const { GetBlockHeight } = require("../models/block_model");
+const { GetValidatorByName } = require("../models/validator");
 
 const GetDeployhashes = async (url, block) => {
     return new Promise((resolve, reject) => {
@@ -243,7 +244,25 @@ async function IsPublicKeyHex(param) {
     return false;
 }
 
+async function GetValidatorPublicKeyByName(param) {
+    try {
+        const validator = await GetValidatorByName(param);
+        if (validator == undefined || validator == null || validator.length < 1)
+            return false;
+        return validator[0].public_key;
+    } catch (err) { }
+    return false;
+}
+
 const GetType = async (param) => {
+
+    const validator = await GetValidatorPublicKeyByName(param);
+    if(validator) {
+        return {
+            value: validator,
+            type: ELEMENT_TYPE.VALIDATOR,
+        };
+    }
 
     // clean the input
     const imput = param.replace(/\s+/g, '');
