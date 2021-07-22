@@ -20,11 +20,11 @@ module.exports = {
         const name = req.body.name;
         const email = req.body.email;
         const icon = req.body.icon;
-        const websites = req.body.websites;
+        const website = req.body.website;
         const links = req.body.links;
         const details = req.body.details;
 
-        validator_db.InsertValidator(public_key, name, email, icon, websites, links, details).then(result => {
+        validator_db.InsertValidator(public_key, name, email, icon, website, links, details).then(result => {
                 res.status(200).json(result);
         }).catch(err => {
             console.log(err);

@@ -301,7 +301,7 @@ async function GetValidatorInformation(address) {
         name: "",
         email: "",
         icon: "",
-        websites: [],
+        website: "",
         links: [],
         details: ""
     }
@@ -314,15 +314,11 @@ async function GetValidatorInformation(address) {
     information.name = validator.name;
     information.email = validator.email;
     information.icon = process.env.ICON_IMAGE_URL + validator.icon + "?raw=true";
+    information.website = validator.website;
+
     {
-        let websites = validator.websites;
-        websites = websites.replace(/\s/g, '');
-        information.websites = websites.split(',');
-    }
-    {
-        let links = validator.links;
-        links = links.replace(/\s/g, '');
-        information.links = links.split(',');
+        const links = JSON.parse(validator.links);
+        information.links = links;
     }
     information.details = validator.details;
 
