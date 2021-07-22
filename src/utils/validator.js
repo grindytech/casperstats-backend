@@ -317,7 +317,11 @@ async function GetValidatorInformation(address) {
     information.website = validator.website;
 
     {
-        const links = JSON.parse(validator.links);
+        let links = JSON.parse(validator.links);
+        links = links.filter(value => {
+            link = value.link.replace(/\s/g, ''); 
+            return link != '';
+        })
         information.links = links;
     }
     information.details = validator.details;
