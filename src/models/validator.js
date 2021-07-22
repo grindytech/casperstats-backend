@@ -14,8 +14,7 @@ const validator_pool = mysql.createPool({
 async function CreateValidatorTable() {
     return new Promise((resolve, reject) => {
 
-        var sql = `CREATE TABLE IF NOT EXISTS validator (public_key VARCHAR(68) NOT NULL PRIMARY KEY,
-    name VARCHAR(50), email VARCHAR(50), icon VARCHAR(50), websites VARCHAR(50), links VARCHAR(100), details VARCHAR(200))`;
+        var sql = `CREATE TABLE IF NOT EXISTS validator (public_key VARCHAR(68) NOT NULL PRIMARY KEY, name VARCHAR(50), email VARCHAR(50), icon VARCHAR(50), websites VARCHAR(200), links VARCHAR(200), details VARCHAR(1000))`;
         validator_pool.query(sql, function (err, result) {
             if (err) reject(err);
             resolve(result);
@@ -25,8 +24,7 @@ async function CreateValidatorTable() {
 
 async function InsertValidator(public_key, name, email, icon, websites, links, details) {
     return new Promise((resolve, reject) => {
-        var sql = `INSERT INTO validator (public_key, name, email, icon, websites, links, details)
-         VALUES ('${public_key}', '${name}', '${email}', '${icon}', '${websites}', '${links}', '${details}')`;
+        var sql = `INSERT INTO validator (public_key, name, email, icon, websites, links, details) VALUES ('${public_key}', '${name}', '${email}', '${icon}', '${websites}', '${links}', '${details}')`;
         validator_pool.query(sql, function (err, result) {
             console.log("err: ", err);
             console.log("result: ", result);

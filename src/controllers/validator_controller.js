@@ -27,6 +27,7 @@ module.exports = {
         validator_db.InsertValidator(public_key, name, email, icon, websites, links, details).then(result => {
                 res.status(200).json(result);
         }).catch(err => {
+            console.log(err);
             res.status(500).json(err);
         })
     },
