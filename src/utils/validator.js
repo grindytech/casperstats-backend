@@ -215,6 +215,8 @@ const GetBids = async () => {
         bids[i]["total_bid"] = math.add(self_bid, total_token_delegated).toString();
         bids[i]["total_delegated"] = total_token_delegated.toString();
 
+        delete bids[i].bid.delegators;
+
         // try to add information to validator
         try{
             const validator_info = await GetValidatorInformation(bids[i].public_key);
