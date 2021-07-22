@@ -211,9 +211,18 @@ const GetBids = async () => {
             const delegated_amount = math.bignumber(delegators[j].staked_amount);
             total_token_delegated = math.add(total_token_delegated, delegated_amount);
         }
-
+        bids[i].bid.number_of_validators = bids[i].bid.delegators.length;
         bids[i]["total_bid"] = math.add(self_bid, total_token_delegated).toString();
         bids[i]["total_delegated"] = total_token_delegated.toString();
+
+        // try to add information to validator
+        try{
+            const validator_info = await GetValidatorInformation(bids[i].public_key);
+            if(validator_info != null) {
+                bids[i].name = validator_info.name;
+                bids[i].icon = validator_info.icon;
+            }
+        }catch(err){} 
     }
 
     //remove bids
