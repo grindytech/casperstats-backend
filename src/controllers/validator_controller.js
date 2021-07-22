@@ -15,6 +15,15 @@ module.exports = {
 
     },
 
+    GetValidators: async function (req, res) {
+        validator_db.GetValidatorsWithNameAndPublicKey().then(value => {
+            res.status(200).json(value);
+        }).catch(err => {
+            console.log(err);
+            res.json([]);
+        })
+    },
+
     AddValidator: async function (req, res) {
         const public_key = req.body.public_key;
         const name = req.body.name;

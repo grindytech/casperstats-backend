@@ -83,7 +83,20 @@ async function DropValidator() {
     })
 }
 
+async function GetValidatorsWithNameAndPublicKey() {
+    return new Promise((resolve, reject) => {
+        var sql = `SELECT name, public_key FROM validator`;
+        validator_pool.query(sql, function (err, result) {
+            if (err) {
+                reject(err);
+            }
+            resolve(result);
+        });
+    })
+}
+
 module.exports = {
     CreateValidatorTable, InsertValidator, GetValidator,
-    DropValidator, DeleteValidator, GetValidatorByName
+    DropValidator, DeleteValidator, GetValidatorByName,
+    GetValidatorsWithNameAndPublicKey
 }
