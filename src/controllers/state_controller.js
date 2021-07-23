@@ -7,10 +7,12 @@ require('dotenv').config();
 const NodeCache = require("node-cache");
 const get_validators_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_VALIDATORS || 60 });
 const get_bids_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_BIDS || 60 });
+const get_era_validators_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_ERA_VALIDATORS || 120 });
 
 module.exports = {
     get_validators_cache,
     get_bids_cache,
+    get_era_validators_cache,
 
     GetBalanceAccountHash: async function (req, res) {
         const account_hash = req.params.account_hash;
@@ -81,8 +83,8 @@ module.exports = {
         try {
             const url = await GetNetWorkRPC();
             const era_validators = await GetEraValidators(url);
-            res.status(200);
-            res.json(era_validators);
+            get_era_validators_cache.set("get-era-validators", era_validators);
+            res.status(200).json(era_validators);
         } catch (err) {
             res.send(err);
         }

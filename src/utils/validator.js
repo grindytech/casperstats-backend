@@ -74,7 +74,7 @@ async function GetTopValidators(auction_state, era_index, number_of_validator) {
             try {
                 const information = await GetValidatorInformation(element.public_key);
                 element.information = information;
-            } catch (err) { 
+            } catch (err) {
                 element.information = null;
             }
 
@@ -172,12 +172,21 @@ const GetEraValidators = async (url) => {
         for (let era_index = 0; era_index < 2; era_index++) {
             const validator_weights = auction_info.auction_state.era_validators[era_index].validator_weights;
             for (let i = 0; i < validator_weights.length; i++) {
-                let public_key = validator_weights[i].public_key;
+                const public_key = validator_weights[i].public_key;
 
                 let element = bids.find(el => el.public_key == public_key);
 
                 const num_of_delegators = element.bid.delegators.length;
                 validator_weights[i]["delegators"] = num_of_delegators;
+
+                // add information to validators
+                try {
+                    const validator_info = await GetValidatorInformation(bids[i].public_key);
+                    if (validator_info != null) {
+                        validator_weights[i].name = validator_info.name;
+                        validator_weights[i].icon = validator_info.icon;
+                    }
+                } catch (err) { }
             }
         }
     }
@@ -218,13 +227,13 @@ const GetBids = async () => {
         delete bids[i].bid.delegators;
 
         // try to add information to validator
-        try{
+        try {
             const validator_info = await GetValidatorInformation(bids[i].public_key);
-            if(validator_info != null) {
+            if (validator_info != null) {
                 bids[i].name = validator_info.name;
                 bids[i].icon = validator_info.icon;
             }
-        }catch(err){} 
+        } catch (err) { }
     }
 
     //remove bids
@@ -330,7 +339,7 @@ async function GetValidatorInformation(address) {
     {
         let links = JSON.parse(validator.links);
         links = links.filter(value => {
-            link = value.link.replace(/\s/g, ''); 
+            link = value.link.replace(/\s/g, '');
             return link != '';
         })
         information.links = links;

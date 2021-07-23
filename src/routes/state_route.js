@@ -8,7 +8,19 @@ router.route("/query-state/:key").get(state_controller.QueryState);
 
 // Auction and staking
 router.route("/get-auction-info").get(state_controller.GetAuctionInfo);
-router.route("/get-era-validators").get(state_controller.GetEraValidators);
+
+//cache for get-era-validators
+const verifyGetEraValidators = (req, res, next) => {
+    try {
+        if (state_controller.get_era_validators_cache.has("get-era-validators")) {
+            return res.status(200).json(state_controller.get_era_validators_cache.get("get-era-validators"));
+        }
+        return next();
+    } catch (err) {
+        throw new Error(err);
+    }
+};
+router.route("/get-era-validators").get(verifyGetEraValidators, state_controller.GetEraValidators);
 
 // cache for get-bids
 const verifyGetBids = (req, res, next) => {
