@@ -47,6 +47,54 @@ module.exports = {
         })
     },
 
+    UpdateValidator: async function (req, res) {
+        const public_key = req.body.public_key;
+        const name = req.body.name;
+        const email = req.body.email;
+        const icon = req.body.icon;
+        const website = req.body.website;
+        const twitter = req.body.twitter;
+        const facebook = req.body.facebook;
+        const telegram = req.body.telegram;
+        const github = req.body.github;
+        const details = req.body.details;
+
+
+        let update_status;
+
+        try {
+
+            if (name != undefined) {
+
+            }
+
+            if (email != undefined) {
+                update_status = await validator_db.UpdateEmail(public_key, email);
+            }
+
+            if (icon != undefined) {
+
+            }
+
+            if (website != undefined) {
+
+            }
+
+            if (details != undefined) {
+
+            }
+            if (twitter != undefined || facebook != undefined || telegram != undefined || github != undefined) {
+                const links = `[{\"tag\": \"Twitter\", \"link\": \"${twitter}\"}, {\"tag\": \"Facebook\", \"link\": \"${facebook}\"}, { \"tag\": \"Telegram\", \"link\": \"${telegram}\"}, {\"tag\": \"Github\", \"link\": \"${github}\"}]`
+
+            }
+            res.status(200).json(update_status);
+        } catch (err) {
+            console.log(err);
+            res.status(500).json(err);
+        }
+
+    },
+
     DeleteValidator: async function (req, res) {
         const public_key = req.params.address;
 

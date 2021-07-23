@@ -95,8 +95,35 @@ async function GetValidatorsWithNameAndPublicKey() {
     })
 }
 
+async function UpdateName(public_key, name) {
+    return new Promise((resolve, reject) => {
+        var sql = `UPDATE validator SET name = '${name}' WHERE public_key = '${public_key}'`;
+        validator_pool.query(sql, function (err, result) {
+            if (err) {
+                reject(err);
+            }
+            resolve(result);
+        });
+    })
+}
+
+async function UpdateEmail(public_key, email) {
+    return new Promise((resolve, reject) => {
+        var sql = `UPDATE validator SET email = '${email}' WHERE public_key = '${public_key}'`;
+        validator_pool.query(sql, function (err, result) {
+            if (err) {
+                reject(err);
+            }
+            resolve(result);
+        });
+    })
+}
+
+
+
 module.exports = {
     CreateValidatorTable, InsertValidator, GetValidator,
     DropValidator, DeleteValidator, GetValidatorByName,
-    GetValidatorsWithNameAndPublicKey
+    GetValidatorsWithNameAndPublicKey, UpdateEmail,
+    UpdateName
 }

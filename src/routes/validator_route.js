@@ -24,6 +24,8 @@ function authentication_required(req, res, next) {
 
 router.route("/get-validators").get(validator_controller.GetValidators);
 
+router.route("/update").post(authentication_required, validator_controller.UpdateValidator);
+
 router.route("/add").post(authentication_required, validator_controller.AddValidator);
 router.route("/delete/:address").get(validator_controller.DeleteValidator);
 router.route("/get-validator/:address").get(validator_controller.GetValidator);
