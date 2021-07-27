@@ -339,7 +339,7 @@ async function GetValidatorInformation(address) {
         let links = JSON.parse(validator.links);
         links = links.filter(value => {
             link = value.link.replace(/\s/g, '');
-            return link != '';
+            return link != undefined && link != null && link != '';
         })
         information.links = links;
     }
