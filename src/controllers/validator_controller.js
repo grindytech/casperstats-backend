@@ -85,7 +85,7 @@ module.exports = {
             }
             if (twitter != undefined || facebook != undefined || telegram != undefined || github != undefined) {
                 const links = `[{\"tag\": \"Twitter\", \"link\": \"${twitter}\"}, {\"tag\": \"Facebook\", \"link\": \"${facebook}\"}, { \"tag\": \"Telegram\", \"link\": \"${telegram}\"}, {\"tag\": \"Github\", \"link\": \"${github}\"}]`
-
+                update_status = await validator_db.UpdateLinks(public_key, links);
             }
             res.status(200).json(update_status);
         } catch (err) {

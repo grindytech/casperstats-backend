@@ -119,11 +119,23 @@ async function UpdateEmail(public_key, email) {
     })
 }
 
+async function UpdateLinks(public_key, links) {
+    return new Promise((resolve, reject) => {
+        var sql = `UPDATE validator SET links = '${links}' WHERE public_key = '${public_key}'`;
+        validator_pool.query(sql, function (err, result) {
+            if (err) {
+                reject(err);
+            }
+            resolve(result);
+        });
+    })
+}
+
 
 
 module.exports = {
     CreateValidatorTable, InsertValidator, GetValidator,
     DropValidator, DeleteValidator, GetValidatorByName,
     GetValidatorsWithNameAndPublicKey, UpdateEmail,
-    UpdateName
+    UpdateName, UpdateLinks
 }
