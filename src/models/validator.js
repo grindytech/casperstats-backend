@@ -131,8 +131,6 @@ async function UpdateLinks(public_key, links) {
     })
 }
 
-
-
 module.exports = {
     CreateValidatorTable, InsertValidator, GetValidator,
     DropValidator, DeleteValidator, GetValidatorByName,

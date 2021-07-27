@@ -4,8 +4,9 @@ const { RpcApiName } = require('./constant');
 const { RequestRPC, GetHeight, GetNetWorkRPC } = require('./common')
 const math = require('mathjs');
 const { GetRecentCirculatingSupply, GetRecentTotalSupply } = require("./chain");
-const { GetTotalRewardByPublicKey, GetLatestEra, GetTotalRewardByEra, GetPublicKeyTotalRewardByDate, GetRewardByPublicKey } = require("../models/era");
-const { GetValidator } = require("../models/validator");
+const { GetTotalRewardByPublicKey, GetLatestEra, GetTotalRewardByEra,
+    GetPublicKeyTotalRewardByDate, GetRewardByPublicKey } = require("../models/era");
+const { GetValidator, GetValidatorLinksByPublicKey } = require("../models/validator");
 
 
 function GetTotalBid(bids, address) {
@@ -339,7 +340,7 @@ async function GetValidatorInformation(address) {
         let links = JSON.parse(validator.links);
         links = links.filter(value => {
             link = value.link.replace(/\s/g, '');
-            return link != undefined && link != null && link != '';
+            return typeof (link) !== "undefined" && link != null && link != '';
         })
         information.links = links;
     }

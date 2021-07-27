@@ -30,10 +30,10 @@ module.exports = {
         const email = req.body.email;
         const icon = req.body.icon;
         const website = req.body.website;
-        const twitter = req.body.twitter;
-        const facebook = req.body.facebook;
-        const telegram = req.body.telegram;
-        const github = req.body.github;
+        const twitter = req.body.twitter || "";
+        const facebook = req.body.facebook || "";
+        const telegram = req.body.telegram || "";
+        const github = req.body.github || "";
         const details = req.body.details;
 
         // parser link
@@ -49,19 +49,33 @@ module.exports = {
 
     UpdateValidator: async function (req, res) {
         const public_key = req.body.public_key;
+
+        let validator = await validator_db.GetValidator(public_key);
+        if (validator == undefined || validator == null || validator.length < 1) {
+            res.status(500).json("Validator not found");
+            return;
+        }
+        validator = validator[0];
+        let links;
+        {
+            links = JSON.parse(validator.links);
+            links = links.filter(value => {
+                link = value.link.replace(/\s/g, '');
+                return link != '';
+            })
+        }
+
         const name = req.body.name;
         const email = req.body.email;
         const icon = req.body.icon;
         const website = req.body.website;
-        const twitter = req.body.twitter;
-        const facebook = req.body.facebook;
-        const telegram = req.body.telegram;
-        const github = req.body.github;
         const details = req.body.details;
-
+        const twitter = req.body.twitter != undefined? req.body.twitter : links.twitter;
+        const facebook = req.body.facebook != undefined? req.body.facebook : links.facebook;
+        const telegram = req.body.telegram != undefined? req.body.telegram : links.telegram;
+        const github = req.body.github != undefined? req.body.github : links.github;
 
         let update_status;
-
         try {
 
             if (name != undefined) {
