@@ -79,7 +79,7 @@ module.exports = {
         try {
 
             if (name != undefined) {
-
+                update_status = await validator_db.UpdateName(public_key, name);
             }
 
             if (email != undefined) {
