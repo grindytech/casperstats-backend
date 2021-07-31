@@ -1,13 +1,32 @@
 const dotenv = require("dotenv");
 dotenv.config();
 const { RpcApiName } = require('./constant');
-const { RequestRPC, GetHeight, GetNetWorkRPC } = require('./common')
+const { RequestRPC, GetNetWorkRPC } = require('./common')
 const math = require('mathjs');
-const { GetRecentCirculatingSupply, GetRecentTotalSupply } = require("./chain");
 const { GetTotalRewardByPublicKey, GetLatestEra, GetTotalRewardByEra,
     GetPublicKeyTotalRewardByDate, GetRewardByPublicKey } = require("../models/era");
-const { GetValidator, GetValidatorLinksByPublicKey } = require("../models/validator");
+const { GetValidator } = require("../models/validator");
+const request = require('request');
 
+const GetCasperlabsSupply = async () => {
+    let options = {
+        url: process.env.TOKEN_METRICS_URL,
+        method: "get",
+        headers:
+        {
+            "content-type": "application/json"
+        }
+    };
+    return new Promise((resolve, reject) => {
+        request(options, (error, response, body) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(JSON.parse(body));
+            }
+        });
+    })
+}
 
 function GetTotalBid(bids, address) {
     // get total bid
@@ -124,12 +143,11 @@ const GetValidators = async (number_of_validator) => {
         result.block_height = auction_state.block_height;
 
         //circle supply
-        const circulating_supply = await GetRecentCirculatingSupply();
-        result.circulating_supply = circulating_supply.circulating_supply;
+        let supply = await GetCasperlabsSupply();
+        result.circulating_supply = supply.data.circulating + "000000000";
+        result.total_supply = supply.data.total + "000000000";
 
         // total_supply
-        const total_supply = await GetRecentTotalSupply();
-        result.total_supply = total_supply.total_supply;
 
         //APY
 
@@ -352,6 +370,7 @@ async function GetValidatorInformation(address) {
 module.exports = {
     GetValidators, GetEraValidators, GetBids,
     GetValidatorData, GetAPY,
-    GetTotalStake, GetValidatorInformation
+    GetTotalStake, GetValidatorInformation,
+    GetCasperlabsSupply
 }
 

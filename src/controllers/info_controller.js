@@ -1,13 +1,13 @@
-const { GetDeploy, GetType, GetRecentCirculatingSupply, GetCasperlabsSupply, GetTransfersVolume } = require('../utils/chain');
+const { GetDeploy, GetType, GetTransfersVolume } = require('../utils/chain');
 
 const { RpcApiName, ELEMENT_TYPE } = require('../utils/constant');
 const { Execute, RequestRPC, GetNetWorkRPC } = require('../utils/common');
 require('dotenv').config();
 
-const { GetCirculatingSupply, GetTotalNumberOfAccount, GetNumberOfAccountFromDate } = require('../models/account');
+const { GetTotalNumberOfAccount, GetNumberOfAccountFromDate } = require('../models/account');
 const { GetNumberOfTransfersByDate, GetVolumeByDate } = require('../models/transfer');
 const CoinGecko = require('coingecko-api');
-const { GetEraValidators, GetAPY, GetTotalStake } = require('../utils/validator');
+const { GetEraValidators, GetAPY, GetTotalStake, GetCasperlabsSupply } = require('../utils/validator');
 const { GetTotalReward } = require('../models/era');
 const CoinGeckoClient = new CoinGecko();
 
@@ -74,19 +74,11 @@ module.exports = {
 
     GetCirculatingSupply: async function (req, res) {
         // CasperLabs APIs
-        GetRecentCirculatingSupply().then(value => {
-            res.json(value);
-        }).catch(err => {
-            res.send(err);
-        })
+        res.status(200).json("comming soon");
     },
 
     GetSupply: async function (req, res) {
-        GetCirculatingSupply().then(value => {
-            res.json(value[0]);
-        }).catch(err => {
-            res.send(err);
-        })
+        res.status(200).json("comming soon");
     },
 
     GetTransferVolume: async function (req, res) {
@@ -253,7 +245,6 @@ module.exports = {
         let economics = {
         }
         try {
-
             const supply = await GetCasperlabsSupply();
             const url = await GetNetWorkRPC();
             const auction_info = await RequestRPC(url, RpcApiName.get_auction_info, []);

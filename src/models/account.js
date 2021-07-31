@@ -83,18 +83,6 @@ async function GetRichAccounts(start, count) {
     })
 }
 
-async function GetCirculatingSupply() {
-    return new Promise((resolve, reject) => {
-        var sql = `SELECT CAST(SUM(CAST(account.balance AS UNSIGNED INTEGER)) as CHAR) as circulating_supply FROM account`;
-        pool.query(sql, function (err, result) {
-            if (err) {
-                reject(err);
-            }
-            resolve(result);
-        });
-    })
-}
-
 async function GetPublicKeyByAccountHash(account_hash) {
     return new Promise((resolve, reject) => {
         var sql = `SELECT public_key_hex FROM account WHERE account_hash = '${account_hash}'`;
@@ -113,7 +101,7 @@ async function GetPublicKeyByAccountHash(account_hash) {
 
 
 module.exports = {
-    GetHolder, GetRichAccounts, GetCirculatingSupply,
+    GetHolder, GetRichAccounts,
     GetTotalNumberOfAccount, GetNumberOfAccountFromDate,
     GetAccounts, GetPublicKeyByAccountHash
 }

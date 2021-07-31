@@ -5,8 +5,6 @@ const account_fn = require('./account');
 const { GetHeight, RequestRPC, GetAccountHash, Execute, GetNetWorkRPC } = require("./common");
 const request = require('request');
 const { GetNumberOfTransfersByDate } = require("../models/transfer");
-const { GetBlockHeight } = require("../models/block_model");
-const { GetValidatorByName } = require("../models/validator");
 
 const GetDeployhashes = async (url, block) => {
     return new Promise((resolve, reject) => {
@@ -330,75 +328,7 @@ const GetType = async (param) => {
     }
 }
 
-const GetRecentCirculatingSupply = async () => {
 
-    let options = {
-        url: process.env.TOKEN_METRICS_URL,
-        method: "get",
-        headers:
-        {
-            "content-type": "application/json"
-        }
-    };
-
-    return new Promise((resolve, reject) => {
-
-        request(options, (error, response, body) => {
-            const result = JSON.parse(body);
-            if (result.error) {
-                reject(result.error);
-            } else {
-                resolve({ circulating_supply: result.data.circulating + "000000000" });
-            }
-        });
-    })
-}
-
-const GetRecentTotalSupply = async () => {
-    let options = {
-        url: process.env.TOKEN_METRICS_URL,
-        method: "get",
-        headers:
-        {
-            "content-type": "application/json"
-        }
-    };
-
-    return new Promise((resolve, reject) => {
-
-        request(options, (error, response, body) => {
-            const result = JSON.parse(body);
-            if (result.error) {
-                reject(result.error);
-            } else {
-                resolve({ total_supply: result.data.total + "000000000" });
-            }
-        });
-    })
-}
-
-const GetCasperlabsSupply = async () => {
-    let options = {
-        url: process.env.TOKEN_METRICS_URL,
-        method: "get",
-        headers:
-        {
-            "content-type": "application/json"
-        }
-    };
-
-    return new Promise((resolve, reject) => {
-
-        request(options, (error, response, body) => {
-            const result = JSON.parse(body);
-            if (result.error) {
-                reject(result.error);
-            } else {
-                resolve(result);
-            }
-        });
-    })
-}
 
 const GetTransfersVolume = async (count) => {
     var datetime = new Date();
@@ -422,6 +352,5 @@ module.exports = {
     GetDeploy, GetTransfersFromDeploy,
     GetTransferDetail, GetBlock,
     GetTransfersInBlock, GetType, GetDeploysInBlock,
-    GetRecentCirculatingSupply, GetRecentTotalSupply,
-    GetCasperlabsSupply, GetTransfersVolume
+    GetTransfersVolume
 }
