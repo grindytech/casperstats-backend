@@ -222,6 +222,9 @@ async function GetNetWorkRPC() {
         try {
             const status = await GetNetworkStatus(URLs[i]);
             if(status.result.last_added_block_info != undefined) {
+                if(URLs[i].includes("127.0.0.1")) {
+                    return "https://deploy.casperstats.io";
+                }
                 return URLs[i];
             }
         } catch (err) {
