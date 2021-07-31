@@ -7,7 +7,7 @@ require('dotenv').config();
 const { GetHolder, GetTotalNumberOfAccount, GetPublicKeyByAccountHash } = require('../models/account');
 const { GetTransfersByAccountHash } = require('../models/transfer');
 const { GetDeploysByPublicKey, GetAllDeployByPublicKey } = require('../models/deploy');
-const { GetAccountHash, RequestRPC, GetBalance, GetBalanceByAccountHash, GetNetWorkRPC } = require('../utils/common');
+const { GetAccountHash, RequestRPC, GetBalanceByAccountHash, GetNetWorkRPC, GetBalance } = require('../utils/common');
 const { GetRewardByPublicKey, GetPublicKeyRewardByDate, GetLatestEra,
   GetPublicKeyRewardByEra, GetTimestampByEra, GetLatestEraByDate,
   GetEraValidatorOfPublicKey,
@@ -191,6 +191,18 @@ module.exports = {
       res.send(err);
     })
 
+  },
+
+  GetBalance: async function (req, res) {
+    const public_key = req.params.public_key;
+    try {
+      const account_hash = await GetAccountHash(public_key);
+      const url = await GetNetWorkRPC();
+      const balance = await GetBalanceByAccountHash(url, "account-hash-" + account_hash);
+      res.status(200).json(balance);
+    } catch (err) {
+      res.send(err);
+    }
   },
 
   GetRichAccounts: async function (req, res) {
