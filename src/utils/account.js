@@ -170,8 +170,8 @@ async function GetDelegating(account) {
                 try {
                     const validator_info = await GetValidatorInformation(value.validator);
                     if (validator_info != null) {
-                        value.name = validator_info.name;
-                        value.icon = validator_info.icon;
+                        value.validator_name = validator_info.name;
+                        value.validator_icon = validator_info.icon;
                     }
                 } catch (err) { }
                 result.push(value);
@@ -276,8 +276,8 @@ async function GetUndelegating(account) {
                 try {
                     const validator_info = await GetValidatorInformation(value.validator);
                     if (validator_info != null) {
-                        value.name = validator_info.name;
-                        value.icon = validator_info.icon;
+                        value.validator_name = validator_info.name;
+                        value.validator_icon = validator_info.icon;
                     }
                 } catch (err) { }
                 result.push(value);
