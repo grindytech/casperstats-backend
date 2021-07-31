@@ -6,6 +6,7 @@ router.route("/get-account/:account").get(account_controller.GetAccount);
 router.route("/get-transfers").get(account_controller.GetAccountTransfers);
 router.route("/get-deploys/").get(account_controller.GetAccountDeploys);
 router.route("/get-balance/:public_key").get(account_controller.GetBalance);
+router.route("/get-account-hash/:public_key").get(account_controller.GetAccountHash);
 
 // cache for get-bids
 const verifyRichAccount = (req, res, next) => {

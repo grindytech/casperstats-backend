@@ -205,6 +205,16 @@ module.exports = {
     }
   },
 
+  GetAccountHash: async function (req, res) {
+    const public_key = req.params.public_key;
+    try {
+      const account_hash = await GetAccountHash(public_key);
+      res.status(200).json(account_hash);
+    } catch (err) {
+      res.status(500).json(null);
+    }
+  },
+
   GetRichAccounts: async function (req, res) {
     const start = req.query.start;
     const count = req.query.count;
