@@ -7,6 +7,7 @@ const { GetAccounts } = require("../models/account");
 const math = require('mathjs');
 const { GetAllDeployByPublicKey } = require("../models/deploy");
 const { GetEraByBlockHash } = require("../models/block_model");
+const { GetValidatorInformation } = require("./validator");
 
 
 async function GetAccountData(address) {
@@ -134,27 +135,21 @@ async function GetDelegating(account) {
         for (let i = 0; i < deploys.length; i++) {
             let params = [deploys[i].deploy_hash];
             let deploy_data = await common.RequestRPC(url, RpcApiName.get_deploy, params);
-
             let value = undefined;
-
             // incase undelegate
             try {
                 const storedContractByHash = deploy_data.result.deploy.session.StoredContractByHash;
                 if (storedContractByHash.entry_point == "delegate") {
                     const args = storedContractByHash.args;
-
                     const delegator = args.filter(value => {
                         return value[0].toString() == "delegator";
                     })[0][1].parsed;
-
                     const validator = args.filter(value => {
                         return value[0].toString() == "validator";
                     })[0][1].parsed;
-
                     const amount = args.filter(value => {
                         return value[0].toString() == "amount";
                     })[0][1].parsed;
-
                     value = {
                         delegator,
                         validator,
@@ -162,10 +157,6 @@ async function GetDelegating(account) {
                     };
                 }
             } catch (err) { }
-            // incase unbonding
-            {
-
-            }
 
             if (value) {
                 // add status
@@ -174,8 +165,15 @@ async function GetDelegating(account) {
                     if (deploy_data.result.execution_results[0].result.Success)
                         status = true;
                 } catch (err) { }
-
                 value.status = status;
+                // try to add information to validator
+                try {
+                    const validator_info = await GetValidatorInformation(value.validator);
+                    if (validator_info != null) {
+                        value.name = validator_info.name;
+                        value.icon = validator_info.icon;
+                    }
+                } catch (err) { }
                 result.push(value);
             }
         }
@@ -275,6 +273,13 @@ async function GetUndelegating(account) {
                 }
                 value.release_timestamp = release_timestamp;
                 value.status = status;
+                try {
+                    const validator_info = await GetValidatorInformation(value.validator);
+                    if (validator_info != null) {
+                        value.name = validator_info.name;
+                        value.icon = validator_info.icon;
+                    }
+                } catch (err) { }
                 result.push(value);
             }
         }
