@@ -413,7 +413,6 @@ module.exports = {
           delegated = delegated[0];
           const data = {
             validator: validator,
-            validator_staked_amount: bids[i].bid.staked_amount,
             delegation_rate: bids[i].bid.delegation_rate,
             staked_amount: delegated.staked_amount,
           };
