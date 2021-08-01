@@ -17,6 +17,7 @@ const { GetRewardByPublicKey, GetPublicKeyRewardByDate, GetLatestEra,
 require('dotenv').config();
 
 const NodeCache = require("node-cache");
+const { GetValidatorInformation } = require('../utils/validator');
 const get_rich_accounts_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_RICH_ACCOUNTS || 60 });
 
 module.exports = {
@@ -388,6 +389,49 @@ module.exports = {
     } catch (err) {
       console.log(err);
       res.send(err);
+    }
+  },
+
+  GetBids: async function (req, res) {
+    const public_key = req.query.public_key;
+    try {
+      const url = await GetNetWorkRPC();
+      const auction_info = await RequestRPC(url, RpcApiName.get_auction_info, []);
+
+      const bids = auction_info.result.auction_state.bids;
+
+      // find all the bids belong to public_key
+
+      let delegate_history = [];
+      for (let i = 0; i < bids.length; i++) {
+        const delegators = bids[i].bid.delegators;
+        let delegated = delegators.filter(value => {
+          return value.public_key == public_key;
+        })
+        if (delegated.length > 0) {
+          const validator = bids[i].public_key;
+          delegated = delegated[0];
+          const data = {
+            validator: validator,
+            validator_staked_amount: bids[i].bid.staked_amount,
+            delegation_rate: bids[i].bid.delegation_rate,
+            staked_amount: delegated.staked_amount,
+          };
+          // try to get validator information
+          try {
+            const validator_info = await GetValidatorInformation(validator);
+            if (validator_info != null) {
+              data.validator_name = validator_info.name;
+              data.validator_icon = validator_info.icon;
+            }
+          } catch (err) { }
+          delegate_history.push(data);
+        }
+      }
+      res.status(200).json(delegate_history);
+    } catch (err) {
+      console.log(err);
+      res.json(err);
     }
   }
 };

@@ -28,5 +28,6 @@ router.route("/get-era-reward").get(account_controller.GetEraReward);
 router.route("/staking/").get(account_controller.GetStaking);
 router.route("/undelegate/").get(account_controller.GetUndelegate);
 router.route("/delegate/").get(account_controller.GetDelegate);
+router.route("/get-bids/").get(account_controller.GetBids);
 
 module.exports = router;
