@@ -201,7 +201,7 @@ async function GetNetworkStatus(URL) {
             if (error) {
                 reject(error);
             } else {
-                resolve(JSON.parse(body));
+                resolve(body);
             }
         });
     })
@@ -220,7 +220,8 @@ async function GetNetWorkRPC() {
     // check status from 0
     for (let i = 0; i < URLs.length; i++) {
         try {
-            const status = await GetNetworkStatus(URLs[i]);
+            let status = await GetNetworkStatus(URLs[i]);
+            status = JSON.parse(status);
             if(status.result.last_added_block_info != undefined) {
                 return URLs[i];
             }

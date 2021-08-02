@@ -202,6 +202,7 @@ module.exports = {
       const balance = await GetBalanceByAccountHash(url, "account-hash-" + account_hash);
       res.status(200).json(balance);
     } catch (err) {
+      console.log(err);
       res.send(err);
     }
   },
@@ -212,6 +213,7 @@ module.exports = {
       const account_hash = await GetAccountHash(public_key);
       res.status(200).json(account_hash);
     } catch (err) {
+      console.log(err);
       res.status(500).json(null);
     }
   },
