@@ -27,7 +27,6 @@ const GetTokenMetrics = async () => {
             } else {
                 if (body.length > 0) {
                     let result = JSON.parse(body);
-                    console.log(result);
                     result = result[0];
                     resolve({
                         circulating_supply: result.circulating_supply,
@@ -292,7 +291,9 @@ const GetAPY = async (url) => {
     }
 
     const apy = (latest_total_reward * 12 * 365) / total_stake * 100;
-    return apy;
+    // with compound interest
+    const compound = 100 * (math.pow((1 + (apy / 438000 )), 4380) - 1);
+    return compound;
 }
 
 const GetValidatorData = async (url, address) => {
