@@ -7,7 +7,7 @@ require('dotenv').config();
 const { GetTotalNumberOfAccount, GetNumberOfAccountFromDate } = require('../models/account');
 const { GetNumberOfTransfersByDate, GetVolumeByDate } = require('../models/transfer');
 const CoinGecko = require('coingecko-api');
-const { GetEraValidators, GetAPY, GetTotalStake, GetCasperlabsSupply } = require('../utils/validator');
+const { GetEraValidators, GetAPY, GetTotalStake, GetTokenMetrics } = require('../utils/validator');
 const { GetTotalReward } = require('../models/era');
 const CoinGeckoClient = new CoinGecko();
 
@@ -167,9 +167,11 @@ module.exports = {
 
         // circulating + total supply
         {
-            const supply = await GetCasperlabsSupply();
-            stats.circulating = supply.data.circulating + "000000000";
-            stats.total_supply = supply.data.total + "000000000";
+            const supply = await GetTokenMetrics();
+            if(supply) {
+                stats.circulating = supply.circulating_supply + "000000000";
+                stats.total_supply = supply.total_supply + "000000000";
+            }
         }
 
         // price + marketcap 
@@ -245,13 +247,15 @@ module.exports = {
         let economics = {
         }
         try {
-            const supply = await GetCasperlabsSupply();
             const url = await GetNetWorkRPC();
             const auction_info = await RequestRPC(url, RpcApiName.get_auction_info, []);
             const auction_state = auction_info.result.auction_state;
             economics.block_height = auction_state.block_height;
-            economics.total_supply = supply.data.total.toString() + "000000000";
-            economics.circulating_supply = supply.data.circulating.toString() + "000000000";
+            const supply = await GetTokenMetrics();
+            if(supply) {
+                economics.total_supply = supply.total_supply + "000000000";
+                economics.circulating_supply = supply.circulating_supply + "000000000";
+            }
 
             // calculate APY
             const apy = await GetAPY(url);

@@ -8,9 +8,12 @@ const { GetTotalRewardByPublicKey, GetLatestEra, GetTotalRewardByEra,
 const { GetValidator } = require("../models/validator");
 const request = require('request');
 
-const GetCasperlabsSupply = async () => {
+/*
+    Get token metrics from coingecko
+*/
+const GetTokenMetrics = async () => {
     let options = {
-        url: process.env.TOKEN_METRICS_URL,
+        url: "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=casper-network&order=market_cap_desc&per_page=1&page=1&sparkline=false",
         method: "get",
         headers:
         {
@@ -22,7 +25,17 @@ const GetCasperlabsSupply = async () => {
             if (error) {
                 reject(error);
             } else {
-                resolve(JSON.parse(body));
+                if (body.length > 0) {
+                    let result = JSON.parse(body);
+                    console.log(result);
+                    result = result[0];
+                    resolve({
+                        circulating_supply: result.circulating_supply,
+                        total_supply: result.total_supply,
+                    });
+                } else {
+                    resolve(null);
+                }
             }
         });
     })
@@ -143,9 +156,11 @@ const GetValidators = async (number_of_validator) => {
         result.block_height = auction_state.block_height;
 
         //circle supply
-        let supply = await GetCasperlabsSupply();
-        result.circulating_supply = supply.data.circulating + "000000000";
-        result.total_supply = supply.data.total + "000000000";
+        let supply = await GetTokenMetrics();
+        if (supply) {
+            result.circulating_supply = supply.circulating_supply + "000000000";
+            result.total_supply = supply.total_supply + "000000000";
+        }
 
         // total_supply
 
@@ -371,6 +386,6 @@ module.exports = {
     GetValidators, GetEraValidators, GetBids,
     GetValidatorData, GetAPY,
     GetTotalStake, GetValidatorInformation,
-    GetCasperlabsSupply
+    GetTokenMetrics
 }
 
