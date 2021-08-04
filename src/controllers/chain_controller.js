@@ -196,7 +196,7 @@ module.exports = {
         delete data[i]["state_root_hash"];
         delete data[i]["validator"];
 
-        const deploys = await GetDeploysInBlock(data[i].height);
+        const deploys = await GetDeploysInBlock(url, data[i].height);
         const transfers = await GetTransfersInBlock(url, data[i].height);
         data[i]["deploys"] = deploys.deploy_hashes.length + deploys.transfer_hashes.length;
         data[i]["transfers"] = transfers.transfers.length;

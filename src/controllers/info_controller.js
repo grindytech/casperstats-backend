@@ -1,4 +1,4 @@
-const { GetDeploy, GetType, GetTransfersVolume } = require('../utils/chain');
+const { GetDeploy, GetType, GetTransfersVolume, GetPendingDeploy } = require('../utils/chain');
 
 const { RpcApiName, ELEMENT_TYPE } = require('../utils/constant');
 const { Execute, RequestRPC, GetNetWorkRPC } = require('../utils/common');
@@ -32,6 +32,17 @@ module.exports = {
             res.json(value);
         }).catch(err => {
             console.log(err);
+            res.send(err)
+        })
+    },
+
+    GetPendingDeploy: async function (req, res) {
+        let hex = req.params.hex; // Hex-encoded deploy hash
+        const url = await GetNetWorkRPC();
+        GetPendingDeploy(url, hex).then(value => {
+            res.status(200);
+            res.json(value);
+        }).catch(err => {
             res.send(err)
         })
     },

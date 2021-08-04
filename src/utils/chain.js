@@ -121,16 +121,24 @@ const GetBlock = async (url, block) => {
 }
 
 
-const GetDeploysInBlock = async (block) => {
-    const rpc_url = await GetNetWorkRPC();
+const GetDeploysInBlock = async (url, block) => {
     return new Promise((resolve, reject) => {
-
-        let command = `${process.env.CASPER_CLIENT} list-deploys --node-address ${rpc_url}`;
-
+        let command = `${process.env.CASPER_CLIENT} list-deploys --node-address ${url}`;
         if (block) {
             command = command + ` -b ${block}`;
         }
 
+        Execute(command).then(value => {
+            resolve(value);
+        }).catch(err => {
+            reject(err);
+        })
+    })
+}
+
+const GetPendingDeploy = async (url, hex) => {
+    return new Promise((resolve, reject) => {
+        let command = `${process.env.CASPER_CLIENT} get-deploy --node-address ${url} ${hex}`;
         Execute(command).then(value => {
             resolve(value);
         }).catch(err => {
@@ -352,5 +360,5 @@ module.exports = {
     GetDeploy, GetTransfersFromDeploy,
     GetTransferDetail, GetBlock,
     GetTransfersInBlock, GetType, GetDeploysInBlock,
-    GetTransfersVolume
+    GetTransfersVolume, GetPendingDeploy
 }
