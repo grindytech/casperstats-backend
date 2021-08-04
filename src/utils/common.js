@@ -27,7 +27,8 @@ async function GetAccountHash(address) {
                 reject(stderr);
                 return;
             }
-            const result = String(stdout).replace(/\n/g, '');
+            let result = String(stdout).replace(/\n/g, '');
+            result = result.replace("account-hash-", "");
             return resolve(result);
         });
 
