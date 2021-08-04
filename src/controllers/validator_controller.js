@@ -91,7 +91,7 @@ module.exports = {
             }
 
             if (website != undefined) {
-
+                update_status = await validator_db.UpdateWebsite(public_key, website);
             }
 
             if (details != undefined) {

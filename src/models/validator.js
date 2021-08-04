@@ -119,6 +119,18 @@ async function UpdateEmail(public_key, email) {
     })
 }
 
+async function UpdateWebsite(public_key, website) {
+    return new Promise((resolve, reject) => {
+        var sql = `UPDATE validator SET website = '${website}' WHERE public_key = '${public_key}'`;
+        validator_pool.query(sql, function (err, result) {
+            if (err) {
+                reject(err);
+            }
+            resolve(result);
+        });
+    })
+}
+
 async function UpdateLinks(public_key, links) {
     return new Promise((resolve, reject) => {
         var sql = `UPDATE validator SET links = '${links}' WHERE public_key = '${public_key}'`;
@@ -135,5 +147,5 @@ module.exports = {
     CreateValidatorTable, InsertValidator, GetValidator,
     DropValidator, DeleteValidator, GetValidatorByName,
     GetValidatorsWithNameAndPublicKey, UpdateEmail,
-    UpdateName, UpdateLinks
+    UpdateName, UpdateLinks, UpdateWebsite
 }
