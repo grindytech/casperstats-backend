@@ -189,7 +189,7 @@ async function GetNetworkStatus(URL) {
     return new Promise((resolve, reject) => {
         const body = JSON.stringify({ "jsonrpc": "2.0", "id": 1,"method": RpcApiName.get_status, "params": [] });
         let options = {
-            url: URL + "/rpc",
+            url: URL,
             method: "post",
             headers:
             {

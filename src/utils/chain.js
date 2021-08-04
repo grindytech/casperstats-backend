@@ -38,35 +38,25 @@ const GetTotalDeployCost = async (execution_results) => {
     return total_cost;
 }
 
-const GetDeploy = async (url, deployhash) => {
-
-    let params = [deployhash];
-    let deploy_data = await RequestRPC(url, RpcApiName.get_deploy, params);
-    if (deploy_data.error) {
-        throw deploy_data.error;
-    }
+const GetDeploy = async (url, hex) => {
+    let deploy_data = await GetDeployByRPC(url, hex);
     const result = deploy_data.result;
-
     // add more common information to header
-    {
+    if (result.execution_results) {
         let first_block_hash = result.execution_results[0].block_hash;
         const first_block_height = await GetBlockHeightByBlock(url, first_block_hash);
         let total_cost = await GetTotalDeployCost(result.execution_results);
-        let to = "unknown";
 
         result.deploy.header["block_hash"] = first_block_hash;
         result.deploy.header["block_height"] = first_block_height;
-        result.deploy.header["to"] = to;
         result.deploy.header["cost"] = total_cost.toString();
+        // add type
+        if (result.deploy.session.Transfer) {
+            result.deploy.header["type"] = "transfer";
+        } else {
+            result.deploy.header["type"] = "deploy";
+        }
     }
-
-    // add type
-    if (result.deploy.session.Transfer) {
-        result.deploy.header["type"] = "transfer";
-    } else {
-        result.deploy.header["type"] = "deploy";
-    }
-
     return result;
 }
 
@@ -136,7 +126,7 @@ const GetDeploysInBlock = async (url, block) => {
     })
 }
 
-const GetPendingDeploy = async (url, hex) => {
+const GetDeployByRPC = async (url, hex) => {
     return new Promise((resolve, reject) => {
         let command = `${process.env.CASPER_CLIENT} get-deploy --node-address ${url} ${hex}`;
         Execute(command).then(value => {
@@ -360,5 +350,5 @@ module.exports = {
     GetDeploy, GetTransfersFromDeploy,
     GetTransferDetail, GetBlock,
     GetTransfersInBlock, GetType, GetDeploysInBlock,
-    GetTransfersVolume, GetPendingDeploy
+    GetTransfersVolume
 }
