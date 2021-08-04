@@ -42,7 +42,7 @@ const GetDeploy = async (url, hex) => {
     let deploy_data = await GetDeployByRPC(url, hex);
     const result = deploy_data.result;
     // add more common information to header
-    if (result.execution_results) {
+    if (result.execution_results.length > 0) {
         let first_block_hash = result.execution_results[0].block_hash;
         const first_block_height = await GetBlockHeightByBlock(url, first_block_hash);
         let total_cost = await GetTotalDeployCost(result.execution_results);
