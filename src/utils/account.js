@@ -38,12 +38,12 @@ async function GetAccountData(address) {
 async function GetRichest(start, count) {
 
     let result = [];
+    const url = await common.GetNetWorkRPC();
     {
         // get all accounts
         const accounts = await GetAccounts();
         let stakers = []; // stake order
         {
-            const url = await common.GetNetWorkRPC();
             // get all staking accounts
             const auction_info = (await common.RequestRPC(url, RpcApiName.get_auction_info, [])).result;
 
@@ -108,8 +108,9 @@ async function GetRichest(start, count) {
         return math.compare(second_balance, first_balance);
     })
 
-    result = result.slice(start, start + count);
-    // add more information
+    result = result.slice(Number(start), Number(start) + Number(count));
+
+    // add more information for genesis account
     {
         for (let i = 0; i < result.length; i++) {
             if (result[i].account_hash == undefined) {
@@ -117,7 +118,7 @@ async function GetRichest(start, count) {
 
                 result[i].balance = result[i].staked_amount;
                 result[i].active_date = "";
-                result[i].transferrable = "0";
+                result[i].transferrable =  (await common.GetBalanceByAccountHash(url, "account-hash-" + result[i].account_hash)).balance_value;
             }
         }
     }
