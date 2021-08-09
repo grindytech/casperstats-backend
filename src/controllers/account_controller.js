@@ -27,7 +27,6 @@ module.exports = {
     let account = req.params.account;
     try {
       const url = await GetNetWorkRPC();
-
       // modify param
       {
         account = account.replace("/\n/g", '');
@@ -36,26 +35,18 @@ module.exports = {
 
       let account_data = await GetHolder(account);
       if (account_data.length == 1) {
-        // from database
         account_data = account_data[0];
       } else {
-        // from ledger
         account_data = await GetAccountData(account);
       }
-      // add more data
-      // BALANCE
-      {
-        try {
-          account_data.balance = (await GetBalanceByAccountHash(url, "account-hash-" + account_data.account_hash)).balance_value;
-        } catch (err) {
-          account_data.balance = 0;
-        }
-      }
 
-      // Available
       let transferrable = 0;
       {
-        transferrable = account_data.balance;
+        try {
+          transferrable = (await GetBalanceByAccountHash(url, "account-hash-" + account_data.account_hash)).balance_value;
+        } catch (err) {
+          transferrable = 0;
+        }
       }
 
       // Total staked
@@ -73,7 +64,6 @@ module.exports = {
               if (delegators) {
                 for (let j = 0; j < delegators.length; j++) {
                   if (delegators[j].public_key == account_data.public_key_hex) {
-                    console.log(account_data.public_key_hex);
                     total_staked = math.add(total_staked, math.bignumber(delegators[j].staked_amount));
                   }
                 }
@@ -86,18 +76,18 @@ module.exports = {
       }
 
       // Undonding
-      let unbonding = 0;
-      try {
-        const result = await GetUndelegating(account);
-        const the_date = new Date();
-        for (let i = 0; i < result.length; i++) {
-          if (result[i].release_timestamp > the_date.getTime()) {
-            unbonding += Number(result[i].amount);
-          }
-        }
-      } catch (err) {
-        unbonding = 0;
-      }
+      // let unbonding = 0;
+      // try {
+      //   const result = await GetUndelegating(account);
+      //   const the_date = new Date();
+      //   for (let i = 0; i < result.length; i++) {
+      //     if (result[i].release_timestamp > the_date.getTime()) {
+      //       unbonding += Number(result[i].amount);
+      //     }
+      //   }
+      // } catch (err) {
+      //   unbonding = 0;
+      // }
 
       // Total reward
       let total_reward = 0;
@@ -115,9 +105,8 @@ module.exports = {
       account_data.balance = (Number(transferrable) + Number(total_staked)).toString();
       account_data.transferrable = transferrable.toString();
       account_data.total_staked = total_staked.toString();
-      account_data.unbonding = unbonding.toString();
+      account_data.unbonding = "comming soon";
       account_data.total_reward = total_reward.toString();
-
       res.json(account_data);
     } catch (err) {
       console.log(err)
@@ -373,11 +362,19 @@ module.exports = {
 
   GetStaking: async function (req, res) {
     const account = req.query.account;
+    const start = req.query.start;
+    const count = req.query.count;
     let public_key = account;
+    // get publickey from account hash
     {
-      const public_key_hex = await GetPublicKeyByAccountHash(account);
-      if (public_key_hex != null) {
-        public_key = public_key_hex.public_key_hex;
+      try {
+        account = account.replace('account-hash-', '');
+        const public_key_hex = await GetPublicKeyByAccountHash(account);
+        if (public_key_hex != null) {
+          public_key = public_key_hex.public_key_hex;
+        }
+      } catch (err) {
+        public_key = account;
       }
     }
     try {

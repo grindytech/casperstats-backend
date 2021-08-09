@@ -11,7 +11,6 @@ const { GetValidatorInformation } = require("./validator");
 
 
 async function GetAccountData(address) {
-
     let account_hash = "";
     let public_key = null;
     if (address.includes('account-hash-')) { // account hash
