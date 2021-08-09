@@ -185,6 +185,14 @@ const GetHeight = async (url) => {
     return height;
 }
 
+const GetEra = async (url) => {
+    let params = [{}];
+    let block_data = await RequestRPC(url, RpcApiName.get_block, params);
+    let era_id = block_data.result.block.header.era_id;
+    return era_id;
+}
+
+
 async function GetNetworkStatus(URL) {
     return new Promise((resolve, reject) => {
         const body = JSON.stringify({ "jsonrpc": "2.0", "id": 1,"method": RpcApiName.get_status, "params": [] });
@@ -241,6 +249,7 @@ module.exports = {
     GetAccountData, GetHeight, QueryState,
     GetLatestStateRootHash, Execute, GetBalance,
     GetAccountHash, RequestRPC, GetBalanceByAccountHash,
-    db_config, GetBalanceByState, GetNetWorkRPC, auth
+    db_config, GetBalanceByState, GetNetWorkRPC, auth,
+    GetEra
 }
 

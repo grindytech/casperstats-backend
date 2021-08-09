@@ -118,7 +118,7 @@ async function GetRichest(start, count) {
 
                 result[i].balance = result[i].staked_amount;
                 result[i].active_date = "";
-                result[i].transferrable =  (await common.GetBalanceByAccountHash(url, "account-hash-" + result[i].account_hash)).balance_value;
+                result[i].transferrable = (await common.GetBalanceByAccountHash(url, "account-hash-" + result[i].account_hash)).balance_value;
             }
         }
     }
@@ -259,20 +259,30 @@ async function GetUndelegating(account) {
                 // timestamp
                 value.timestamp = deploy_data.result.deploy.header.timestamp;
                 // calculate exact time receive token
-                let release_timestamp = null;
-                if (status) {
-                    const era = await GetEraByBlockHash(deploy_data.result.execution_results[0].block_hash.toString());
-                    if (era) {
-                        let era_timestamp = (await GetTimestampByEra(era)).timestamp;
-                        if (era_timestamp == null) {
-                            era_timestamp = (await GetTimestampByEra(Number(era) - 1)).timestamp;
-                            release_timestamp = Number(new Date(era_timestamp).getTime()) + 3600000 * 14;
-                        } else {
-                            release_timestamp = Number(new Date(era_timestamp).getTime()) + 3600000 * 16;
+                {
+                    let release_timestamp = null;
+                    let undelegate_era;
+                    if (status) {
+                        undelegate_era = await GetEraByBlockHash(deploy_data.result.execution_results[0].block_hash.toString());
+                        if (undelegate_era) {
+                            let era_timestamp = (await GetTimestampByEra(undelegate_era)).timestamp;
+                            if (era_timestamp == null) {
+                                era_timestamp = (await GetTimestampByEra(Number(undelegate_era) - 1)).timestamp;
+                                release_timestamp = Number(new Date(era_timestamp).getTime()) + 3600000 * 14;
+                            } else {
+                                release_timestamp = Number(new Date(era_timestamp).getTime()) + 3600000 * 16;
+                            }
                         }
                     }
+                    value.release_timestamp = release_timestamp;
+                    const current_era = await common.GetEra(url);
+                    if(current_era >= undelegate_era + 8) {
+                        value.is_release = true;
+                    } else {
+                        value.is_release = false;
+                    }
                 }
-                value.release_timestamp = release_timestamp;
+
                 value.status = status;
                 try {
                     const validator_info = await GetValidatorInformation(value.validator);
