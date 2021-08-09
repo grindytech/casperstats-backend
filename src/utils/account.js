@@ -261,9 +261,8 @@ async function GetUndelegating(account) {
                 // calculate exact time receive token
                 {
                     let release_timestamp = null;
-                    let undelegate_era;
                     if (status) {
-                        undelegate_era = await GetEraByBlockHash(deploy_data.result.execution_results[0].block_hash.toString());
+                        const undelegate_era = await GetEraByBlockHash(deploy_data.result.execution_results[0].block_hash.toString());
                         if (undelegate_era) {
                             let era_timestamp = (await GetTimestampByEra(undelegate_era)).timestamp;
                             if (era_timestamp == null) {
@@ -273,14 +272,13 @@ async function GetUndelegating(account) {
                                 release_timestamp = Number(new Date(era_timestamp).getTime()) + 3600000 * 16;
                             }
                         }
+
+                        const current_era = await common.GetEra(url);
+                        if (current_era >= undelegate_era + 8) {
+                            value.is_release = true;
+                        }
                     }
                     value.release_timestamp = release_timestamp;
-                    const current_era = await common.GetEra(url);
-                    if(current_era >= undelegate_era + 8) {
-                        value.is_release = true;
-                    } else {
-                        value.is_release = false;
-                    }
                 }
 
                 value.status = status;
