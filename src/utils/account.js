@@ -276,6 +276,8 @@ async function GetUndelegating(account) {
                         const current_era = await common.GetEra(url);
                         if (current_era >= undelegate_era + 8) {
                             value.is_release = true;
+                        } else {
+                            value.is_release = false;
                         }
                     }
                     value.release_timestamp = release_timestamp;
