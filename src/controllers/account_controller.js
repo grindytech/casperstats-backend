@@ -352,8 +352,8 @@ module.exports = {
         {
           const validator_info = await GetValidatorInformation(withdraw[i].validator_public_key);
           if (validator_info != null) {
-            withdraw[i].validator_name = validator_info.validator_name;
-            withdraw[i].validator_icon = validator_info.validator_icon;
+            withdraw[i].validator_name = validator_info.name;
+            withdraw[i].validator_icon = validator_info.icon;
           }
         }
       }
