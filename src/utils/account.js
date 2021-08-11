@@ -139,6 +139,8 @@ async function GetDelegating(account) {
             // incase undelegate
             try {
                 const storedContractByHash = deploy_data.result.deploy.session.StoredContractByHash;
+                let timestamp = deploy_data.result.deploy.header.timestamp;
+                timestamp = (new Date(timestamp)).getTime();
                 if (storedContractByHash.entry_point == "delegate") {
                     const args = storedContractByHash.args;
                     const delegator = args.filter(value => {
@@ -153,7 +155,8 @@ async function GetDelegating(account) {
                     value = {
                         delegator,
                         validator,
-                        amount
+                        amount,
+                        timestamp
                     };
                 }
             } catch (err) { }
@@ -205,7 +208,7 @@ async function GetUndelegating(url, public_key) {
     if (withdraw_data == undefined || withdraw_data.length == 0)
         return [];
 
-    return withdraw_data;
+    return withdraw_data.reverse();
 }
 
 module.exports = {
