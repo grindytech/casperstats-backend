@@ -332,17 +332,30 @@ module.exports = {
       const withdraw = await GetUndelegating(url, public_key);
       const current_era = await GetEra(url);
       for (let i = 0; i < withdraw.length; i++) {
-        const era_of_releasing = Number(withdraw[i].era_of_creation) + 8;
-        withdraw[i].era_of_releasing = era_of_releasing;
-        const time_of_creation = (await GetTimestampByEra(withdraw[i].era_of_creation)).timestamp;
-        if (time_of_creation) {
-          const creation_date = new Date(time_of_creation)
-          withdraw[i].time_of_creation = creation_date.getTime();
-          const time_of_releasing = Number(withdraw[i].time_of_creation) + 480000;
-          withdraw[i].time_of_releasing = time_of_releasing;
+        delete withdraw[i].bonding_purse;
+        // Add release information
+        {
+          const era_of_releasing = Number(withdraw[i].era_of_creation) + 8;
+          withdraw[i].era_of_releasing = era_of_releasing;
+          const time_of_creation = (await GetTimestampByEra(withdraw[i].era_of_creation)).timestamp;
+          if (time_of_creation) {
+            const creation_date = new Date(time_of_creation)
+            withdraw[i].time_of_creation = creation_date.getTime();
+            const time_of_releasing = Number(withdraw[i].time_of_creation) + 480000;
+            withdraw[i].time_of_releasing = time_of_releasing;
+          }
+          const is_release = current_era >= era_of_releasing ? true : false;
+          withdraw[i].is_release = is_release;
         }
-        const is_release = current_era >= era_of_releasing ? true : false;
-        withdraw[i].is_release = is_release;
+
+        // Add validator information
+        {
+          const validator_info = await GetValidatorInformation(withdraw[i].validator_public_key);
+          if (validator_info != null) {
+            withdraw[i].validator_name = validator_info.validator_name;
+            withdraw[i].validator_icon = validator_info.validator_icon;
+          }
+        }
       }
 
       res.status(200).json(withdraw);
