@@ -101,7 +101,7 @@ module.exports = {
       account_data.balance = (Number(transferrable) + Number(total_staked)).toString();
       account_data.transferrable = transferrable.toString();
       account_data.total_staked = total_staked.toString();
-      account_data.unbonding = "comming soon";
+      account_data.unbonding = unbonding.toString();
       account_data.total_reward = total_reward.toString();
       res.json(account_data);
     } catch (err) {
@@ -331,18 +331,17 @@ module.exports = {
       const url = await GetNetWorkRPC();
       const withdraw = await GetUndelegating(url, public_key);
       const current_era = await GetEra(url);
-
-      for(let i =0; i<withdraw.length; i++) {
-        const time_of_creation = await GetTimestampByEra(withdraw[i].era_of_creation);
-        withdraw.time_of_creation = (new Date(time_of_creation)).getTime();
-
+      for (let i = 0; i < withdraw.length; i++) {
         const era_of_releasing = Number(withdraw[i].era_of_creation) + 8;
         withdraw[i].era_of_releasing = era_of_releasing;
-
-        const time_of_releasing = Number(withdraw[i].time_of_creation) + 480000;
-        withdraw[i].time_of_releasing = time_of_releasing;
-
-        const is_release = current_era >= era_of_releasing? true: false;
+        const time_of_creation = (await GetTimestampByEra(withdraw[i].era_of_creation)).timestamp;
+        if (time_of_creation) {
+          const creation_date = new Date(time_of_creation)
+          withdraw[i].time_of_creation = creation_date.getTime();
+          const time_of_releasing = Number(withdraw[i].time_of_creation) + 480000;
+          withdraw[i].time_of_releasing = time_of_releasing;
+        }
+        const is_release = current_era >= era_of_releasing ? true : false;
         withdraw[i].is_release = is_release;
       }
 
