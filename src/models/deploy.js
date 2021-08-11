@@ -36,4 +36,17 @@ async function GetAllDeployByPublicKey(public_key) {
     })
 }
 
-module.exports = { GetDeploysByPublicKey, GetAllDeployByPublicKey}
+async function GetDeployOfPublicKeyByType(public_key, type, start, count) {
+    return new Promise((resolve, reject) => {
+
+        var sql = `SELECT * FROM deploy WHERE public_key = '${public_key}' AND type = '${type}' ORDER BY timestamp DESC LIMIT ${start}, ${count}`;
+        pool.query(sql, function (err, result) {
+            if (err) {
+                reject(err);
+            }
+            resolve(result);
+        });
+    })
+}
+
+module.exports = { GetDeploysByPublicKey, GetAllDeployByPublicKey, GetDeployOfPublicKeyByType }

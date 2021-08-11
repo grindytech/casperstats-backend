@@ -5,7 +5,7 @@ const common = require('./common');
 const { GetTotalRewardByPublicKey, GetTimestampByEra } = require("../models/era");
 const { GetAccounts } = require("../models/account");
 const math = require('mathjs');
-const { GetAllDeployByPublicKey } = require("../models/deploy");
+const { GetAllDeployByPublicKey, GetDeployOfPublicKeyByType } = require("../models/deploy");
 const { GetEraByBlockHash } = require("../models/block_model");
 const { GetValidatorInformation } = require("./validator");
 
@@ -185,34 +185,9 @@ async function GetDelegating(account) {
     return result;
 }
 
-async function GetUndelegating(url, public_key) {
-    // get all deploy
-    const deploys = await GetAllDeployByPublicKey(public_key);
-    // get latest undelegating deploy
-    let withdraw_data = undefined;
-    for (let i = 0; i < deploys.length; i++) {
-        let params = [deploys[i].deploy_hash];
-        let deploy_data = await common.RequestRPC(url, RpcApiName.get_deploy, params);
-        try {
-            if (deploy_data.result.deploy.session.StoredContractByHash.entry_point == "undelegate") {
-                const transforms = deploy_data.result.execution_results[0].result.Success.effect.transforms;
-                const transform = transforms.filter(value => {
-                    return value.key == "withdraw-6ee862e976a99eed1c517bbf7f0d3e97f988f1cf12f3b8e347c033ac9ff745d2";
-                });
-                withdraw_data = transform[0].transform.WriteWithdraw;
-                break;
-            }
-        } catch (err) {}
-    }
-
-    if (withdraw_data == undefined || withdraw_data.length == 0)
-        return [];
-
-    return withdraw_data.reverse();
-}
 
 module.exports = {
     GetAccountData, GetRichest,
-    GetDelegating, GetUndelegating
+    GetDelegating
 }
 

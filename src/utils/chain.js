@@ -38,6 +38,28 @@ const GetTotalDeployCost = async (execution_results) => {
     return total_cost;
 }
 
+async function get_deploy_type(deploy_data) {
+    const type = "unknown";
+    {
+        // undelegate
+        try {
+            const transfer = await deploy_data.deploy.session.Transfer;
+            if (transfer) {
+                return "transfer";
+            }
+        } catch (err) {
+        }
+        try {
+            const entry_point = await deploy_data.deploy.session.StoredContractByHash.entry_point;
+            if (entry_point) {
+                return entry_point;
+            }
+        } catch (err) {
+        }
+    }
+    return type;
+}
+
 const GetDeploy = async (url, hex) => {
     let deploy_data = await GetDeployByRPC(url, hex);
     const result = deploy_data.result;
@@ -51,11 +73,8 @@ const GetDeploy = async (url, hex) => {
         result.deploy.header["block_height"] = first_block_height;
         result.deploy.header["cost"] = total_cost.toString();
         // add type
-        if (result.deploy.session.Transfer) {
-            result.deploy.header["type"] = "transfer";
-        } else {
-            result.deploy.header["type"] = "deploy";
-        }
+        const type = get_deploy_type(deploy_data.result);
+        result.deploy.header["type"] = type;
     }
     return result;
 }
@@ -350,5 +369,5 @@ module.exports = {
     GetDeploy, GetTransfersFromDeploy,
     GetTransferDetail, GetBlock,
     GetTransfersInBlock, GetType, GetDeploysInBlock,
-    GetTransfersVolume
+    GetTransfersVolume, GetDeployByRPC
 }

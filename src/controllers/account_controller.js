@@ -4,17 +4,19 @@ const math = require('mathjs');
 require('dotenv').config();
 const { GetHolder, GetTotalNumberOfAccount, GetPublicKeyByAccountHash } = require('../models/account');
 const { GetTransfersByAccountHash } = require('../models/transfer');
-const { GetDeploysByPublicKey } = require('../models/deploy');
-const { GetAccountHash, RequestRPC, GetBalanceByAccountHash, GetNetWorkRPC, GetBalance, GetEra } = require('../utils/common');
+const { GetDeploysByPublicKey, GetDeployOfPublicKeyByType } = require('../models/deploy');
+const { GetAccountHash, RequestRPC, GetBalanceByAccountHash, GetNetWorkRPC, GetEra } = require('../utils/common');
 const { GetRewardByPublicKey, GetPublicKeyRewardByDate, GetLatestEra,
   GetPublicKeyRewardByEra, GetTimestampByEra, GetLatestEraByDate,
   GetEraValidatorOfPublicKey,
   GetLatestTimestampByPublicKey } = require('../models/era');
+const { GetValidatorInformation } = require('../utils/validator');
+const { GetDeployByRPC } = require('../utils/chain');
 
 require('dotenv').config();
 
 const NodeCache = require("node-cache");
-const { GetValidatorInformation } = require('../utils/validator');
+const { GetEraByBlockHash } = require('../models/block_model');
 const get_rich_accounts_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_RICH_ACCOUNTS || 60 });
 
 module.exports = {
@@ -71,20 +73,6 @@ module.exports = {
       } catch (err) {
         total_staked = math.bignumber("0");
       }
-
-      let unbonding = 0;
-      try {
-        const current_era = await GetEra(url);
-        const withdraw = await GetUndelegating(url, account_data.public_key_hex);
-        for (let i = 0; i < withdraw.length; i++) {
-          if (Number(withdraw[i].era_of_creation) + 8 < Number(current_era)) {
-            unbonding += Number(withdraw[i].amount);
-          }
-        }
-      } catch (err) {
-        unbonding = 0;
-      }
-
       // Total reward
       let total_reward = 0;
       try {
@@ -97,11 +85,9 @@ module.exports = {
       } catch (err) {
         total_reward = 0;
       }
-
       account_data.balance = (Number(transferrable) + Number(total_staked)).toString();
       account_data.transferrable = transferrable.toString();
       account_data.total_staked = total_staked.toString();
-      account_data.unbonding = unbonding.toString();
       account_data.total_reward = total_reward.toString();
       res.json(account_data);
     } catch (err) {
@@ -320,6 +306,8 @@ module.exports = {
 
   GetUndelegate: async function (req, res) {
     const account = req.query.account;
+    const start = req.query.start;
+    const count = req.query.count;
     let public_key = account;
     {
       const public_key_hex = await GetPublicKeyByAccountHash(account);
@@ -329,36 +317,53 @@ module.exports = {
     }
     try {
       const url = await GetNetWorkRPC();
-      const withdraw = await GetUndelegating(url, public_key);
+      let withdraws = [];
+      const deploys = await GetDeployOfPublicKeyByType(public_key, "undelegate", start, count);
       const current_era = await GetEra(url);
-      for (let i = 0; i < withdraw.length; i++) {
-        delete withdraw[i].bonding_purse;
-        // Add release information
-        {
-          const era_of_releasing = Number(withdraw[i].era_of_creation) + 8;
-          withdraw[i].era_of_releasing = era_of_releasing;
-          const time_of_creation = (await GetTimestampByEra(withdraw[i].era_of_creation)).timestamp;
+      for (let i = 0; i < deploys.length; i++) {
+        let withdraw = {};
+        withdraw.hash = deploys[i].deploy_hash;
+        const deploy_data = await GetDeployByRPC(url, deploys[i].deploy_hash);
+        const args = deploy_data.result.deploy.session.StoredContractByHash.args;
+        withdraw.unbonder_public_key = args.find(value => {
+          return value[0] == "delegator";
+        })[1].parsed;
+        withdraw.validator_public_key = args.find(value => {
+          return value[0] == "validator";
+        })[1].parsed;
+        withdraw.amount = args.find(value => {
+          return value[0] == "amount";
+        })[1].parsed;
+
+        const status = deploys[i].status == "success" ? true : false;
+        withdraw.status = status;
+        const era_of_creation = await GetEraByBlockHash(deploys[i].hash);
+        withdraw.era_of_creation = era_of_creation;
+        if (status) {
+          const era_of_releasing = Number(era_of_creation) + 8;
+          withdraw.era_of_releasing = era_of_releasing;
+
+          const time_of_creation = (await GetTimestampByEra(era_of_creation)).timestamp;
           if (time_of_creation) {
             const creation_date = new Date(time_of_creation)
-            withdraw[i].time_of_creation = creation_date.getTime();
-            const time_of_releasing = Number(withdraw[i].time_of_creation) + 480000;
-            withdraw[i].time_of_releasing = time_of_releasing;
+            withdraw.time_of_creation = creation_date.getTime();
+            const time_of_releasing = Number(withdraw.time_of_creation) + 480000;
+            withdraw.time_of_releasing = time_of_releasing;
           }
           const is_release = current_era >= era_of_releasing ? true : false;
-          withdraw[i].is_release = is_release;
+          withdraw.is_release = is_release;
         }
 
-        // Add validator information
-        {
-          const validator_info = await GetValidatorInformation(withdraw[i].validator_public_key);
+        try {
+          const validator_info = await GetValidatorInformation(withdraw.validator_public_key);
           if (validator_info != null) {
-            withdraw[i].validator_name = validator_info.name;
-            withdraw[i].validator_icon = validator_info.icon;
+            withdraw.validator_name = validator_info.name;
+            withdraw.validator_icon = validator_info.icon;
           }
-        }
+        } catch (err) { }
+        withdraws.push(withdraw);
       }
-
-      res.status(200).json(withdraw);
+      res.status(200).json(withdraws);
     } catch (err) {
       console.log(err);
       res.send(err);
@@ -367,6 +372,8 @@ module.exports = {
 
   GetDelegate: async function (req, res) {
     const account = req.query.account;
+    const start = req.query.start;
+    const count = req.query.count;
     let public_key = account;
     {
       const public_key_hex = await GetPublicKeyByAccountHash(account);
@@ -375,9 +382,36 @@ module.exports = {
       }
     }
     try {
-      const result = await GetDelegating(public_key);
-      res.status(200);
-      res.json(result);
+      const url = await GetNetWorkRPC();
+      let withdraws = [];
+      const deploys = await GetDeployOfPublicKeyByType(public_key, "delegate", start, count);
+      for (let i = 0; i < deploys.length; i++) {
+        let withdraw = {};
+        withdraw.hash = deploys[i].deploy_hash;
+        const deploy_data = await GetDeployByRPC(url, deploys[i].deploy_hash);
+        const args = deploy_data.result.deploy.session.StoredContractByHash.args;
+        withdraw.unbonder_public_key = args.find(value => {
+          return value[0] == "delegator";
+        })[1].parsed;
+        withdraw.validator_public_key = args.find(value => {
+          return value[0] == "validator";
+        })[1].parsed;
+        withdraw.amount = args.find(value => {
+          return value[0] == "amount";
+        })[1].parsed;
+        const status = deploys[i].status == "success" ? true : false;
+        withdraw.status = status;
+        withdraw.timestamp = (new Date(deploy_data.result.deploy.header.timestamp)).getTime();
+        try {
+          const validator_info = await GetValidatorInformation(withdraw.validator_public_key);
+          if (validator_info != null) {
+            withdraw.validator_name = validator_info.name;
+            withdraw.validator_icon = validator_info.icon;
+          }
+        } catch (err) { }
+        withdraws.push(withdraw);
+      }
+      res.status(200).json(withdraws);
     } catch (err) {
       console.log(err);
       res.send(err);
