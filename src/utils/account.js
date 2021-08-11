@@ -182,120 +182,30 @@ async function GetDelegating(account) {
     return result;
 }
 
-async function GetUndelegating(account) {
+async function GetUndelegating(url, public_key) {
     // get all deploy
-    const deploys = await GetAllDeployByPublicKey(account);
-
-    let result = [];
-    {
-        const url = await common.GetNetWorkRPC();
-        for (let i = 0; i < deploys.length; i++) {
-            let params = [deploys[i].deploy_hash];
-            let deploy_data = await common.RequestRPC(url, RpcApiName.get_deploy, params);
-            let value = undefined;
-
-            // incase undelegate
-            try {
-                const storedContractByHash = deploy_data.result.deploy.session.StoredContractByHash;
-                if (storedContractByHash.entry_point == "undelegate") {
-                    const args = storedContractByHash.args;
-
-                    const delegator = args.filter(value => {
-                        return value[0].toString() == "delegator";
-                    })[0][1].parsed;
-
-                    const validator = args.filter(value => {
-                        return value[0].toString() == "validator";
-                    })[0][1].parsed;
-
-                    const amount = args.filter(value => {
-                        return value[0].toString() == "amount";
-                    })[0][1].parsed;
-
-                    value = {
-                        delegator,
-                        validator,
-                        amount
-                    };
-                }
-            } catch (err) { }
-
-            // incase unbonding for validator
-            try {
-                const args = deploy_data.result.deploy.session.ModuleBytes.args;
-
-                const if_unbond = args.filter(value => {
-                    return value[0].toString() == "unbond_purse";
+    const deploys = await GetAllDeployByPublicKey(public_key);
+    // get latest undelegating deploy
+    let withdraw_data = undefined;
+    for (let i = 0; i < deploys.length; i++) {
+        let params = [deploys[i].deploy_hash];
+        let deploy_data = await common.RequestRPC(url, RpcApiName.get_deploy, params);
+        try {
+            if (deploy_data.result.deploy.session.StoredContractByHash.entry_point == "undelegate") {
+                const transforms = deploy_data.result.execution_results[0].result.Success.effect.transforms;
+                const transform = transforms.filter(value => {
+                    return value.key == "withdraw-6ee862e976a99eed1c517bbf7f0d3e97f988f1cf12f3b8e347c033ac9ff745d2";
                 });
-
-                if (if_unbond) {
-                    const delegator = args.filter(value => {
-                        return value[0].toString() == "public_key";
-                    })[0][1].parsed;
-
-                    const validator = delegator;
-
-                    const amount = args.filter(value => {
-                        return value[0].toString() == "amount";
-                    })[0][1].parsed;
-
-                    value = {
-                        delegator,
-                        validator,
-                        amount
-                    };
-                }
-
-            } catch (err) { }
-
-            if (value) {
-                // add status
-                let status = false;
-                try {
-                    if (deploy_data.result.execution_results[0].result.Success)
-                        status = true;
-                } catch (err) { }
-                // timestamp
-                value.timestamp = deploy_data.result.deploy.header.timestamp;
-                // calculate exact time receive token
-                {
-                    let release_timestamp = null;
-                    if (status) {
-                        const undelegate_era = await GetEraByBlockHash(deploy_data.result.execution_results[0].block_hash.toString());
-                        if (undelegate_era) {
-                            let era_timestamp = (await GetTimestampByEra(undelegate_era)).timestamp;
-                            if (era_timestamp == null) {
-                                era_timestamp = (await GetTimestampByEra(Number(undelegate_era) - 1)).timestamp;
-                                release_timestamp = Number(new Date(era_timestamp).getTime()) + 3600000 * 14;
-                            } else {
-                                release_timestamp = Number(new Date(era_timestamp).getTime()) + 3600000 * 16;
-                            }
-                        }
-
-                        const current_era = await common.GetEra(url);
-                        if (current_era >= undelegate_era + 8) {
-                            value.is_release = true;
-                        } else {
-                            value.is_release = false;
-                        }
-                    }
-                    value.release_timestamp = release_timestamp;
-                }
-
-                value.status = status;
-                try {
-                    const validator_info = await GetValidatorInformation(value.validator);
-                    if (validator_info != null) {
-                        value.validator_name = validator_info.name;
-                        value.validator_icon = validator_info.icon;
-                    }
-                } catch (err) { }
-                result.push(value);
+                withdraw_data = transform[0].transform.WriteWithdraw;
+                break;
             }
-        }
+        } catch (err) {}
     }
-    //parser result
-    return result;
+
+    if (withdraw_data == undefined || withdraw_data.length == 0)
+        return [];
+
+    return withdraw_data;
 }
 
 module.exports = {

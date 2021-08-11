@@ -25,7 +25,6 @@ router.route("/get-rich-accounts/").get(verifyRichAccount, account_controller.Ge
 router.route("/count-holders/").get(account_controller.CountHolders);
 router.route("/get-rewards").get(account_controller.GetRewards);
 router.route("/get-era-reward").get(account_controller.GetEraReward);
-router.route("/staking/").get(account_controller.GetStaking);
 router.route("/undelegate/").get(account_controller.GetUndelegate);
 router.route("/delegate/").get(account_controller.GetDelegate);
 router.route("/get-bids/").get(account_controller.GetBids);

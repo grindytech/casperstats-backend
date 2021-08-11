@@ -1,17 +1,14 @@
-const { Execute } = require('../utils/chain');
 const { RpcApiName } = require('../utils/constant');
 const { GetAccountData, GetRichest, GetUndelegating, GetDelegating } = require('../utils/account');
 const math = require('mathjs');
-const mysql = require('mysql');
 require('dotenv').config();
 const { GetHolder, GetTotalNumberOfAccount, GetPublicKeyByAccountHash } = require('../models/account');
 const { GetTransfersByAccountHash } = require('../models/transfer');
-const { GetDeploysByPublicKey, GetAllDeployByPublicKey } = require('../models/deploy');
-const { GetAccountHash, RequestRPC, GetBalanceByAccountHash, GetNetWorkRPC, GetBalance } = require('../utils/common');
+const { GetDeploysByPublicKey } = require('../models/deploy');
+const { GetAccountHash, RequestRPC, GetBalanceByAccountHash, GetNetWorkRPC, GetBalance, GetEra } = require('../utils/common');
 const { GetRewardByPublicKey, GetPublicKeyRewardByDate, GetLatestEra,
   GetPublicKeyRewardByEra, GetTimestampByEra, GetLatestEraByDate,
   GetEraValidatorOfPublicKey,
-  GetTotalRewardByPublicKey,
   GetLatestTimestampByPublicKey } = require('../models/era');
 
 require('dotenv').config();
@@ -75,19 +72,18 @@ module.exports = {
         total_staked = math.bignumber("0");
       }
 
-      // Undonding
-      // let unbonding = 0;
-      // try {
-      //   const result = await GetUndelegating(account);
-      //   const the_date = new Date();
-      //   for (let i = 0; i < result.length; i++) {
-      //     if (result[i].release_timestamp > the_date.getTime()) {
-      //       unbonding += Number(result[i].amount);
-      //     }
-      //   }
-      // } catch (err) {
-      //   unbonding = 0;
-      // }
+      let unbonding = 0;
+      try {
+        const current_era = await GetEra(url);
+        const withdraw = await GetUndelegating(url, account_data.public_key_hex);
+        for (let i = 0; i < withdraw.length; i++) {
+          if (Number(withdraw[i].era_of_creation) + 8 < Number(current_era)) {
+            unbonding += Number(withdraw[i].amount);
+          }
+        }
+      } catch (err) {
+        unbonding = 0;
+      }
 
       // Total reward
       let total_reward = 0;
@@ -332,9 +328,25 @@ module.exports = {
       }
     }
     try {
-      const result = await GetUndelegating(public_key);
-      res.status(200);
-      res.json(result);
+      const url = await GetNetWorkRPC();
+      const withdraw = await GetUndelegating(url, public_key);
+      const current_era = await GetEra(url);
+
+      for(let i =0; i<withdraw.length; i++) {
+        const time_of_creation = await GetTimestampByEra(withdraw[i].era_of_creation);
+        withdraw.time_of_creation = (new Date(time_of_creation)).getTime();
+
+        const era_of_releasing = Number(withdraw[i].era_of_creation) + 8;
+        withdraw[i].era_of_releasing = era_of_releasing;
+
+        const time_of_releasing = Number(withdraw[i].time_of_creation) + 480000;
+        withdraw[i].time_of_releasing = time_of_releasing;
+
+        const is_release = current_era >= era_of_releasing? true: false;
+        withdraw[i].is_release = is_release;
+      }
+
+      res.status(200).json(withdraw);
     } catch (err) {
       console.log(err);
       res.send(err);
@@ -354,37 +366,6 @@ module.exports = {
       const result = await GetDelegating(public_key);
       res.status(200);
       res.json(result);
-    } catch (err) {
-      console.log(err);
-      res.send(err);
-    }
-  },
-
-  GetStaking: async function (req, res) {
-    const account = req.query.account;
-    const start = req.query.start;
-    const count = req.query.count;
-    let public_key = account;
-    // get publickey from account hash
-    {
-      try {
-        account = account.replace('account-hash-', '');
-        const public_key_hex = await GetPublicKeyByAccountHash(account);
-        if (public_key_hex != null) {
-          public_key = public_key_hex.public_key_hex;
-        }
-      } catch (err) {
-        public_key = account;
-      }
-    }
-    try {
-      const delegate = await GetDelegating(public_key);
-      const undelegate = await GetUndelegating(public_key);
-      res.status(200);
-      res.json({
-        delegate,
-        undelegate
-      });
     } catch (err) {
       console.log(err);
       res.send(err);
