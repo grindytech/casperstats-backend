@@ -147,7 +147,7 @@ async function GetTotalDelegator(era) {
             if (err) {
                 reject(err);
             }
-            if (result && result.length > 0) {
+            if (result != undefined && result != null && result.length > 0) {
                 resolve(result[0]);
             } else {
                 resolve({ total_delegators: 0 })

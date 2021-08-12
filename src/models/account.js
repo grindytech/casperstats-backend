@@ -43,7 +43,7 @@ async function GetNumberOfAccountFromDate(date) {
                 reject(err);
             }
 
-            if (result.length == 1) {
+            if (result != undefined && result != null && result.length == 1) {
                 resolve(result[0]);
             } else {
                 resolve(0);
@@ -61,7 +61,7 @@ async function GetTotalNumberOfAccount() {
                 reject(err);
             }
 
-            if (result.length == 1) {
+            if (result != undefined && result != null &&  result.length == 1) {
                 resolve(result[0]);
             } else {
                 resolve(0);

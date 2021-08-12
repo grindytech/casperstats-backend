@@ -54,7 +54,7 @@ async function GetNumberOfTransfersByDate(from, to) {
             if (err) {
                 reject(err);
             }
-            if (result.length == 1) {
+            if (result != undefined && result != null && result.length == 1) {
                 resolve(result[0]);
             } else {
                 resolve(0);

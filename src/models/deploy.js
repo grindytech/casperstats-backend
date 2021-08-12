@@ -49,4 +49,20 @@ async function GetDeployOfPublicKeyByType(public_key, type, start, count) {
     })
 }
 
-module.exports = { GetDeploysByPublicKey, GetAllDeployByPublicKey, GetDeployOfPublicKeyByType }
+async function CountDeployByType(public_key, type) {
+    return new Promise((resolve, reject) => {
+        var sql = `SELECT COUNT(*) as total FROM deploy WHERE public_key = '${public_key}' AND type = '${type}'`;
+        pool.query(sql, function (err, result) {
+            if (err) {
+                reject(err);
+            }
+            if (result != undefined && result != null && result.length == 1) {
+                resolve(result[0]);
+            } else {
+                resolve(0);
+            }
+        });
+    })
+}
+
+module.exports = { GetDeploysByPublicKey, GetAllDeployByPublicKey, GetDeployOfPublicKeyByType, CountDeployByType }
