@@ -44,7 +44,7 @@ async function GetBlockHashByHeight(height) {
             if (err) {
                 reject(err);
             }
-            if(result.length > 0) {
+            if (result.length > 0) {
                 resolve(result[0]);
             } else {
                 resolve("");
@@ -58,8 +58,8 @@ async function GetBlockHeight() {
     return new Promise((resolve, reject) => {
         var sql = `SELECT height FROM block WHERE height = (SELECT MAX(height) FROM block)`;
         pool.query(sql, function (err, result, fields) {
-            if(err) resolve(false);
-            if(result != undefined && result.length > 0) {
+            if (err) resolve(false);
+            if (result != undefined && result.length > 0) {
                 const height = result[0].height;
                 resolve(height);
             } else {
@@ -74,8 +74,8 @@ async function GetEraByBlockHash(hash) {
     return new Promise((resolve, reject) => {
         var sql = `SELECT era FROM block WHERE hash = '${hash}'`;
         pool.query(sql, function (err, result, fields) {
-            if(err) resolve(false);
-            if(result != undefined && result.length > 0) {
+            if (err) resolve(false);
+            if (result != undefined && result.length > 0) {
                 const era = result[0].era;
                 resolve(era);
             } else {
@@ -85,5 +85,23 @@ async function GetEraByBlockHash(hash) {
     })
 }
 
-module.exports = { GetBlocksByValidator, GetSwitchBlockByDate,
-    GetBlockHashByHeight, GetBlockHeight, GetEraByBlockHash } 
+async function GetTimestampByEra(era) {
+    return new Promise((resolve, reject) => {
+        var sql = `SELECT timestamp FROM block WHERE height = (SELECT MIN(height) AS height FROM block WHERE era = ${era})`;
+        pool.query(sql, function (err, result, fields) {
+            if (err) reject(err);
+            if (result != undefined && result != null && result.length > 0) {
+                const timestamp = result[0].timestamp;
+                resolve(timestamp);
+            } else {
+                resolve(null);
+            }
+        });
+    })
+}
+
+module.exports = {
+    GetBlocksByValidator, GetSwitchBlockByDate,
+    GetBlockHashByHeight, GetBlockHeight, GetEraByBlockHash,
+    GetTimestampByEra
+}

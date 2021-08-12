@@ -2,11 +2,9 @@ const dotenv = require("dotenv");
 dotenv.config();
 const { RpcApiName } = require('./constant');
 const common = require('./common');
-const { GetTotalRewardByPublicKey, GetTimestampByEra } = require("../models/era");
 const { GetAccounts } = require("../models/account");
 const math = require('mathjs');
-const { GetAllDeployByPublicKey, GetDeployOfPublicKeyByType } = require("../models/deploy");
-const { GetEraByBlockHash } = require("../models/block_model");
+const { GetAllDeployByPublicKey } = require("../models/deploy");
 const { GetValidatorInformation } = require("./validator");
 
 

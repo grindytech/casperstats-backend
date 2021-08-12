@@ -73,7 +73,7 @@ const GetDeploy = async (url, hex) => {
         result.deploy.header["block_height"] = first_block_height;
         result.deploy.header["cost"] = total_cost.toString();
         // add type
-        const type = get_deploy_type(deploy_data.result);
+        const type = await get_deploy_type(deploy_data.result);
         result.deploy.header["type"] = type;
     }
     return result;
