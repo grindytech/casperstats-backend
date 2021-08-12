@@ -356,7 +356,7 @@ module.exports = {
           if (time_of_creation) {
             const creation_date = new Date(time_of_creation)
             withdraw.time_of_creation = creation_date.getTime();
-            const time_of_releasing = Number(withdraw.time_of_creation) + 480000;
+            const time_of_releasing = Number(withdraw.time_of_creation) + 57600000;
             withdraw.time_of_releasing = time_of_releasing;
           }
           const is_release = current_era >= era_of_releasing ? true : false;
