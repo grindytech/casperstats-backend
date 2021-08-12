@@ -172,6 +172,22 @@ async function GetTotalReward() {
     })
 }
 
+async function GetTimestampByEra(era) {
+    return new Promise((resolve, reject) => {
+        var sql = `SELECT timestamp FROM era WHERE era = '${era}' LIMIT 1`;
+        pool.query(sql, function (err, result) {
+            if (err) {
+                reject(err);
+            }
+            if (result && result.length > 0) {
+                resolve(result[0]);
+            } else {
+                resolve(0)
+            }
+        });
+    })
+}
+
 async function GetEraValidatorOfPublicKey(public_key, era) {
     return new Promise((resolve, reject) => {
         var sql = `SELECT validator FROM era WHERE ((validator = '${public_key}' AND delegator = "") OR delegator = '${public_key}') AND era = ${era}`;
@@ -209,6 +225,6 @@ module.exports = {
     GetLatestEra, GetPublicKeyTotalRewardByDate,
     GetTotalDelegator, GetTotalReward, GetRewardByPublicKey,
     GetPublicKeyRewardByDate, GetPublicKeyRewardByEra,
-    GetLatestEraByDate, GetEraValidatorOfPublicKey,
+    GetTimestampByEra, GetLatestEraByDate, GetEraValidatorOfPublicKey,
     GetLatestTimestampByPublicKey
 }

@@ -85,7 +85,7 @@ async function GetEraByBlockHash(hash) {
     })
 }
 
-async function GetTimestampByEra(era) {
+async function GetTimestampByEraFromSwtichBlock(era) {
     return new Promise((resolve, reject) => {
         var sql = `SELECT timestamp FROM block WHERE height = (SELECT MIN(height) AS height FROM block WHERE era = ${era})`;
         pool.query(sql, function (err, result, fields) {
@@ -103,5 +103,5 @@ async function GetTimestampByEra(era) {
 module.exports = {
     GetBlocksByValidator, GetSwitchBlockByDate,
     GetBlockHashByHeight, GetBlockHeight, GetEraByBlockHash,
-    GetTimestampByEra
+    GetTimestampByEraFromSwtichBlock
 }

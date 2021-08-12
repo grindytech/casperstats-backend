@@ -4,7 +4,8 @@ const math = require('mathjs');
 require('dotenv').config();
 const { GetHolder, GetTotalNumberOfAccount, GetPublicKeyByAccountHash } = require('../models/account');
 const { GetTransfersByAccountHash } = require('../models/transfer');
-const {GetTimestampByEra} = require("../models/block_model");
+const {GetTimestampByEraFromSwtichBlock} = require("../models/block_model");
+const {GetTimestampByEra} = require("../models/era");
 const { GetDeploysByPublicKey, GetDeployOfPublicKeyByType, CountDeployByType } = require('../models/deploy');
 const { GetAccountHash, RequestRPC, GetBalanceByAccountHash, GetNetWorkRPC, GetEra } = require('../utils/common');
 const { GetRewardByPublicKey, GetPublicKeyRewardByDate, GetLatestEra,
@@ -291,7 +292,7 @@ module.exports = {
           if (era_reward == null) {
             era_reward = 0;
           }
-          const timestamp = await GetTimestampByEra(index_era);
+          const timestamp = (await GetTimestampByEra(index_era)).timestamp;
           result.push([
             (new Date(timestamp).getTime()),
             Number((Number(era_reward) / 1000000000).toFixed(2)), //convert to CSPR
@@ -352,7 +353,7 @@ module.exports = {
           const era_of_releasing = Number(era_of_creation) + 8;
           withdraw.era_of_releasing = era_of_releasing;
 
-          const time_of_creation = (await GetTimestampByEra(era_of_creation));
+          const time_of_creation = (await GetTimestampByEraFromSwtichBlock(era_of_creation));
           if (time_of_creation) {
             const creation_date = new Date(time_of_creation)
             withdraw.time_of_creation = creation_date.getTime();
