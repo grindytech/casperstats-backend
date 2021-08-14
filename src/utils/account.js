@@ -4,8 +4,9 @@ const { RpcApiName } = require('./constant');
 const common = require('./common');
 const { GetAccounts } = require("../models/account");
 const math = require('mathjs');
-const { GetAllDeployByPublicKey } = require("../models/deploy");
-const { GetValidatorInformation } = require("./validator");
+const { GetAllDeployOfPublicKeyByType } = require("../models/deploy");
+const { GetDeployByRPC } = require("./chain");
+const { GetEraByBlockHash } = require("../models/block_model");
 
 
 async function GetAccountData(address) {
@@ -122,70 +123,27 @@ async function GetRichest(start, count) {
     return result;
 }
 
-async function GetDelegating(account) {
-    // get all deploy
-    const deploys = await GetAllDeployByPublicKey(account);
-
-    // filter delegate deploy
-    let result = [];
-    {
-        const url = await common.GetNetWorkRPC();
-        for (let i = 0; i < deploys.length; i++) {
-            let params = [deploys[i].deploy_hash];
-            let deploy_data = await common.RequestRPC(url, RpcApiName.get_deploy, params);
-            let value = undefined;
-            // incase undelegate
-            try {
-                const storedContractByHash = deploy_data.result.deploy.session.StoredContractByHash;
-                let timestamp = deploy_data.result.deploy.header.timestamp;
-                timestamp = (new Date(timestamp)).getTime();
-                if (storedContractByHash.entry_point == "delegate") {
-                    const args = storedContractByHash.args;
-                    const delegator = args.filter(value => {
-                        return value[0].toString() == "delegator";
-                    })[0][1].parsed;
-                    const validator = args.filter(value => {
-                        return value[0].toString() == "validator";
-                    })[0][1].parsed;
-                    const amount = args.filter(value => {
-                        return value[0].toString() == "amount";
-                    })[0][1].parsed;
-                    value = {
-                        delegator,
-                        validator,
-                        amount,
-                        timestamp
-                    };
-                }
-            } catch (err) { }
-
-            if (value) {
-                // add status
-                let status = false;
-                try {
-                    if (deploy_data.result.execution_results[0].result.Success)
-                        status = true;
-                } catch (err) { }
-                value.status = status;
-                // try to add information to validator
-                try {
-                    const validator_info = await GetValidatorInformation(value.validator);
-                    if (validator_info != null) {
-                        value.validator_name = validator_info.name;
-                        value.validator_icon = validator_info.icon;
-                    }
-                } catch (err) { }
-                result.push(value);
-            }
+async function GetUnstakingAmount(url, public_key) {
+    const deploys = await GetAllDeployOfPublicKeyByType(public_key, "undelegate");
+    const current_era = await common.GetEra(url);
+    let total = 0;
+    for (let i = 0; i < deploys.length; i++) {
+        if (deploys[i].status == "success") {
+            const era_of_creation = await GetEraByBlockHash(deploys[i].hash);
+            if (Number(era_of_creation) + 8 < Number(current_era)) break;
+            const deploy_data = await GetDeployByRPC(url, deploys[i].deploy_hash);
+            const args = deploy_data.result.deploy.session.StoredContractByHash.args;
+            const amount = args.find(value => {
+                return value[0] == "amount";
+            })[1].parsed;
+            total += Number(amount);
         }
     }
-    //parser result
-    return result;
+    return total;
 }
-
 
 module.exports = {
     GetAccountData, GetRichest,
-    GetDelegating
+    GetUnstakingAmount
 }
 

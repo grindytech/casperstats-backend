@@ -49,6 +49,19 @@ async function GetDeployOfPublicKeyByType(public_key, type, start, count) {
     })
 }
 
+async function GetAllDeployOfPublicKeyByType(public_key, type) {
+    return new Promise((resolve, reject) => {
+
+        var sql = `SELECT * FROM deploy WHERE public_key = '${public_key}' AND type = '${type}' ORDER BY timestamp DESC`;
+        pool.query(sql, function (err, result) {
+            if (err) {
+                reject(err);
+            }
+            resolve(result);
+        });
+    })
+}
+
 async function CountDeployByType(public_key, type) {
     return new Promise((resolve, reject) => {
         var sql = `SELECT COUNT(*) as total FROM deploy WHERE public_key = '${public_key}' AND type = '${type}'`;
@@ -65,4 +78,7 @@ async function CountDeployByType(public_key, type) {
     })
 }
 
-module.exports = { GetDeploysByPublicKey, GetAllDeployByPublicKey, GetDeployOfPublicKeyByType, CountDeployByType }
+module.exports = {
+    GetDeploysByPublicKey, GetAllDeployByPublicKey,
+    GetDeployOfPublicKeyByType, CountDeployByType, GetAllDeployOfPublicKeyByType
+}

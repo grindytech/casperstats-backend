@@ -1,11 +1,11 @@
 const { RpcApiName } = require('../utils/constant');
-const { GetAccountData, GetRichest } = require('../utils/account');
+const { GetAccountData, GetRichest, GetUnstakingAmount } = require('../utils/account');
 const math = require('mathjs');
 require('dotenv').config();
 const { GetHolder, GetTotalNumberOfAccount, GetPublicKeyByAccountHash } = require('../models/account');
 const { GetTransfersByAccountHash } = require('../models/transfer');
-const {GetTimestampByEraFromSwtichBlock} = require("../models/block_model");
-const {GetTimestampByEra} = require("../models/era");
+const { GetTimestampByEraFromSwtichBlock } = require("../models/block_model");
+const { GetTimestampByEra } = require("../models/era");
 const { GetDeploysByPublicKey, GetDeployOfPublicKeyByType, CountDeployByType } = require('../models/deploy');
 const { GetAccountHash, RequestRPC, GetBalanceByAccountHash, GetNetWorkRPC, GetEra } = require('../utils/common');
 const { GetRewardByPublicKey, GetPublicKeyRewardByDate, GetLatestEra,
@@ -87,10 +87,21 @@ module.exports = {
       } catch (err) {
         total_reward = 0;
       }
+
+      // unbonding
+      let unbonding = 0;
+      {
+        try {
+          unbonding = await GetUnstakingAmount(url, account_data.public_key_hex);
+        } catch (err) {
+          unbonding = 0;
+        }
+      }
       account_data.balance = (Number(transferrable) + Number(total_staked)).toString();
       account_data.transferrable = transferrable.toString();
       account_data.total_staked = total_staked.toString();
       account_data.total_reward = total_reward.toString();
+      account_data.unbonding = unbonding.toString();
       res.json(account_data);
     } catch (err) {
       console.log(err)
@@ -310,7 +321,7 @@ module.exports = {
     const account = req.query.account;
     const start = req.query.start;
     const count = req.query.count;
-    
+
     try {
       let public_key = account;
       {
@@ -319,13 +330,13 @@ module.exports = {
           public_key = public_key_hex.public_key_hex;
         }
       }
-      
+
       const total = (await CountDeployByType(public_key, "undelegate")).total;
       if (Number(total) < 1) {
         res.status(200).json({});
         return;
       }
-    
+
       const url = await GetNetWorkRPC();
       let withdraws = [];
       const deploys = await GetDeployOfPublicKeyByType(public_key, "undelegate", start, count);
