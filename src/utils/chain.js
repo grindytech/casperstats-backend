@@ -204,7 +204,7 @@ async function IsDeployHash(url, param) {
     if (param.length == 64) {
         try {
             const value = await GetDeploy(url, param);
-            if (value.deploy.header.type == "deploy") {
+            if (value != null) {
                 return true;
             }
         } catch (err) { }
@@ -259,25 +259,8 @@ async function IsPublicKeyHex(param) {
     return false;
 }
 
-// async function GetValidatorPublicKeyByName(param) {
-//     try {
-//         const validator = await GetValidatorByName(param);
-//         if (validator == undefined || validator == null || validator.length < 1)
-//             return false;
-//         return validator[0].public_key;
-//     } catch (err) { }
-//     return false;
-// }
 
 const GetType = async (param) => {
-
-    // const validator = await GetValidatorPublicKeyByName(param);
-    // if(validator) {
-    //     return {
-    //         value: validator,
-    //         type: ELEMENT_TYPE.VALIDATOR,
-    //     };
-    // }
 
     // clean the input
     const imput = param.replace(/\s+/g, '');
