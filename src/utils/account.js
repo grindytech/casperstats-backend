@@ -130,7 +130,7 @@ async function GetUnstakingAmount(url, public_key) {
     for (let i = 0; i < deploys.length; i++) {
         if (deploys[i].status == "success") {
             const era_of_creation = await GetEraByBlockHash(deploys[i].hash);
-            if (Number(era_of_creation) + 8 < Number(current_era)) break;
+            if (Number(era_of_creation) + 8 <= Number(current_era)) break;
             const deploy_data = await GetDeployByRPC(url, deploys[i].deploy_hash);
             const args = deploy_data.result.deploy.session.StoredContractByHash.args;
             const amount = args.find(value => {
