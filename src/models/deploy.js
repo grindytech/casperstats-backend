@@ -78,7 +78,20 @@ async function CountDeployByType(public_key, type) {
     })
 }
 
+async function GetDeployByDate(type, from, to) {
+    return new Promise((resolve, reject) => {
+        var sql = `SELECT * FROM deploy WHERE type = '${type}' AND (DATE(timestamp) BETWEEN DATE('${from}') AND DATE('${to}'))`;
+        pool.query(sql, function (err, result) {
+            if (err) {
+                reject(err);
+            }
+            resolve(result);
+        });
+    })
+}
+
 module.exports = {
     GetDeploysByPublicKey, GetAllDeployByPublicKey,
-    GetDeployOfPublicKeyByType, CountDeployByType, GetAllDeployOfPublicKeyByType
+    GetDeployOfPublicKeyByType, CountDeployByType, GetAllDeployOfPublicKeyByType,
+    GetDeployByDate
 }

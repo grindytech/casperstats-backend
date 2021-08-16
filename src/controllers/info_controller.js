@@ -7,23 +7,30 @@ require('dotenv').config();
 const { GetTotalNumberOfAccount, GetNumberOfAccountFromDate } = require('../models/account');
 const { GetNumberOfTransfersByDate, GetVolumeByDate } = require('../models/transfer');
 const CoinGecko = require('coingecko-api');
-const { GetEraValidators, GetAPY, GetTotalStake, GetTokenMetrics } = require('../utils/validator');
+const { GetEraValidators, GetAPY, GetTotalStake, GetTokenMetrics, GetAmountOfUndelegate } = require('../utils/validator');
 const { GetTotalReward } = require('../models/era');
 const CoinGeckoClient = new CoinGecko();
 
 const NodeCache = require("node-cache");
+const { GetDeployByDate } = require('../models/deploy');
 const get_stats_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_STATS || 1800 });
 const economics_cache = new NodeCache({ stdTTL: process.env.CACHE_ECONOMICS || 3600 });
 
 const transfer_volume_cache = new NodeCache({ stdTTL: process.env.CACHE_TRANSFER_VOLUME || 1800 });
 const get_volume_cache = new NodeCache({ stdTTL: process.env.CACHE_VOLUME || 1800 });
 
+const get_staking_volume_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_UNDELEGATE_VOLUME || 1800 });
+const get_staking_tx_volume_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_TX_UNDELEGATE_VOLUME || 1800 });
+
+
 module.exports = {
     get_stats_cache,
     economics_cache,
     transfer_volume_cache,
     get_volume_cache,
-    
+    get_staking_volume_cache,
+    get_staking_tx_volume_cache,
+
     GetDeploy: async function (req, res) {
         let hex = req.params.hex; // Hex-encoded deploy hash
         const url = await GetNetWorkRPC();
@@ -120,6 +127,65 @@ module.exports = {
         }
     },
 
+    GetStakingVolume: async function (req, res) {
+        try {
+            const count = req.query.count;
+            const type = req.query.type;
+            if (type != "delegate" && type != "undelegate") {
+                res.status(400).send("Can not get this type");
+                return;
+            }
+            var datetime = new Date();
+            let result = [];
+            const url = await GetNetWorkRPC();
+            for (let i = 0; i < count; i++) {
+                let the_date = new Date();
+                the_date.setDate(datetime.getDate() - i);
+                the_date = the_date.toISOString().slice(0, 10);
+                let undelegate_deploys = await GetDeployByDate(type, the_date, the_date);
+                let amount = await GetAmountOfUndelegate(url, undelegate_deploys);
+                const paser_data = [
+                    Math.floor(new Date(the_date).getTime()),
+                    amount
+                ]
+                result.push(paser_data);
+            }
+            get_staking_volume_cache.set(`${type}-${count}`, result);
+            res.json(result);
+        } catch (err) {
+            res.status(400).send(`Can not get ${type} volume`);
+        }
+    },
+
+    GetStakingTxVolume: async function (req, res) {
+        try {
+            const count = req.query.count;
+            const type = req.query.type;
+            if (type !== "delegate" && type !== "undelegate") {
+                res.send("Can not get this type");
+                return;
+            }
+            var datetime = new Date();
+            let result = [];
+            for (let i = 0; i < count; i++) {
+                let the_date = new Date();
+                the_date.setDate(datetime.getDate() - i);
+                the_date = the_date.toISOString().slice(0, 10);
+                let data = await GetDeployByDate(type, the_date, the_date);
+                const paser_data = [
+                    Math.floor(new Date(the_date).getTime()),
+                    data.length
+                ]
+                result.push(paser_data);
+            }
+            get_staking_tx_volume_cache.set(`${type}-${count}`, result);
+            res.json(result);
+        } catch (err) {
+            console.log(err);
+            res.send(`Can not get ${type} tx volume`);
+        }
+    },
+
     GetStats: async function (req, res) {
         let stats = {
             holders: 0,
@@ -138,106 +204,106 @@ module.exports = {
             transactions_change: 0, // last 24 hours
             transfers: [], // last 60 days transfer
         }
-        try{
-        const url = await GetNetWorkRPC();
-        // holder
-        {
-            var datetime = new Date();
-            let yesterday = new Date();
+        try {
+            const url = await GetNetWorkRPC();
+            // holder
             {
-                yesterday.setDate(datetime.getDate() - 1);
-                yesterday = yesterday.toISOString();
+                var datetime = new Date();
+                let yesterday = new Date();
+                {
+                    yesterday.setDate(datetime.getDate() - 1);
+                    yesterday = yesterday.toISOString();
+                }
+
+                const holders = (await GetTotalNumberOfAccount()).number_of_holders;
+                const last_holders = (await GetNumberOfAccountFromDate(yesterday)).number_of_holders;
+                stats.holders = holders;
+                stats.holders_change = (Number(holders) - Number(last_holders)) / Number(holders) * 100;
             }
 
-            const holders = (await GetTotalNumberOfAccount()).number_of_holders;
-            const last_holders = (await GetNumberOfAccountFromDate(yesterday)).number_of_holders;
-            stats.holders = holders;
-            stats.holders_change = (Number(holders) - Number(last_holders)) / Number(holders) * 100;
-        }
 
-
-        // validator
-        {
-            const era_validators = await GetEraValidators(url);
-            const current_validators = era_validators.auction_state.era_validators[0].validator_weights.length;
-            stats.validators = current_validators;
-
-        }
-
-        // circulating + total supply
-        {
-            const supply = await GetTokenMetrics();
-            if(supply) {
-                stats.circulating = supply.circulating_supply + "000000000";
-                stats.total_supply = supply.total_supply + "000000000";
-            }
-        }
-
-        // price + marketcap 
-        {
-            const params = {
-                tickers: false,
-                community_data: false,
-                developer_data: false,
-                localization: false,
-
-            }
-            let data = await CoinGeckoClient.coins.fetch('casper-network', params);
-            stats.price = data.data.market_data.current_price.usd;
-            stats.price_change = data.data.market_data.price_change_percentage_24h;
-            stats.marketcap = data.data.market_data.market_cap.usd;
-            stats.marketcap_change = data.data.market_data.market_cap_change_percentage_24h;
-        }
-
-        // volume
-        {
-            // const params = {
-            //     days: 1,
-            //     vs_currency: 'usd',
-            // }
-            // let data = await CoinGeckoClient.coins.fetchMarketChart('casper-network', params);
-
-            // const length = data.data.total_volumes.length;
-            // const current_transaction =  data.data.total_volumes[0][1];
-            // const last_transaction = data.data.total_volumes[282][length - 1];
-            // stats.volume = current_transaction;
-            // stats.volume_change = (Number(last_transaction) - Number(current_transaction)) / Number(current_transaction) * 100
-
-            let now = new Date();
-            now = now.toISOString();
-
-            const the_time = new Date();
-            let yesterday = new Date();
+            // validator
             {
-                yesterday.setDate(the_time.getDate() - 1);
-                yesterday = yesterday.toISOString();
+                const era_validators = await GetEraValidators(url);
+                const current_validators = era_validators.auction_state.era_validators[0].validator_weights.length;
+                stats.validators = current_validators;
+
             }
 
-            let before_yesterday = new Date();
+            // circulating + total supply
             {
-                before_yesterday.setDate(the_time.getDate() - 2);
-                before_yesterday = before_yesterday.toISOString();
+                const supply = await GetTokenMetrics();
+                if (supply) {
+                    stats.circulating = supply.circulating_supply + "000000000";
+                    stats.total_supply = supply.total_supply + "000000000";
+                }
             }
 
-            let today_transfers = (await GetNumberOfTransfersByDate(yesterday, now)).number_of_transfers;
-            let yesterday_transfers = (await GetNumberOfTransfersByDate(before_yesterday, yesterday)).number_of_transfers;
+            // price + marketcap 
+            {
+                const params = {
+                    tickers: false,
+                    community_data: false,
+                    developer_data: false,
+                    localization: false,
 
-            stats.transactions = today_transfers;
-            stats.transactions_change = ((Number(today_transfers) - Number(yesterday_transfers)) / Number(yesterday_transfers)) * 100;
+                }
+                let data = await CoinGeckoClient.coins.fetch('casper-network', params);
+                stats.price = data.data.market_data.current_price.usd;
+                stats.price_change = data.data.market_data.price_change_percentage_24h;
+                stats.marketcap = data.data.market_data.market_cap.usd;
+                stats.marketcap_change = data.data.market_data.market_cap_change_percentage_24h;
+            }
+
+            // volume
+            {
+                // const params = {
+                //     days: 1,
+                //     vs_currency: 'usd',
+                // }
+                // let data = await CoinGeckoClient.coins.fetchMarketChart('casper-network', params);
+
+                // const length = data.data.total_volumes.length;
+                // const current_transaction =  data.data.total_volumes[0][1];
+                // const last_transaction = data.data.total_volumes[282][length - 1];
+                // stats.volume = current_transaction;
+                // stats.volume_change = (Number(last_transaction) - Number(current_transaction)) / Number(current_transaction) * 100
+
+                let now = new Date();
+                now = now.toISOString();
+
+                const the_time = new Date();
+                let yesterday = new Date();
+                {
+                    yesterday.setDate(the_time.getDate() - 1);
+                    yesterday = yesterday.toISOString();
+                }
+
+                let before_yesterday = new Date();
+                {
+                    before_yesterday.setDate(the_time.getDate() - 2);
+                    before_yesterday = before_yesterday.toISOString();
+                }
+
+                let today_transfers = (await GetNumberOfTransfersByDate(yesterday, now)).number_of_transfers;
+                let yesterday_transfers = (await GetNumberOfTransfersByDate(before_yesterday, yesterday)).number_of_transfers;
+
+                stats.transactions = today_transfers;
+                stats.transactions_change = ((Number(today_transfers) - Number(yesterday_transfers)) / Number(yesterday_transfers)) * 100;
+            }
+
+            // transfers
+            {
+
+                const count = 60;
+                const data = await GetTransfersVolume(count);
+                stats.transfers = data;
+            }
+            get_stats_cache.set("get-stats", stats);
+            res.json(stats);
+        } catch (err) {
+            res.send(err);
         }
-
-        // transfers
-        {
-
-            const count = 60;
-            const data = await GetTransfersVolume(count);
-            stats.transfers = data;
-        }
-        get_stats_cache.set("get-stats", stats);
-        res.json(stats);
-    }catch(err) {
-        res.send(err);
-    }
 
     },
 
@@ -251,7 +317,7 @@ module.exports = {
             const auction_state = auction_info.result.auction_state;
             economics.block_height = auction_state.block_height;
             const supply = await GetTokenMetrics();
-            if(supply) {
+            if (supply) {
                 economics.total_supply = supply.total_supply + "000000000";
                 economics.circulating_supply = supply.circulating_supply + "000000000";
             }
