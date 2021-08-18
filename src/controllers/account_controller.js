@@ -104,8 +104,8 @@ module.exports = {
       account_data.unbonding = unbonding.toString();
       res.json(account_data);
     } catch (err) {
-      console.log(err)
-      res.send(err);
+      console.log(err);
+      res.status(500).send("Can not query account data");
     }
   },
 
@@ -115,7 +115,8 @@ module.exports = {
     GetTotalNumberOfAccount().then(value => {
       res.json(value);
     }).catch(err => {
-      res.send(err);
+      console.log(err);
+      res.status(500).send("Can not get number of holder");
     })
   },
 
@@ -151,7 +152,7 @@ module.exports = {
       res.json(value);
     }).catch(err => {
       console.log(err);
-      res.send(err);
+      res.status(500).send("Can not get transfer deploys history");
     })
   },
 
@@ -173,7 +174,8 @@ module.exports = {
     GetDeploysByPublicKey(public_key_hex, start, count).then(value => {
       res.json(value);
     }).catch(err => {
-      res.send(err);
+      console.log(err);
+      res.status(500).send("Can not get deploy history");
     })
 
   },
@@ -187,7 +189,7 @@ module.exports = {
       res.status(200).json(balance);
     } catch (err) {
       console.log(err);
-      res.send(err);
+      res.status(500).send("Can not get account balance");
     }
   },
 
@@ -211,7 +213,7 @@ module.exports = {
       res.status(200);
       res.json(value);
     }).catch(err => {
-      res.send(err);
+      res.status(500).send("Can not get rich list");
     })
   },
 
@@ -226,14 +228,11 @@ module.exports = {
         public_key = public_key_hex.public_key_hex;
       }
     }
-
     const start = Number(req.query.start);
     const count = Number(req.query.count);
-
     try {
       // Get the last date that account has reward
       const last_date = (await GetLatestTimestampByPublicKey(public_key)).timestamp;
-
       // return if account never stake
       if (last_date == null) {
         res.status(200);
@@ -258,16 +257,8 @@ module.exports = {
           if (reward == null) {
             reward = 0;
           }
-
-          let validator = "";
-          {
-            const latest_date_era = (await GetLatestEraByDate(the_date, mark_date)).era_id;
-            validator = (await GetEraValidatorOfPublicKey(public_key, latest_date_era)).validator;
-          }
-
           rewards.push({
             "date": (new Date(the_date).getTime()),
-            "validator": validator,
             "reward": reward.toString(),
           })
           mark_date = the_date;
@@ -276,7 +267,8 @@ module.exports = {
       res.status(200);
       res.json(rewards);
     } catch (err) {
-      res.send(err);
+      console.log(err);
+      res.status(200).send("Can not get account rewards");
     }
   },
 
@@ -313,7 +305,8 @@ module.exports = {
         res.json(result);
       }
     } catch (err) {
-      res.send(err);
+      console.log(err);
+      res.status(500).send("Can not get era reward");
     }
   },
 
@@ -390,7 +383,7 @@ module.exports = {
       });
     } catch (err) {
       console.log(err);
-      res.send(err);
+      res.status(500).send("Can not get undelegate history");
     }
   },
 
@@ -448,7 +441,7 @@ module.exports = {
       });
     } catch (err) {
       console.log(err);
-      res.send(err);
+      res.status(500).send("Can not get undelegate history");
     }
   },
 
@@ -490,7 +483,7 @@ module.exports = {
       res.status(200).json(delegate_history);
     } catch (err) {
       console.log(err);
-      res.json(err);
+      res.status(500).json("Can not get bid history");
     }
   }
 };

@@ -47,11 +47,11 @@ module.exports = {
     }
     RequestRPC(url, RpcApiName.get_block, params).then(value => {
       value.result["current_height"] = height;
-
       get_block_cache.set(b, value);
       res.status(200).json(value);
     }).catch(err => {
-      res.send(err);
+      console.log(err);
+      res.status(500).send("Can not get block data");
     })
   },
 
@@ -70,7 +70,8 @@ module.exports = {
       res.status(200);
       res.json(value.result.transfers);
     }).catch(err => {
-      res.send(err);
+      console.log(err);
+      res.status(500).send("Can not get tx data");
     })
   },
 
@@ -90,7 +91,8 @@ module.exports = {
       res.status(200);
       res.json(value);
     }).catch(err => {
-      res.send(err)
+      console.log(err);
+      res.status(500).send("Can not get state_root_hash");
     })
   },
 
@@ -109,7 +111,8 @@ module.exports = {
       res.json(datas);
 
     } catch (err) {
-      res.send(err)
+      console.log(err);
+      res.status(500).send("Can not get latest block");
     }
   },
 
@@ -130,7 +133,8 @@ module.exports = {
       res.status(200);
       res.json(data);
     } catch (err) {
-      res.send(err)
+      console.log(err);
+      res.status(500).send("Can not get block by range");
     }
   },
 
@@ -147,7 +151,8 @@ module.exports = {
       res.status(200);
       res.json(data);
     } catch (err) {
-      res.send(err)
+      console.log(err);
+      res.status(500).send("Can not get block tx data");
     }
   },
 
@@ -178,7 +183,8 @@ module.exports = {
       res.status(200);
       res.json(result);
     } catch (err) {
-      res.send(err);
+      console.log(err);
+      res.status(500).send("Can not latest txs");
     }
   },
 
@@ -205,7 +211,7 @@ module.exports = {
       res.json(data);
     } catch (err) {
       console.log(err);
-      res.send(err);
+      res.status(500).send("Can not get block proposer");
     }
   },
 
@@ -216,7 +222,7 @@ module.exports = {
       res.json(status).status(200);
     } catch (err) {
       console.log(err);
-      res.send(err);
+      res.status(500).send("Can not get network status");
     }
   },
 
@@ -226,6 +232,7 @@ module.exports = {
       res.json(rpc);
     } catch (err) {
       console.log(err);
+      res.status(500).send("Can not get network rpc");
     }
   }
 };

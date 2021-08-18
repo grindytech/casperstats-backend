@@ -384,23 +384,10 @@ async function GetValidatorInformation(address) {
     return information
 }
 
-async function GetAmountOfUndelegate(url, deploys) {
-    let total = 0;
-    for (let i = 0 ;i < deploys.length; i++) {
-        const deploy_data = await GetDeployByRPC(url, deploys[i].deploy_hash);
-        const args = deploy_data.result.deploy.session.StoredContractByHash.args;
-        const amount = args.find(value => {
-          return value[0] == "amount";
-        })[1].parsed;
-        total += Number(amount);
-    }
-    return total;
-}
-
 module.exports = {
     GetValidators, GetEraValidators, GetBids,
     GetValidatorData, GetAPY,
     GetTotalStake, GetValidatorInformation,
-    GetTokenMetrics, GetAmountOfUndelegate
+    GetTokenMetrics
 }
 

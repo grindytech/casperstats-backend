@@ -7,7 +7,7 @@ require('dotenv').config();
 const { GetTotalNumberOfAccount, GetNumberOfAccountFromDate } = require('../models/account');
 const { GetNumberOfTransfersByDate, GetVolumeByDate } = require('../models/transfer');
 const CoinGecko = require('coingecko-api');
-const { GetEraValidators, GetAPY, GetTotalStake, GetTokenMetrics, GetAmountOfUndelegate } = require('../utils/validator');
+const { GetEraValidators, GetAPY, GetTotalStake, GetTokenMetrics } = require('../utils/validator');
 const { GetTotalReward } = require('../models/era');
 const CoinGeckoClient = new CoinGecko();
 
@@ -137,13 +137,15 @@ module.exports = {
             }
             var datetime = new Date();
             let result = [];
-            const url = await GetNetWorkRPC();
             for (let i = 0; i < count; i++) {
                 let the_date = new Date();
                 the_date.setDate(datetime.getDate() - i);
                 the_date = the_date.toISOString().slice(0, 10);
-                let undelegate_deploys = await GetDeployByDate(type, the_date, the_date);
-                let amount = await GetAmountOfUndelegate(url, undelegate_deploys);
+                let deploys = await GetDeployByDate(type, the_date, the_date);
+                let amount = 0;
+                for(deploy of deploys) {
+                    amount += Number(deploy.amount);
+                }
                 const paser_data = [
                     Math.floor(new Date(the_date).getTime()),
                     amount
