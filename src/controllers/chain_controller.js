@@ -234,5 +234,38 @@ module.exports = {
       console.log(err);
       res.status(500).send("Can not get network rpc");
     }
+  },
+
+  GetBlockTime: async function (req, res) {
+    try {
+      const url = await GetNetWorkRPC();
+      let current_height = 0;
+      let current_timestamp = 0;
+      {
+        const params = [];
+        const block_data = await RequestRPC(url, RpcApiName.get_block, params);
+        current_height = block_data.result.block.header.height;
+        current_timestamp = (new Date(block_data.result.block.header.timestamp)).getTime();
+
+      }
+      let last_timestamp = 0;
+      {
+        params = [{ "Height": Number(current_height) - 1}]
+        const block_data = await RequestRPC(url, RpcApiName.get_block, params);
+        last_timestamp = (new Date(block_data.result.block.header.timestamp)).getTime();
+      }
+
+      const block_time = current_timestamp - last_timestamp;
+
+      res.status(200).json({
+        "current_block": current_height,
+        "next_block": Number(current_height) + 1,
+        "block_time": block_time
+      })
+
+    } catch (err) {
+      console.log(err);
+      res.status(500).send("Can not get block time");
+    }
   }
 };

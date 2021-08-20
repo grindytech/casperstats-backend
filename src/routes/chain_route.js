@@ -29,6 +29,7 @@ router.route("/get-proposer-blocks").get(chain_controller.GetBlocksByProposer);
 
 // status
 router.route("/status/").get(chain_controller.GetStatus);
-router.route("/get-network-rpc").get(chain_controller.GetNetworkRPC)
+router.route("/get-network-rpc").get(chain_controller.GetNetworkRPC);
+router.route("/get-block-time").get(chain_controller.GetBlockTime);
 
 module.exports = router;
