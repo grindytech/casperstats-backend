@@ -293,7 +293,7 @@ const GetAPY = async (url) => {
 
     const apy = (latest_total_reward * 12 * 365) / total_stake * 100;
     // with compound interest
-    const compound = 100 * (math.pow((1 + (apy / 438000 )), 4380) - 1);
+    const compound = 100 * (math.pow((1 + (apy / 438000)), 4380) - 1);
     return compound;
 }
 
@@ -368,7 +368,9 @@ async function GetValidatorInformation(address) {
 
     information.name = validator.name;
     information.email = validator.email;
-    information.icon = process.env.ICON_IMAGE_URL + validator.icon + "?raw=true";
+    if (validator.icon) {
+        validator.icon = process.env.ICON_IMAGE_URL + validator.icon + "?raw=true";
+    }
     information.website = validator.website;
 
     {
