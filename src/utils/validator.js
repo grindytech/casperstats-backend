@@ -369,7 +369,7 @@ async function GetValidatorInformation(address) {
     information.name = validator.name;
     information.email = validator.email;
     if (validator.icon) {
-        validator.icon = process.env.ICON_IMAGE_URL + validator.icon + "?raw=true";
+        information.icon = process.env.ICON_IMAGE_URL + validator.icon + "?raw=true";
     }
     information.website = validator.website;
 
