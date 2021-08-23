@@ -143,7 +143,7 @@ module.exports = {
                 the_date = the_date.toISOString().slice(0, 10);
                 let deploys = await GetDeployByDate(type, the_date, the_date);
                 let amount = 0;
-                for(deploy of deploys) {
+                for (deploy of deploys) {
                     amount += Number(deploy.amount);
                 }
                 const paser_data = [
@@ -366,5 +366,19 @@ module.exports = {
         } catch (err) {
             res.send(err);
         }
+    },
+
+    GetMarketChart: async function (req, res) {
+
+        const days = req.params.days;
+
+        if (days === 1) {
+            
+        } else if (days === "max") {
+            
+        } else {
+            
+        }
+        // const market_chart_url = "https://api.coingecko.com/api/v3/coins/casper-network/market_chart?vs_currency=usd&days=1&interval=hourly"
     }
 };
