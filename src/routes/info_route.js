@@ -91,6 +91,4 @@ const verifyEconomics = (req, res, next) => {
 };
 router.route("/economics").get(verifyEconomics, info_controller.GetEconomics);
 
-router.route("/market-chart").get(info_controller.GetMarketChart);
-
 module.exports = router;

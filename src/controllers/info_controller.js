@@ -367,18 +367,4 @@ module.exports = {
             res.send(err);
         }
     },
-
-    GetMarketChart: async function (req, res) {
-
-        const days = req.params.days;
-
-        if (days === 1) {
-            
-        } else if (days === "max") {
-            
-        } else {
-            
-        }
-        // const market_chart_url = "https://api.coingecko.com/api/v3/coins/casper-network/market_chart?vs_currency=usd&days=1&interval=hourly"
-    }
 };
