@@ -1,10 +1,13 @@
-const { RequestRPC, QueryState, GetBalance, GetBalanceByAccountHash, GetBalanceByState, GetNetWorkRPC } = require('../utils/common');
-const { GetValidators, GetEraValidators, GetBids, GetValidatorData, GetValidatorInformation } = require('../utils/validator');
+const { RequestRPC, QueryState, GetBalance,
+    GetBalanceByAccountHash, GetBalanceByState, GetNetWorkRPC } = require('../utils/common');
+const { GetValidators, GetEraValidators,
+    GetBids, GetValidatorData, GetValidatorInformation } = require('../utils/validator');
 const { RpcApiName } = require('../utils/constant');
 
 require('dotenv').config();
 
 const NodeCache = require("node-cache");
+const { GetLatestDeployCostByType } = require('../models/deploy');
 const get_validators_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_VALIDATORS || 60 });
 const get_bids_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_BIDS || 60 });
 const get_era_validators_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_ERA_VALIDATORS || 120 });
@@ -132,6 +135,19 @@ module.exports = {
             res.json(result);
         } catch (err) {
             res.send(err);
+        }
+    },
+
+    GetLatestTransaction: async function (req, res) {
+        const type = req.params.type;
+        try {
+            const cost = (await GetLatestDeployCostByType(type)).cost;
+            res.status(200).json({
+                type: type,
+                fee: cost
+            })
+        } catch (err) {
+            res.status(500).send(`Can not get latest cost of ${type} transaction`);
         }
     }
 };

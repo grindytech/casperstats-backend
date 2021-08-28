@@ -49,5 +49,6 @@ const verifyGetValidators = (req, res, next) => {
 };
 router.route("/get-validators/:number").get(verifyGetValidators, state_controller.GetValidators);
 router.route("/get-validator/:address").get(state_controller.GetValidator);
+router.route("/get-fee/:type").get(state_controller.GetLatestTransaction);
 
 module.exports = router;
