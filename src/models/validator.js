@@ -26,8 +26,6 @@ async function InsertValidator(public_key, name, email, icon, website, links, de
     return new Promise((resolve, reject) => {
         var sql = `INSERT INTO validator (public_key, name, email, icon, website, links, details) VALUES ('${public_key}', '${name}', '${email}', '${icon}', '${website}', '${links}', '${details}')`;
         validator_pool.query(sql, function (err, result) {
-            console.log("err: ", err);
-            console.log("result: ", result);
             if (err) {
                 reject(err);
             };
