@@ -10,7 +10,9 @@ module.exports = {
             res.status(200).json(value);
         }).catch(err => {
             console.log(err);
-            res.status(500).json(err);
+            res.status(500).json({
+                error: "Can not get validator"
+            });
         })
 
     },
@@ -20,7 +22,7 @@ module.exports = {
             res.status(200).json(value);
         }).catch(err => {
             console.log(err);
-            res.json([]);
+            res.status(500).json("can not get validators");
         })
     },
 
@@ -43,7 +45,9 @@ module.exports = {
             res.status(200).json(result);
         }).catch(err => {
             console.log(err);
-            res.status(500).json(err);
+            res.status(500).json({
+                error: "Can not add new validator"
+            });
         })
     },
 
@@ -70,10 +74,10 @@ module.exports = {
         const icon = req.body.icon;
         const website = req.body.website;
         const details = req.body.details;
-        const twitter = req.body.twitter != undefined? req.body.twitter : links.twitter;
-        const facebook = req.body.facebook != undefined? req.body.facebook : links.facebook;
-        const telegram = req.body.telegram != undefined? req.body.telegram : links.telegram;
-        const github = req.body.github != undefined? req.body.github : links.github;
+        const twitter = req.body.twitter != undefined ? req.body.twitter : links.twitter;
+        const facebook = req.body.facebook != undefined ? req.body.facebook : links.facebook;
+        const telegram = req.body.telegram != undefined ? req.body.telegram : links.telegram;
+        const github = req.body.github != undefined ? req.body.github : links.github;
 
         let update_status;
         try {
@@ -104,7 +108,9 @@ module.exports = {
             res.status(200).json(update_status);
         } catch (err) {
             console.log(err);
-            res.status(500).json(err);
+            res.status(500).json({
+                error: "Can not update validator"
+            });
         }
 
     },
@@ -115,7 +121,8 @@ module.exports = {
         validator_db.DeleteValidator(public_key).then(result => {
             res.status(200).json(result);
         }).catch(err => {
-            res.status(500).json(err);
+            console.log(err);
+            res.status(500).json("Can not delete validator");
         })
     },
 
