@@ -7,14 +7,14 @@ module.exports = {
     GetAddress: async function (req, res) {
         const address = req.params.address;
         address_db.GetAddress(address).then(value => {
-            if(value.length == 1) {
+            if (value.length == 1) {
                 res.status(200).json(value[0]);
             } else {
                 res.status(200).json({});
             }
         }).catch(err => {
-            res.status(500).send("Can not get address");
-        }) 
+            res.status(500).json({ error: "Can not get address" });
+        })
     },
 
     AddAddress: async function (req, res) {
@@ -30,7 +30,7 @@ module.exports = {
             res.status(200).json(value);
         }).catch(err => {
             console.log(err);
-            res.status(500).send("Can not insert new address");
+            res.status(500).send({error: "Can not insert new address"});
         })
     },
 
