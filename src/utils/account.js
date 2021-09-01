@@ -170,26 +170,24 @@ async function GetDexAddressesTraffic(type, from, to) {
         }
     }
 
+    let value = []; // turn to array
     for (var key in traffic_value) {
         let obj = traffic_value[key];
         const percentage = obj.amount / total * 100;
-        obj["percentage"] = Number(percentage).toFixed(2);
-        traffic_value[key] = obj;
+        value.push({
+            name: key,
+            amount: obj.amount,
+            percentage: percentage
+        })
     }
 
-    // sort by amount
-    let sorted = {};
-    Object
-        .keys(traffic_value).sort(function (a, b) {
-            return traffic_value[b].amount - traffic_value[a].amount;
-        })
-        .forEach(function (key) {
-            sorted[key] = traffic_value[key];
-        });
+    value.sort(function(a, b) {
+        return b.amount - a.amount;
+    });
 
     return {
         total,
-        value: sorted
+        value
     };
 }
 
