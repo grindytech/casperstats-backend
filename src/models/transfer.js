@@ -75,8 +75,41 @@ async function GetVolumeByDate(from, to) {
     })
 }
 
+async function GetInflowOfAddressByDate(account_hash, from, to) {
+    return new Promise((resolve, reject) => {
+        var sql = `SELECT CAST(SUM(CAST(transfer.value AS UNSIGNED INTEGER)) as CHAR) as amount FROM transfer WHERE to_address = '${account_hash}' AND (DATE(timestamp) BETWEEN DATE('${from}') AND DATE('${to}'));`;
+        pool.query(sql, function (err, result) {
+            if (err) {
+                reject(err);
+            }
+            if (result && result[0].amount != null) {
+                resolve(result[0].amount);
+            } else {
+                resolve(0);
+            }
+        });
+    })
+}
+
+async function GetOutflowOfAddressByDate(account_hash, from, to) {
+    return new Promise((resolve, reject) => {
+        var sql = `SELECT CAST(SUM(CAST(transfer.value AS UNSIGNED INTEGER)) as CHAR) as amount FROM transfer WHERE from_address = '${account_hash}' AND (DATE(timestamp) BETWEEN DATE('${from}') AND DATE('${to}'));`;
+        pool.query(sql, function (err, result) {
+            if (err) {
+                reject(err);
+            }
+            if (result && result[0].amount != null) {
+                resolve(result[0].amount);
+            } else {
+                resolve(0);
+            }
+        });
+    })
+}
+
 module.exports = {
     GetTransfersByAccountHash, GetTotalNumberOfTransfers,
     GetNumberOfTransfersByDate, GetVolumeByDate,
-    GetTransfers
+    GetTransfers, GetInflowOfAddressByDate,
+    GetOutflowOfAddressByDate
 }

@@ -7,6 +7,8 @@ const math = require('mathjs');
 const { GetAllDeployOfPublicKeyByType } = require("../models/deploy");
 const { GetDeployByRPC } = require("./chain");
 const { GetEraByBlockHash } = require("../models/block_model");
+const { GetAllKnownAddress } = require("../models/address");
+const { GetInflowOfAddressByDate, GetOutflowOfAddressByDate } = require("../models/transfer");
 
 
 async function GetAccountData(address) {
@@ -142,8 +144,46 @@ async function GetUnstakingAmount(url, public_key) {
     return total;
 }
 
+async function GetDexAddressesTraffic(type, from, to) {
+
+    let get_traffic;
+    if(type == "in") {
+        get_traffic = GetInflowOfAddressByDate;
+    } else {
+        get_traffic = GetOutflowOfAddressByDate;
+    }
+    let accounts = await GetAllKnownAddress();
+    let traffic_value = {};
+    let total = 0;
+    for (let i = 0; i < accounts.length; i++) {
+        const amount = await get_traffic(accounts[i].account_hash, from, to);
+        const cspr = Math.round(amount / Math.pow(10, 9));
+        if (cspr > 0) {
+            if (traffic_value[accounts[i].name]) {
+                traffic_value[accounts[i].name].amount += Number(cspr);
+            } else {
+                traffic_value[accounts[i].name] = {};
+                traffic_value[accounts[i].name]["amount"] = 0;
+                traffic_value[accounts[i].name].amount += Number(cspr);
+            }
+            total += Number(cspr);
+        }
+    }
+
+    for (var key in traffic_value) {
+        let obj = traffic_value[key];
+        const percentage = obj.amount / total * 100;
+        obj["percentage"] = Number(percentage).toFixed(2);
+        traffic_value[key] = obj;
+    }
+    return {
+        total,
+        value: traffic_value 
+    };
+}
+
 module.exports = {
     GetAccountData, GetRichest,
-    GetUnstakingAmount
+    GetUnstakingAmount, GetDexAddressesTraffic
 }
 

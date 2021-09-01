@@ -81,9 +81,21 @@ async function UpdateName(public_key, name) {
     })
 }
 
+async function GetAllKnownAddress() {
+    return new Promise((resolve, reject) => {
+        var sql = `SELECT * from address`;
+        address_pool.query(sql, function (err, result) {
+            if (err) {
+                reject(err);
+            }
+            resolve(result);
+        });
+    })
+}
+
 
 module.exports = {
     CreateAddressTable, InsertAddress, GetAddress,
     DropAddress, DeleteAddress,
-    UpdateName
+    UpdateName, GetAllKnownAddress
 }

@@ -5,9 +5,10 @@ const { Execute, RequestRPC, GetNetWorkRPC } = require('../utils/common');
 require('dotenv').config();
 
 const { GetTotalNumberOfAccount, GetNumberOfAccountFromDate } = require('../models/account');
-const { GetNumberOfTransfersByDate, GetVolumeByDate } = require('../models/transfer');
+const { GetNumberOfTransfersByDate, GetVolumeByDate, GetInflowOfAddressByDate, GetOutflowOfAddressByDate } = require('../models/transfer');
 const CoinGecko = require('coingecko-api');
 const { GetEraValidators, GetAPY, GetTotalStake, GetTokenMetrics } = require('../utils/validator');
+const { GetDexAddressesTraffic } = require('../utils/account');
 const { GetTotalReward } = require('../models/era');
 const CoinGeckoClient = new CoinGecko();
 
@@ -367,4 +368,29 @@ module.exports = {
             res.send(err);
         }
     },
+
+    GetDexTraffic: async function (req, res) {
+        // get all known address
+        try {
+            let now = new Date();
+            let yesterday = new Date();
+            {
+                yesterday.setDate(now.getDate() - 1);
+                yesterday = yesterday.toISOString();
+                now = now.toISOString();
+            }
+            let inflow = await GetDexAddressesTraffic("in", yesterday, now);
+            let outflow = await GetDexAddressesTraffic("out", yesterday, now);
+
+            res.status(200).json({
+                inflow,
+                outflow
+            });
+        } catch (err) {
+            console.log(err);
+            res.status(500).json({
+                error: "can not get dex traffic"
+            })
+        }
+    }
 };
