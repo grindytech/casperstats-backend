@@ -147,7 +147,7 @@ async function GetUnstakingAmount(url, public_key) {
 async function GetDexAddressesTraffic(type, from, to) {
 
     let get_traffic;
-    if(type == "in") {
+    if (type == "in") {
         get_traffic = GetInflowOfAddressByDate;
     } else {
         get_traffic = GetOutflowOfAddressByDate;
@@ -176,9 +176,20 @@ async function GetDexAddressesTraffic(type, from, to) {
         obj["percentage"] = Number(percentage).toFixed(2);
         traffic_value[key] = obj;
     }
+
+    // sort by amount
+    let sorted = {};
+    Object
+        .keys(traffic_value).sort(function (a, b) {
+            return traffic_value[b].amount - traffic_value[a].amount;
+        })
+        .forEach(function (key) {
+            sorted[key] = traffic_value[key];
+        });
+
     return {
         total,
-        value: traffic_value 
+        value: sorted
     };
 }
 
