@@ -8,7 +8,7 @@ const { GetTotalNumberOfAccount, GetNumberOfAccountFromDate } = require('../mode
 const { GetNumberOfTransfersByDate, GetVolumeByDate, GetInflowOfAddressByDate, GetOutflowOfAddressByDate } = require('../models/transfer');
 const CoinGecko = require('coingecko-api');
 const { GetEraValidators, GetAPY, GetTotalStake, GetTokenMetrics } = require('../utils/validator');
-const { GetDexAddressesTraffic } = require('../utils/account');
+const { GetDexAddressesTraffic, GetExchangeVolumeByDate } = require('../utils/account');
 const { GetTotalReward } = require('../models/era');
 const CoinGeckoClient = new CoinGecko();
 
@@ -390,6 +390,29 @@ module.exports = {
             console.log(err);
             res.status(500).json({
                 error: "can not get dex traffic"
+            })
+        }
+    },
+
+    GetExchangeVolume: async function (req, res) {
+        // get all known address
+        const count = req.query.count;
+        try {
+            var datetime = new Date();
+            let result = [];
+            for (let i = 0; i < count; i++) {
+                let the_date = new Date();
+                the_date.setDate(datetime.getDate() - i);
+                the_date = the_date.toISOString().slice(0, 10);
+
+                const traffic_data = await GetExchangeVolumeByDate(the_date, the_date);
+                result.push(traffic_data);
+            }
+            res.status(200).json(result);
+        } catch (err) {
+            console.log(err);
+            res.status(500).json({
+                error: "can not get exchange volume"
             })
         }
     }

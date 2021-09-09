@@ -193,6 +193,26 @@ async function GetDexAddressesTraffic(type, from, to) {
     };
 }
 
+async function GetExchangeVolumeByDate(date) {
+    let accounts = await GetAllKnownAddress();
+    let in_total = 0;
+    let out_total = 0;
+    for (let i = 0; i < accounts.length; i++) {
+        const in_amount = await GetInflowOfAddressByDate(accounts[i].account_hash, date, date);
+        in_total += Number(in_amount);
+        const out_amount = await GetOutflowOfAddressByDate(accounts[i].account_hash, date, date);
+        out_total += Number(out_amount);
+    }
+    in_total = Math.round(in_total / Math.pow(10, 9));
+    out_total = Math.round(out_total / Math.pow(10, 9));
+    const timestamp = (new Date(date)).getTime();
+    return [
+        timestamp,
+        in_total,
+        out_total
+    ]
+}
+
 async function GetAccountName(account) {
     let address_name = await GetAddress(account);
     if (address_name && address_name.length > 0) {
@@ -208,6 +228,6 @@ async function GetAccountName(account) {
 module.exports = {
     GetAccountData, GetRichest,
     GetUnstakingAmount, GetDexAddressesTraffic,
-    GetAccountName
+    GetAccountName, GetExchangeVolumeByDate
 }
 
