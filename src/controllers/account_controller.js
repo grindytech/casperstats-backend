@@ -1,5 +1,5 @@
 const { RpcApiName } = require('../utils/constant');
-const { GetAccountData, GetRichest, GetUnstakingAmount } = require('../utils/account');
+const { GetAccountData, GetRichest, GetUnstakingAmount, GetAccountName } = require('../utils/account');
 const math = require('mathjs');
 require('dotenv').config();
 const { GetHolder, GetTotalNumberOfAccount, GetPublicKeyByAccountHash } = require('../models/account');
@@ -97,6 +97,12 @@ module.exports = {
           unbonding = 0;
         }
       }
+
+      // get name
+      try {
+        account_data.name = await GetAccountName(account_data.public_key_hex);
+      } catch (err) { }
+
       account_data.balance = (Number(transferrable) + Number(total_staked)).toString();
       account_data.transferrable = transferrable.toString();
       account_data.total_staked = total_staked.toString();

@@ -9,6 +9,8 @@ const { GetDeployByRPC } = require("./chain");
 const { GetEraByBlockHash } = require("../models/block_model");
 const { GetAllKnownAddress } = require("../models/address");
 const { GetInflowOfAddressByDate, GetOutflowOfAddressByDate } = require("../models/transfer");
+const {GetAddress} = require('../models/address');
+const { GetValidatorInformation } = require("./validator");
 
 
 async function GetAccountData(address) {
@@ -181,7 +183,7 @@ async function GetDexAddressesTraffic(type, from, to) {
         })
     }
 
-    value.sort(function(a, b) {
+    value.sort(function (a, b) {
         return b.amount - a.amount;
     });
 
@@ -191,8 +193,21 @@ async function GetDexAddressesTraffic(type, from, to) {
     };
 }
 
+async function GetAccountName(account) {
+    let address_name = await GetAddress(account);
+    if (address_name && address_name.length > 0) {
+       return address_name[0].name;
+    }
+    let validator_name = await GetValidatorInformation(account);
+    if (validator_name) {
+        return validator_name.name;
+    }
+    return null;
+}
+
 module.exports = {
     GetAccountData, GetRichest,
-    GetUnstakingAmount, GetDexAddressesTraffic
+    GetUnstakingAmount, GetDexAddressesTraffic,
+    GetAccountName
 }
 
