@@ -255,11 +255,18 @@ module.exports = {
         mark_date = mark_date.toISOString().slice(0, 10);
 
         for (let i = 0; i < count; i++) {
+
+          const circle_start = Date.now();
+
           let the_date = new Date();
           the_date.setDate(start_date.getDate() - (start + i));
           the_date = the_date.toISOString().slice(0, 10);
 
+          const db_start = Date.now()
           let reward = (await GetPublicKeyRewardByDate(public_key, the_date, mark_date)).reward;
+          const db_stop = Date.now()
+          console.log(`Time Taken to execute query database = ${(db_stop - db_start)} milliseconds`);
+
           if (reward == null) {
             reward = 0;
           }
@@ -268,6 +275,9 @@ module.exports = {
             "reward": reward.toString(),
           })
           mark_date = the_date;
+
+          const circle_stop = Date.now();
+          console.log(`Time Taken to execute circle = ${(circle_stop - circle_start)} milliseconds`);
         }
       }
       res.status(200);
