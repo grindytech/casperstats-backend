@@ -106,8 +106,24 @@ async function GetLatestDeployCostByType(type) {
     })
 }
 
+async function GetLatestDeployByType() {
+    return new Promise((resolve, reject) => {
+        var sql = `SELECT cost FROM deploy WHERE type = '${type}' AND status = 'success' ORDER BY timestamp DESC LIMIT 1`;
+        pool.query(sql, function (err, result) {
+            if (err) {
+                reject(err);
+            }
+            if (result.length > 0) {
+                resolve(result[0]);
+            } else {
+                resolve(null);
+            }
+        });
+    })
+}
+
 module.exports = {
     GetDeploysByPublicKey, GetAllDeployByPublicKey,
     GetDeployOfPublicKeyByType, CountDeployByType, GetAllDeployOfPublicKeyByType,
-    GetDeployByDate, GetLatestDeployCostByType
+    GetDeployByDate, GetLatestDeployCostByType, GetLatestDeployByType
 }

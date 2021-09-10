@@ -94,7 +94,7 @@ async function GetLatestEraByDate(from, to) {
 
 async function GetPublicKeyRewardByDate(public_key, from, to) {
     return new Promise((resolve, reject) => {
-        var sql = `SELECT CAST(SUM(CAST(era.amount AS UNSIGNED INTEGER)) as CHAR) as reward FROM era WHERE ((validator = '${public_key}' AND delegator = "") OR delegator = '${public_key}') AND timestamp BETWEEN '${from}' AND '${to}'`;
+        var sql = `SELECT SUM(era.amount) as reward FROM era WHERE ((validator = '${public_key}' AND delegator = "") OR delegator = '${public_key}') AND timestamp BETWEEN '${from}' AND '${to}'`;
         pool.query(sql, function (err, result) {
             if (err) {
                 reject(err);
