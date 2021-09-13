@@ -9,9 +9,9 @@ const { GetTimestampByEra } = require("../models/era");
 const { GetDeploysByPublicKey, GetDeployOfPublicKeyByType, CountDeployByType } = require('../models/deploy');
 const { GetAccountHash, RequestRPC, GetBalanceByAccountHash, GetNetWorkRPC, GetEra } = require('../utils/common');
 const { GetRewardByPublicKey, GetPublicKeyRewardByDate, GetLatestEra,
-  GetPublicKeyRewardByEra, GetLatestEraByDate,
-  GetEraValidatorOfPublicKey,
+  GetPublicKeyRewardByEra,
   GetLatestTimestampByPublicKey } = require('../models/era');
+const { GerEraIdByDate } = require('../models/era_id');
 const { GetValidatorInformation } = require('../utils/validator');
 const { GetDeployByRPC } = require('../utils/chain');
 
@@ -249,7 +249,6 @@ module.exports = {
       // get rewards
       let rewards = [];
       {
-        const start_date = new Date(last_date);
         let mark_date = new Date();
         mark_date.setDate(start_date.getDate() + (1 - start)); // next day
         mark_date = mark_date.toISOString().slice(0, 10);
@@ -261,12 +260,7 @@ module.exports = {
           let the_date = new Date();
           the_date.setDate(start_date.getDate() - (start + i));
           the_date = the_date.toISOString().slice(0, 10);
-
-          const db_start = Date.now()
           let reward = (await GetPublicKeyRewardByDate(public_key, the_date, mark_date)).reward;
-          const db_stop = Date.now()
-          console.log(`Time Taken to execute query database = ${(db_stop - db_start)} milliseconds`);
-
           if (reward == null) {
             reward = 0;
           }
@@ -275,9 +269,6 @@ module.exports = {
             "reward": reward.toString(),
           })
           mark_date = the_date;
-
-          const circle_stop = Date.now();
-          console.log(`Time Taken to execute circle = ${(circle_stop - circle_start)} milliseconds`);
         }
       }
       res.status(200);
@@ -325,6 +316,63 @@ module.exports = {
       res.status(500).send("Can not get era reward");
     }
   },
+
+  GetRewardV2: async function (req, res) {
+    // get params
+    const account = req.query.account;
+
+    let public_key = account;
+    {
+      const public_key_hex = await GetPublicKeyByAccountHash(account);
+      if (public_key_hex != null) {
+        public_key = public_key_hex.public_key_hex;
+      }
+    }
+    const start = Number(req.query.start);
+    const count = Number(req.query.count);
+    try {
+      // Get the last date that account has reward
+      const last_date = (await GetLatestTimestampByPublicKey(public_key)).timestamp;
+      // return if account never stake
+      if (last_date == null) {
+        res.status(200);
+        res.json([]);
+        return;
+      }
+
+      // get rewards
+      let rewards = [];
+      {
+        const start_date = new Date(last_date);
+        let mark_date = new Date();
+        mark_date.setDate(start_date.getDate() + (1 - start)); // next day
+        mark_date = mark_date.toISOString().slice(0, 10);
+
+        for (let i = 0; i < count; i++) {
+
+          let the_date = new Date();
+          the_date.setDate(start_date.getDate() - (start + i));
+          the_date = the_date.toISOString().slice(0, 10);
+          const era_ids = await GerEraIdByDate(the_date, mark_date);
+          let total_reward = 0;
+          for (const id of era_ids) {
+            let era_reward = (await GetPublicKeyRewardByEra(public_key, id.era)).reward;
+            total_reward += Number(era_reward);
+          }
+          rewards.push({
+            "date": (new Date(mark_date).getTime()),
+            "reward": total_reward.toString(),
+          })
+          mark_date = the_date;
+        }
+      }
+      res.status(200).json(rewards);
+    } catch (err) {
+      console.log(err);
+      res.status(200).send("Can not get account rewards");
+    }
+  },
+
 
   GetUndelegate: async function (req, res) {
     const account = req.query.account;
