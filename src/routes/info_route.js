@@ -92,7 +92,19 @@ const verifyEconomics = (req, res, next) => {
 router.route("/economics").get(verifyEconomics, info_controller.GetEconomics);
 
 router.route("/get-dex-traffic").get(info_controller.GetDexTraffic);
-router.route("/exchange-volume").get(info_controller.GetExchangeVolume);
+
+const verifyExchangeVolume = (req, res, next) => {
+    try {
+        const count = req.query.count;
+        if (info_controller.exchange_volume_cache.has(count)) {
+            return res.status(200).json(info_controller.exchange_volume_cache.get(count));
+        }
+        return next();
+    } catch (err) {
+        throw new Error(err);
+    }
+};
+router.route("/exchange-volume").get(verifyExchangeVolume, info_controller.GetExchangeVolume);
 
 
 module.exports = router;

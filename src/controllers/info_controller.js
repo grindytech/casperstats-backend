@@ -22,6 +22,7 @@ const get_volume_cache = new NodeCache({ stdTTL: process.env.CACHE_VOLUME || 180
 
 const get_staking_volume_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_UNDELEGATE_VOLUME || 1800 });
 const get_staking_tx_volume_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_TX_UNDELEGATE_VOLUME || 1800 });
+const exchange_volume_cache = new NodeCache({ stdTTL: process.env.CACHE_EXCHANGE_VOLUME || 7200 });
 
 
 module.exports = {
@@ -31,6 +32,7 @@ module.exports = {
     get_volume_cache,
     get_staking_volume_cache,
     get_staking_tx_volume_cache,
+    exchange_volume_cache,
 
     GetDeploy: async function (req, res) {
         let hex = req.params.hex; // Hex-encoded deploy hash
@@ -408,6 +410,7 @@ module.exports = {
                 const traffic_data = await GetExchangeVolumeByDate(the_date, the_date);
                 result.push(traffic_data);
             }
+            exchange_volume_cache.set(count, result);
             res.status(200).json(result);
         } catch (err) {
             console.log(err);
