@@ -359,8 +359,9 @@ module.exports = {
             let era_reward = (await GetPublicKeyRewardByEra(public_key, id.era)).reward;
             total_reward += Number(era_reward);
           }
+
           rewards.push({
-            "date": (new Date(mark_date).getTime()),
+            "date": (new Date(the_date).getTime()),
             "reward": total_reward.toString(),
           })
           mark_date = the_date;
