@@ -341,8 +341,6 @@ module.exports = {
         return;
       }
       let start_date = new Date(last_date);
-      console.log("start_date: ", start_date);
-
       // get rewards
       let rewards = [];
       {
