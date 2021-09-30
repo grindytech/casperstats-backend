@@ -10,7 +10,6 @@
     "test-chain": "mocha 'src/test/chain/**/*.js' --recursive --timeout 60000 --exit",
     "test-info": "mocha 'src/test/info/**/*.js' --recursive --timeout 60000 --exit",
     "test-state": "mocha 'src/test/state/**/*.js' --recursive --timeout 60000 --exit"
-    
   },
   "repository": {
     "type": "git",

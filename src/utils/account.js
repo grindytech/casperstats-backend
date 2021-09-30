@@ -225,9 +225,16 @@ async function GetAccountName(account) {
     return null;
 }
 
+function WithoutTime(dateTime) {
+    var date = new Date(dateTime.getTime());
+    date.setHours(0, 0, 0, 0);
+    return date;
+}
+
 module.exports = {
     GetAccountData, GetRichest,
     GetUnstakingAmount, GetDexAddressesTraffic,
-    GetAccountName, GetExchangeVolumeByDate
+    GetAccountName, GetExchangeVolumeByDate,
+    WithoutTime
 }
 

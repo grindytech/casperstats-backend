@@ -1,5 +1,6 @@
 const { RpcApiName } = require('../utils/constant');
-const { GetAccountData, GetRichest, GetUnstakingAmount, GetAccountName } = require('../utils/account');
+const { GetAccountData, GetRichest, GetUnstakingAmount, 
+  GetAccountName, WithoutTime } = require('../utils/account');
 const math = require('mathjs');
 require('dotenv').config();
 const { GetHolder, GetTotalNumberOfAccount, GetPublicKeyByAccountHash } = require('../models/account');
@@ -339,29 +340,25 @@ module.exports = {
         res.json([]);
         return;
       }
+      let start_date = new Date(last_date);
+      console.log("start_date: ", start_date);
 
       // get rewards
       let rewards = [];
       {
-        const start_date = new Date(last_date);
-        let mark_date = new Date();
-        mark_date.setDate(start_date.getDate() + (1 - start)); // next day
-        mark_date = mark_date.toISOString().slice(0, 10);
-
+        let mark_date = new Date(start_date.getTime() + ((24 * 60 * 60 * 1000) * (1 - start)));
+        mark_date = WithoutTime(mark_date);
         for (let i = 0; i < count; i++) {
-
-          let the_date = new Date();
-          the_date.setDate(start_date.getDate() - (start + i));
-          the_date = the_date.toISOString().slice(0, 10);
-          const era_ids = await GerEraIdByDate(the_date, mark_date);
+          let the_date = new Date(start_date.getTime() - ((24 * 60 * 60 * 1000) * (start + i)));
+          the_date = WithoutTime(the_date);
+          const era_ids = await GerEraIdByDate(the_date.toISOString(), mark_date.toISOString());
           let total_reward = 0;
           for (const id of era_ids) {
             let era_reward = (await GetPublicKeyRewardByEra(public_key, id.era)).reward;
             total_reward += Number(era_reward);
           }
-
           rewards.push({
-            "date": (new Date(the_date).getTime()),
+            "date": the_date.getTime(),
             "reward": total_reward.toString(),
           })
           mark_date = the_date;

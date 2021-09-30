@@ -12,7 +12,8 @@ const pool = mysql.createPool({
 
 async function GerEraIdByDate(from, to) {
     return new Promise((resolve, reject) => {
-        var sql = `SELECT era FROM era_id WHERE timestamp BETWEEN '${from}' AND '${to}'`;
+        var sql = `SELECT era FROM era_id WHERE timestamp BETWEEN DATE('${from}') AND DATE('${to}')`;
+        console.log(sql);
         pool.query(sql, function (err, result) {
             if (err) {
                 reject(err);
