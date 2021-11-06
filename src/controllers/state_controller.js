@@ -141,10 +141,15 @@ module.exports = {
     GetLatestTransaction: async function (req, res) {
         const type = req.params.type;
         try {
-            const cost = (await GetLatestDeployCostByType(type)).cost;
+            let cost = (await GetLatestDeployCostByType(type)).cost;
+
+            if(type == "delegate") {
+                cost = Number(cost) + Number(process.env.DELEGATE_FEE);
+            }
+
             res.status(200).json({
                 type: type,
-                fee: cost
+                fee: cost.toString()
             })
         } catch (err) {
             res.status(500).send(`Can not get latest cost of ${type} transaction`);
