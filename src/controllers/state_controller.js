@@ -142,11 +142,11 @@ module.exports = {
         const type = req.params.type;
         try {
             let cost = (await GetLatestDeployCostByType(type)).cost;
-
             if(type == "delegate") {
-                cost = Number(cost) + Number(process.env.DELEGATE_FEE);
+                if(Number(cost) < Number(process.env.MIN_DELEGATE_FEE)) {
+                    cost = Number(process.env.MIN_DELEGATE_FEE);
+                }
             }
-
             res.status(200).json({
                 type: type,
                 fee: cost.toString()
