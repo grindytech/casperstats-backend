@@ -8,6 +8,8 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 const HOST = process.env.HOST || "127.0.0.1";
+// Specific domain
+const allowedOrigins =  JSON.parse(process.env.ALLOW_ORIGINS);
 
 require('./models');
 
@@ -21,8 +23,6 @@ app.use(function (req, res, next) {
   // All domain
   // res.header("Access-Control-Allow-Origin", "*");
 
-  // Specific domain
-  const allowedOrigins = ['https://casperstats.io', 'http://localhost'];
   const origin = req.headers.origin;
   if (allowedOrigins.includes(origin)) {
     res.setHeader('Access-Control-Allow-Origin', origin);
