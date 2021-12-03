@@ -7,6 +7,7 @@ require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const HOST = process.env.HOST || "127.0.0.1";
 
 require('./models');
 
@@ -39,6 +40,6 @@ app.get('/favicon.ico', (req, res) => {
 app.use(express.json());
 app.use(routes);
 
-app.listen(PORT, () => {
+app.listen(PORT, HOST,  () => {
   console.log(`Server is running on port: ${PORT}`);
 })
