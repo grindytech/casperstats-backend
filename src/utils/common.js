@@ -87,7 +87,7 @@ async function GetAccountData(url, address) {
 const Execute = async (command) => {
     return new Promise((resolve, reject) => {
 
-        exec(command, (error, stdout, stderr) => {
+        exec(command, {maxBuffer: 1024 * 10000}, (error, stdout, stderr) => {
             if (error) {
                 reject(error)
                 return;
