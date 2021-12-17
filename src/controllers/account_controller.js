@@ -46,6 +46,8 @@ module.exports = {
       {
         try {
           transferrable = (await GetBalanceByAccountHash(url, "account-hash-" + account_data.account_hash)).balance_value;
+          
+          console.log("transferrable: ", transferrable);
         } catch (err) {
           transferrable = 0;
         }
@@ -59,13 +61,13 @@ module.exports = {
           const bids = auction_info.result.auction_state.bids;
           if (bids) {
             for (let i = 0; i < bids.length; i++) {
-              if (bids[i].public_key == account_data.public_key_hex) {
+              if (bids[i].public_key.toLowerCase() == account_data.public_key_hex.toLowerCase()) {
                 total_staked = math.add(total_staked, math.bignumber(bids[i].bid.staked_amount));
               }
               const delegators = bids[i].bid.delegators;
               if (delegators) {
                 for (let j = 0; j < delegators.length; j++) {
-                  if (delegators[j].public_key == account_data.public_key_hex) {
+                  if (delegators[j].public_key.toLowerCase() == account_data.public_key_hex.toLowerCase()) {
                     total_staked = math.add(total_staked, math.bignumber(delegators[j].staked_amount));
                   }
                 }
@@ -74,13 +76,14 @@ module.exports = {
           }
         }
       } catch (err) {
+        console.log("Get Total Stake Error: ", err.message);
         total_staked = math.bignumber("0");
       }
       // Total reward
       let total_reward = 0;
       try {
         if (account_data.public_key_hex) {
-          total_reward = (await GetRewardByPublicKey(account_data.public_key_hex)).total_reward;
+          total_reward = (await GetRewardByPublicKey(account_data.public_key_hex.toLowerCase())).total_reward;
         }
         if (total_reward == null) {
           total_reward = 0;
@@ -93,7 +96,7 @@ module.exports = {
       let unbonding = 0;
       {
         try {
-          unbonding = await GetUnstakingAmount(url, account_data.public_key_hex);
+          unbonding = await GetUnstakingAmount(url, account_data.public_key_hex.toLowerCase());
         } catch (err) {
           unbonding = 0;
         }
@@ -101,7 +104,7 @@ module.exports = {
 
       // get name
       try {
-        account_data.name = await GetAccountName(account_data.public_key_hex);
+        account_data.name = await GetAccountName(account_data.public_key_hex.toLowerCase());
       } catch (err) { }
 
       account_data.balance = (Number(transferrable) + Number(total_staked)).toString();
