@@ -375,8 +375,8 @@ module.exports = {
 
   GetUndelegate: async function (req, res) {
     const account = req.query.account;
-    const start = req.query.start;
-    const count = req.query.count;
+    const start = req.query.start || 0;
+    const count = req.query.count || 10;
 
     try {
       let public_key = account;
@@ -452,8 +452,8 @@ module.exports = {
 
   GetDelegate: async function (req, res) {
     const account = req.query.account;
-    const start = req.query.start;
-    const count = req.query.count;
+    const start = req.query.start || 0;
+    const count = req.query.count || 10;
     try {
       let public_key = account;
       {
@@ -522,7 +522,7 @@ module.exports = {
       for (let i = 0; i < bids.length; i++) {
         const delegators = bids[i].bid.delegators;
         let delegated = delegators.filter(value => {
-          return value.public_key == public_key;
+          return value.public_key.toLowerCase() == public_key.toLowerCase();
         })
         if (delegated.length > 0) {
           const validator = bids[i].public_key;
