@@ -315,32 +315,32 @@ const GetValidatorData = async (url, address) => {
         element.bid.delegators = sort_value;
 
         // today reward
-        let last_24h_reward = 0;
-        {
-            try {
-                var datetime = new Date();
-                let yesterday = new Date();
-                {
-                    yesterday.setDate(datetime.getDate() - 1);
-                    yesterday = yesterday.toISOString();
-                }
-                last_24h_reward = (await GetPublicKeyTotalRewardByDate(element.public_key, yesterday, datetime.toISOString())).total_reward;
-            }
-            catch (err) {
+        // let last_24h_reward = 0;
+        // {
+        //     try {
+        //         var datetime = new Date();
+        //         let yesterday = new Date();
+        //         {
+        //             yesterday.setDate(datetime.getDate() - 1);
+        //             yesterday = yesterday.toISOString();
+        //         }
+        //         last_24h_reward = (await GetPublicKeyTotalRewardByDate(element.public_key, yesterday, datetime.toISOString())).total_reward;
+        //     }
+        //     catch (err) {
 
-            }
-        }
-        if (last_24h_reward == null) {
-            last_24h_reward = 0;
-        }
-        element.last_24h_reward = last_24h_reward.toString();
+        //     }
+        // }
+        // if (last_24h_reward == null) {
+        //     last_24h_reward = 0;
+        // }
+        // element.last_24h_reward = last_24h_reward.toString();
 
         // add total rewards paid
-        const total_reward = await GetRewardByPublicKey(element.public_key);
-        element.total_reward = total_reward.total_reward;
+        // const total_reward = await GetRewardByPublicKey(element.public_key);
+        // element.total_reward = total_reward.total_reward;
 
-        const total_reward_paid = await GetTotalRewardByPublicKey(element.public_key);
-        element.total_reward_paid = total_reward_paid.total_reward;
+        // const total_reward_paid = await GetTotalRewardByPublicKey(element.public_key);
+        // element.total_reward_paid = total_reward_paid.total_reward;
     } else {
         throw ({
             "code": -32000,
