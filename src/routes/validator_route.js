@@ -22,13 +22,13 @@ function authentication_required(req, res, next) {
     }
 }
 
-router.route("/get-validators").get(validator_controller.GetValidators);
+router.route("/get-validators").get(validator_controller.GetValidatorsInfo);
 
-router.route("/update").post(authentication_required, validator_controller.UpdateValidator);
+router.route("/update").post(authentication_required, validator_controller.UpdateValidatorInfo);
 
-router.route("/add").post(authentication_required, validator_controller.AddValidator);
-router.route("/delete/:address").get(authentication_required, validator_controller.DeleteValidator);
-router.route("/get-validator/:address").get(validator_controller.GetValidator);
+router.route("/add").post(authentication_required, validator_controller.AddValidatorInfo);
+router.route("/delete/:address").get(authentication_required, validator_controller.DeleteValidatorInfo);
+router.route("/get-validator/:address").get(validator_controller.GetValidatorInfo);
 router.route("/init").get(authentication_required, validator_controller.Init);
 router.route("/drop").get(authentication_required, validator_controller.Drop);
 

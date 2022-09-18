@@ -65,18 +65,7 @@ const verifyGetStakingTxVolume = (req, res, next) => {
 };
 router.route("/get-staking-tx-volume").get(verifyGetStakingTxVolume, info_controller.GetStakingTxVolume);
 
-// cache for get-stats
-const verifyGetStats = (req, res, next) => {
-    try {
-        if (info_controller.get_stats_cache.has("get-stats")) {
-            return res.status(200).json(info_controller.get_stats_cache.get("get-stats"));
-        }
-        return next();
-    } catch (err) {
-        throw new Error(err);
-    }
-};
-router.route("/get-stats").get(verifyGetStats, info_controller.GetStats);
+router.route("/get-stats").get(info_controller.GetStats);
 
 // cache for economics
 const verifyEconomics = (req, res, next) => {

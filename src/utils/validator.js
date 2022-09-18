@@ -5,41 +5,14 @@ const { RequestRPC, GetNetWorkRPC } = require('./common')
 const math = require('mathjs');
 const { GetTotalRewardByPublicKey, GetLatestEra, GetTotalRewardByEra,
     GetPublicKeyTotalRewardByDate, GetRewardByPublicKey } = require("../models/era");
-const { GetValidator } = require("../models/validator");
+const { GetValidator, GetCurrentEraValidator, GetNextEraValidator, GetTotalStakeNextEra, GetTotalStakeCurrentEra,
+    GetAllValidator, GetTotalValidator, GetTotalActiveValidator, GetRangeValidator, GetValidatorInfo } = require("../models/validator");
+const { GetDelegatorsOfValidator } = require("../models/delegator");
 const request = require('request');
 const { GetDeployByRPC } = require("./chain");
+const { GetStats } = require("../models/stats");
 
-/*
-    Get token metrics from coingecko
-*/
-const GetTokenMetrics = async () => {
-    let options = {
-        url: "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=casper-network&order=market_cap_desc&per_page=1&page=1&sparkline=false",
-        method: "get",
-        headers:
-        {
-            "content-type": "application/json"
-        }
-    };
-    return new Promise((resolve, reject) => {
-        request(options, (error, response, body) => {
-            if (error) {
-                reject(error);
-            } else {
-                if (body.length > 0) {
-                    let result = JSON.parse(body);
-                    result = result[0];
-                    resolve({
-                        circulating_supply: result.circulating_supply,
-                        total_supply: result.total_supply,
-                    });
-                } else {
-                    resolve(null);
-                }
-            }
-        });
-    })
-}
+
 
 function GetTotalBid(bids, address) {
     // get total bid
@@ -62,61 +35,67 @@ function GetTotalBid(bids, address) {
  * @param {number} era_index The era index of era_validators, it's only 0 or 1 with 0 is the current ear and 1 is the next era.
  * @return {Array} result return top 10 validators by height and also add more information to them.
  */
-async function GetTopValidators(auction_state, era_index, number_of_validator) {
+async function GetTopValidators(number_of_validator) {
 
-    const bids = auction_state.bids;
-    const era_validator = auction_state.era_validators[era_index];
-    let top_weights = [];
-    let weights = era_validator.validator_weights;
+    // const bids = auction_state.bids;
+    // const era_validator = auction_state.era_validators[era_index];
+    // let top_weights = [];
+    // let weights = era_validator.validator_weights;
 
-    // add total_bid
-    {
-        for (let i = 0; i < weights.length; i++) {
-            const total_stake = GetTotalBid(bids, weights[i].public_key);
-            weights[i]["total_stake"] = total_stake;
-        }
-    }
+    // // add total_bid
+    // {
+    //     for (let i = 0; i < weights.length; i++) {
+    //         const total_stake = GetTotalBid(bids, weights[i].public_key);
+    //         weights[i]["total_stake"] = total_stake;
+    //     }
+    // }
 
-    //Get top 10 validators by weight
-    {
-        weights.sort((first, second) => {
-            return math.compare(second.total_stake, first.total_stake);
-        })
-        top_weights = weights.slice(0, number_of_validator);
-    }
+    // //Get top 10 validators by weight
+    // {
+    //     weights.sort((first, second) => {
+    //         return math.compare(second.total_stake, first.total_stake);
+    //     })
+    //     top_weights = weights.slice(0, number_of_validator);
+    // }
 
-    // add more data to top weights
+    // // add more data to top weights
+    // let top_validators = [];
+    // {
+    //     for (let i = 0; i < top_weights.length; i++) {
+    //         let element = bids.find(el => el.public_key == top_weights[i].public_key);
+    //         const total_stake = GetTotalBid(bids, element.public_key);
+    //         element.bid["total_stake"] = total_stake;
+
+    //         // Add number of delegatee
+    //         let number_delegators = 0;
+    //         if (element.bid.delegators !== undefined) {
+    //             number_delegators = element.bid.delegators.length;
+    //         }
+
+    //         delete element.bid["bonding_purse"];
+    //         element.bid["delegators"] = number_delegators;
+    //         delete element.bid["inactive"];
+
+    //         // add information to top validators
+    //         try {
+    //             const information = await GetValidatorInformation(element.public_key);
+    //             element.information = information;
+    //         } catch (err) {
+    //             element.information = null;
+    //         }
+
+    //         top_validators.push(element);
+    //     }
+    // }
+
+    let validators = await GetNextEraValidator();
     let top_validators = [];
-    {
-        for (let i = 0; i < top_weights.length; i++) {
-            let element = bids.find(el => el.public_key == top_weights[i].public_key);
-            const total_stake = GetTotalBid(bids, element.public_key);
-            element.bid["total_stake"] = total_stake;
+    validators.sort((first, second) => {
+        return math.compare(second.total_stake, first.total_stake);
+    })
 
-            // Add number of delegatee
-            let number_delegators = 0;
-            if (element.bid.delegators !== undefined) {
-                number_delegators = element.bid.delegators.length;
-            }
-
-            delete element.bid["bonding_purse"];
-            element.bid["delegators"] = number_delegators;
-            delete element.bid["inactive"];
-
-            // add information to top validators
-            try {
-                const information = await GetValidatorInformation(element.public_key);
-                element.information = information;
-            } catch (err) {
-                element.information = null;
-            }
-
-            top_validators.push(element);
-        }
-    }
-
+    top_validators = validators.slice(0, number_of_validator);
     const result = {
-        era_id: era_validator.era_id,
         validators: top_validators,
     }
 
@@ -136,7 +115,6 @@ async function GetTotalStake(auction_state, era_index) {
 const GetValidators = async (number_of_validator) => {
 
     let result = {
-        block_height: 0,
         total_active_validators: 0,
         total_bid_validators: 0,
         total_stake: "",
@@ -144,22 +122,16 @@ const GetValidators = async (number_of_validator) => {
         total_supply: 0,
         APY: 0,
         era_validators: {}
-    }
-
-    const url = await GetNetWorkRPC();
-    const auction_info = await RequestRPC(url, RpcApiName.get_auction_info, []);
+    } 
 
     try {
 
-        const auction_state = auction_info.result.auction_state;
-
-        result.block_height = auction_state.block_height;
-
         //circle supply
-        let supply = await GetTokenMetrics();
+        let supply = await GetStats();
+        
         if (supply) {
-            result.circulating_supply = supply.circulating_supply + "000000000";
-            result.total_supply = supply.total_supply + "000000000";
+            result.circulating_supply = supply.circulating_supply;
+            result.total_supply = supply.total_supply;
         }
 
         // total_supply
@@ -167,20 +139,19 @@ const GetValidators = async (number_of_validator) => {
         //APY
 
         // calculate APY
-        const apy = await GetAPY(url);
+        const apy = await GetAPY();
         result.APY = apy;
 
         // calculate total_stake
-        let total_stake = 0;
-        total_stake = await GetTotalStake(auction_state, 0);
+        let total_stake = await GetTotalStakeCurrentEra();
 
         result.total_stake = total_stake.toString();
-        result.total_active_validators = auction_state.era_validators[0].validator_weights.length;
-        result.total_bid_validators = auction_state.bids.length;
+        result.total_active_validators = await GetTotalActiveValidator();
+        result.total_bid_validators = await GetTotalValidator();
 
         // get top 10 validators with height
         //    current era
-        const top_validators = await GetTopValidators(auction_state, 0, number_of_validator);
+        const top_validators = await GetTopValidators(number_of_validator);
         result.era_validators = top_validators;
     } catch (err) {
         throw err.message;
@@ -189,107 +160,154 @@ const GetValidators = async (number_of_validator) => {
 }
 
 
-const GetEraValidators = async (url) => {
-    let auction_info = (await RequestRPC(url, RpcApiName.get_auction_info, [])).result;
+const GetCurrentEraValidators = async (url) => {
 
-    // get total stake
-    const total_stake_current_era = await GetTotalStake(auction_info.auction_state, 0);
-    const total_stake_next_era = await GetTotalStake(auction_info.auction_state, 1);
+    let result = {
+        era_id: 0,
+        total_stake: '',
+        validators: {}
+    }
 
-    auction_info.auction_state.era_validators[0]["total_stake"] = total_stake_current_era.toString();
-    auction_info.auction_state.era_validators[1]["total_stake"] = total_stake_next_era.toString();
+    const block_info = (await RequestRPC(url, RpcApiName.get_block, [])).result;
+    
+    const era_id = block_info.block.header.era_id;
+    
+    result.era_id = era_id;
+    
+    const total_stake_current_era = await GetTotalStakeCurrentEra();
+    result.total_stake = total_stake_current_era.toString();
+    
+    let auction_info = await GetCurrentEraValidator();
+    
+    auction_info.sort((first, second) => {
+        return math.compare(Number(second.total_stake), Number(first.total_stake));
+    })
 
+    result.validators = auction_info;
 
-    // Add number of delegators
-    {
-        const bids = auction_info.auction_state.bids;
-        for (let era_index = 0; era_index < 2; era_index++) {
-            let validator_weights = auction_info.auction_state.era_validators[era_index].validator_weights;
-            for (let i = 0; i < validator_weights.length; i++) {
-                const public_key = validator_weights[i].public_key;
-                let element = bids.find(el => el.public_key == public_key);
-                const num_of_delegators = element.bid.delegators.length;
-                validator_weights[i]["delegators"] = num_of_delegators;
+    for(let i = 0; i< auction_info.length; i++){
+        const total_weight_current_era = auction_info[i].total_stake;
+        const percentage_of_network_current_era = ((Number(total_weight_current_era)*100/Number(total_stake_current_era)).toFixed(2)).toString()
 
-                // add information to validators
-                try {
-                    const validator_info = await GetValidatorInformation(public_key);
-                    if (validator_info != null) {
-                        validator_weights[i].name = validator_info.name;
-                        validator_weights[i].icon = validator_info.icon;
-                    }
-                } catch (err) { }
+        result.validators[i].percentage_of_network = percentage_of_network_current_era;
+
+        try{
+            const validator_info = await GetValidatorInfo(auction_info[i].public_key_hex);
+            if(validator_info != null){
+                result.validators[i].name = validator_info[0].name;
+                result.validators[i].icon = validator_info[0].icon
             }
-            auction_info.auction_state.era_validators[era_index].validator_weights = validator_weights;
-        }
+        }catch {}
     }
 
-    //remove bids
-    delete auction_info.auction_state.bids;
+    return result;
+}
 
-    // sort validators by weight
-    for (let era_index = 0; era_index < 2; era_index++) {
-        auction_info.auction_state.era_validators[era_index].validator_weights.sort((first, second) => {
-            return math.compare(second.weight, first.weight);
-        })
+const GetNextEraValidators = async (url) => {
+    let result = {
+        era_id: 0,
+        total_stake: "",
+        validators: {}
     }
 
-    return auction_info;
+    const block_info = (await RequestRPC(url, RpcApiName.get_block, [])).result;
+    
+    const era_id = block_info.block.header.era_id;
+
+    result.era_id = math.add(Number(era_id), 1);
+    
+    const total_stake_next_era = await GetTotalStakeNextEra();
+    result.total_stake = total_stake_next_era.toString();
+
+    let auction_info = await GetNextEraValidator();
+    
+    auction_info.sort((first, second) => {
+        return math.compare(Number(second.total_stake), Number(first.total_stake));
+    })
+
+    result.validators = auction_info;
+
+    for(let i = 0; i< auction_info.length; i++){
+        const total_weight_next_era = auction_info[i].total_stake;
+        const percentage_of_network_next_era = ((Number(total_weight_next_era)*100/Number(total_stake_next_era)).toFixed(2)).toString()
+
+        result.validators[i].percentage_of_network = percentage_of_network_next_era;
+
+        try{
+            const validator_info = await GetValidatorInfo(auction_info[i].public_key_hex);
+            if(validator_info != null){
+                result.validators[i].name = validator_info[0].name;
+                result.validators[i].icon = validator_info[0].icon
+            }
+        }catch {}
+    }
+
+    return result;
 }
 
 const GetBids = async () => {
-    const url = await GetNetWorkRPC();
-    const auction_info = (await RequestRPC(url, RpcApiName.get_auction_info, [])).result;
 
-    // get total bid
-    let bids = auction_info.auction_state.bids;
+    let result = {
+        total_validator: 0,
+        validators: {}
+    }
+    const total_validator = await GetTotalValidator();
+    result.total_validator = total_validator;
 
-    for (let i = 0; i < bids.length; i++) {
-        let self_bid = math.bignumber(bids[i].bid.staked_amount);
-
-        let total_token_delegated = math.bignumber("0");
-        let delegators = bids[i].bid.delegators;
-        for (let j = 0; j < delegators.length; j++) {
-            const delegated_amount = math.bignumber(delegators[j].staked_amount);
-            total_token_delegated = math.add(total_token_delegated, delegated_amount);
+    let auction_info = await GetAllValidator();
+     
+    for (let i=0; i< auction_info.length; i++) {
+        let total_bid = auction_info[i].total_stake_next_era;
+        let inactive = auction_info[i].inactive;
+        if(inactive == 0){
+            auction_info[i].inactive = false;
+        }else{
+            auction_info[i].inactive = true;
         }
-        bids[i].bid.number_of_delegators = bids[i].bid.delegators.length;
-        bids[i]["total_bid"] = math.add(self_bid, total_token_delegated).toString();
-        bids[i]["total_delegated"] = total_token_delegated.toString();
+       auction_info[i].total_bid = total_bid;
 
-        delete bids[i].bid.delegators;
-
-        // try to add information to validator
-        try {
-            const validator_info = await GetValidatorInformation(bids[i].public_key);
-            if (validator_info != null) {
-                bids[i].name = validator_info.name;
-                bids[i].icon = validator_info.icon;
+       try{
+            const validator_info = await GetValidatorInfo(auction_info[i].public_key_hex);
+            if(validator_info != null) {
+                auction_info[i].name = validator_info[0].name;
+                auction_info[i].icon = validator_info[0].icon
             }
-        } catch (err) { }
+       }catch {}
     }
 
-    //remove bids
-    delete auction_info.auction_state.era_validators;
-
-    // sort bids by total_bid
-    auction_info.auction_state.bids.sort((first, second) => {
-        return math.compare(second.total_bid, first.total_bid);
+    auction_info.sort((first, second) => {
+        return math.compare(Number(second.total_bid), Number(first.total_bid));
     })
-    return auction_info;
+    result.validators = auction_info;
+    
+    console.log(result);
+    return result;
 }
 
-const GetAPY = async (url) => {
+const GetRangeBids = async (start, count) => {
+    let result = {
+        total_validator: 0,
+        validators: {}
+    }
+
+    const total_validator = await GetTotalValidator();
+    result.total_validator = total_validator;
+
+    let auction_info = await GetRangeValidator(start, count);
+    result.validators = auction_info;
+
+    return result;
+}
+
+const GetAPY = async (total_stake) => {
 
     const latest_era = await GetLatestEra();
     const latest_total_reward = (await GetTotalRewardByEra(latest_era.era_id)).total_reward;
 
-    let total_stake = 0;
-    {
-        const auction_info = await RequestRPC(url, RpcApiName.get_auction_info, []);
-        const auction_state = auction_info.result.auction_state;
-        total_stake = await GetTotalStake(auction_state, 0);
-    }
+    // let total_stake = 0;
+    // {
+    //     total_stake = Number(await GetTotalStakeCurrentEra());
+    // }
 
     const apy = (latest_total_reward * 12 * 365) / total_stake * 100;
     // with compound interest
@@ -298,56 +316,91 @@ const GetAPY = async (url) => {
 }
 
 const GetValidatorData = async (url, address) => {
-    const auction_info = (await RequestRPC(url, RpcApiName.get_auction_info, [])).result;
+    // const auction_info = (await RequestRPC(url, RpcApiName.get_auction_info, [])).result;
 
-    // get total bid
-    let bids = auction_info.auction_state.bids;
-    let element = bids.find(el => el.public_key == address);
+    // // get total bid
+    // let bids = auction_info.auction_state.bids;
+    // let element = bids.find(el => el.public_key == address);
 
-    if (element) {
-        const total_stake = GetTotalBid(bids, element.public_key);
-        element.bid["total_stake"] = total_stake;
+    // if (element) {
+    //     const total_stake = GetTotalBid(bids, element.public_key);
+    //     element.bid["total_stake"] = total_stake;
 
-        // sort delegator by stake
-        const sort_value = element.bid.delegators.sort(function (a, b) {
-            return math.compare(b.staked_amount, a.staked_amount);
-        })
-        element.bid.delegators = sort_value;
+    //     // sort delegator by stake
+    //     const sort_value = element.bid.delegators.sort(function (a, b) {
+    //         return math.compare(b.staked_amount, a.staked_amount);
+    //     })
+    //     element.bid.delegators = sort_value;
 
-        // today reward
-        // let last_24h_reward = 0;
-        // {
-        //     try {
-        //         var datetime = new Date();
-        //         let yesterday = new Date();
-        //         {
-        //             yesterday.setDate(datetime.getDate() - 1);
-        //             yesterday = yesterday.toISOString();
-        //         }
-        //         last_24h_reward = (await GetPublicKeyTotalRewardByDate(element.public_key, yesterday, datetime.toISOString())).total_reward;
-        //     }
-        //     catch (err) {
+    //     // today reward
+    //     // let last_24h_reward = 0;
+    //     // {
+    //     //     try {
+    //     //         var datetime = new Date();
+    //     //         let yesterday = new Date();
+    //     //         {
+    //     //             yesterday.setDate(datetime.getDate() - 1);
+    //     //             yesterday = yesterday.toISOString();
+    //     //         }
+    //     //         last_24h_reward = (await GetPublicKeyTotalRewardByDate(element.public_key, yesterday, datetime.toISOString())).total_reward;
+    //     //     }
+    //     //     catch (err) {
 
-        //     }
-        // }
-        // if (last_24h_reward == null) {
-        //     last_24h_reward = 0;
-        // }
-        // element.last_24h_reward = last_24h_reward.toString();
+    //     //     }
+    //     // }
+    //     // if (last_24h_reward == null) {
+    //     //     last_24h_reward = 0;
+    //     // }
+    //     // element.last_24h_reward = last_24h_reward.toString();
 
-        // add total rewards paid
-        // const total_reward = await GetRewardByPublicKey(element.public_key);
-        // element.total_reward = total_reward.total_reward;
+    //     // add total rewards paid
+    //     // const total_reward = await GetRewardByPublicKey(element.public_key);
+    //     // element.total_reward = total_reward.total_reward;
 
-        // const total_reward_paid = await GetTotalRewardByPublicKey(element.public_key);
-        // element.total_reward_paid = total_reward_paid.total_reward;
-    } else {
+    //     // const total_reward_paid = await GetTotalRewardByPublicKey(element.public_key);
+    //     // element.total_reward_paid = total_reward_paid.total_reward;
+    // } else {
+    //     throw ({
+    //         "code": -32000,
+    //         "message": "validator not known",
+    //         "data": null
+    //     })
+    // }
+    const validator = await GetValidator(address);
+    if(validator.length == 0){
         throw ({
             "code": -32000,
             "message": "validator not known",
             "data": null
         })
     }
+    let element = {
+        public_key: '',
+        staked_amount: '',
+        delegation_rate: 0,
+        inactive: false,
+        total_stake: '',
+        information: null,
+        delegators: []
+    }
+    
+    element.public_key = validator[0].public_key_hex;
+    element.staked_amount = validator[0].self_stake;
+    element.total_stake = validator[0].total_stake_next_era;
+    element.delegation_rate = validator[0].delegation_rate;
+
+    let status = false;
+    if(validator[0].inactive === 'true'){
+        status = true;
+    }
+
+    element.inactive = status;
+    const delegators = await GetDelegatorsOfValidator(address);
+    delegators.sort((first, second) => {
+        return math.compare(Number(second.staked_amount), Number(first.staked_amount));
+    })
+    element.delegators = delegators;
+
     return element;
 }
 
@@ -361,7 +414,7 @@ async function GetValidatorInformation(address) {
         details: ""
     }
 
-    let validator = await GetValidator(address);
+    let validator = await GetValidatorInfo(address);
     if (validator == undefined || validator == null || validator.length < 1)
         return null;
     validator = validator[0];
@@ -387,9 +440,9 @@ async function GetValidatorInformation(address) {
 }
 
 module.exports = {
-    GetValidators, GetEraValidators, GetBids,
+    GetValidators, GetCurrentEraValidators, GetBids,
     GetValidatorData, GetAPY,
     GetTotalStake, GetValidatorInformation,
-    GetTokenMetrics
+    GetNextEraValidators, GetRangeBids
 }
 

@@ -6,8 +6,8 @@ const bodyParser = require('body-parser');
 require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
-const HOST = process.env.HOST || "127.0.0.1";
+const PORT = process.env.PORT || 3307;
+const HOST = process.env.SERVER_HOST || "127.0.0.1";
 // Specific domain
 const allowedOrigins =  JSON.parse(process.env.ALLOW_ORIGINS);
 
@@ -41,5 +41,5 @@ app.use(express.json());
 app.use(routes);
 
 app.listen(PORT, HOST,  () => {
-  console.log(`Server is running on port: ${PORT}`);
+  console.log(`Server is running on port: ${PORT} ${HOST}`);
 })

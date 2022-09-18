@@ -5,6 +5,9 @@ const account_fn = require('./account');
 const { GetHeight, RequestRPC, GetAccountHash, Execute, GetNetWorkRPC } = require("./common");
 const request = require('request');
 const { GetNumberOfTransfersByDate } = require("../models/transfer");
+const { GetDeployByDeployHash } = require("../models/deploy");
+const { GetBlockHeightByHash } = require("../models/block_model");
+const { GetAllValidator } = require("../models/validator");
 
 const GetDeployhashes = async (url, block) => {
     return new Promise((resolve, reject) => {
@@ -61,16 +64,42 @@ async function get_deploy_type(deploy_data) {
 }
 
 const GetDeploy = async (url, hex) => {
+    //let deploy_data = await GetDeployByRPC(url, hex);
+    let deploy_data = await GetDeployByDeployHash(hex); //edited
+    // const result = deploy_data.result;
+    // // add more common information to header
+    // if (result.execution_results.length > 0) {
+    //     let first_block_hash = result.execution_results[0].block_hash;
+    //     const first_block_height = await GetBlockHeightByBlock(url, first_block_hash);
+    //     let total_cost = await GetTotalDeployCost(result.execution_results);
+
+    //     result.deploy.header["block_hash"] = first_block_hash;
+    //     result.deploy.header["block_height"] = first_block_height;
+    //     result.deploy.header["cost"] = total_cost.toString();
+    //     // add type
+    //     const type = await get_deploy_type(deploy_data.result);
+    //     result.deploy.header["type"] = type;
+    // }
+    // return result;
+    return deploy_data[0];
+}
+
+const GetDeployFromRPC = async (url, hex) =>{
     let deploy_data = await GetDeployByRPC(url, hex);
     const result = deploy_data.result;
     // add more common information to header
     if (result.execution_results.length > 0) {
         let first_block_hash = result.execution_results[0].block_hash;
-        const first_block_height = await GetBlockHeightByBlock(url, first_block_hash);
+        let first_block_height = await GetBlockHeightByHash(first_block_hash);
+        if(first_block_height.length > 0){
+            first_block_height = first_block_height[0].height
+        }else {
+            first_block_height = await GetBlockHeightByBlock(url, first_block_hash);
+        }
         let total_cost = await GetTotalDeployCost(result.execution_results);
 
         result.deploy.header["block_hash"] = first_block_hash;
-        result.deploy.header["block_height"] = first_block_height;
+        result.deploy.header["block_height"] = first_block_height; 
         result.deploy.header["cost"] = total_cost.toString();
         // add type
         const type = await get_deploy_type(deploy_data.result);
@@ -203,7 +232,7 @@ async function IsBlockHash(url, param) {
 async function IsDeployHash(url, param) {
     if (param.length == 64) {
         try {
-            const value = await GetDeploy(url, param);
+            const value = await GetDeployFromRPC(url, param);
             if (value != null) {
                 return true;
             }
@@ -215,7 +244,7 @@ async function IsDeployHash(url, param) {
 async function IsTransferHash(url, param) {
     if (param.length == 64) {
         try {
-            let deploy_info = await GetDeploy(url, param);
+            let deploy_info = await GetDeployFromRPC(url, param);
             if (deploy_info.deploy.header.type == "transfer") {
                 return true;
             }
@@ -228,9 +257,8 @@ async function IsValidatorAddress(url, param) {
     try {
         const is_pk = await IsPublicKeyHex(param);
         if (is_pk) {
-            const auction_info = await (RequestRPC(url, RpcApiName.get_auction_info, []));
-            const current_validator_weights = auction_info.result.auction_state.era_validators[0].validator_weights;
-            let element = current_validator_weights.find(el => el.public_key == param);
+            const auction_info = await GetAllValidator();
+            let element = auction_info.find(el => el.public_key_hex == param);
             if (element) {
                 return true;
             }
@@ -352,5 +380,6 @@ module.exports = {
     GetDeploy, GetTransfersFromDeploy,
     GetTransferDetail, GetBlock,
     GetTransfersInBlock, GetType, GetDeploysInBlock,
-    GetTransfersVolume, GetDeployByRPC
+    GetTransfersVolume, GetDeployByRPC,
+    GetDeployFromRPC
 }

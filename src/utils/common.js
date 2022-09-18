@@ -157,11 +157,12 @@ const GetLatestStateRootHash = async (url) => {
  * @return {object}.
  */
 const QueryState = async (key, state = "", id = undefined) => {
-
-    if (state == "") {
-        state = await GetLatestStateRootHash();
-    }
     const rpc_url = await GetNetWorkRPC();
+    
+    if (state == "") {
+        state = await GetLatestStateRootHash(rpc_url);
+    }
+    
     return new Promise((resolve, reject) => {
         let command = `${process.env.CASPER_CLIENT} query-state --node-address ${rpc_url} -k ${key} -s ${state}`;
         console.log("command: ", command);
