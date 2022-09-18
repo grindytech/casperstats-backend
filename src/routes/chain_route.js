@@ -15,10 +15,34 @@ const verifyBlock = (req, res, next) => {
 
 router.route("/get-block/:block").get(verifyBlock, chain_controller.GetBlock);
 router.route("/get-latest-blocks/:number").get(chain_controller.GetLatestBlocks);
-router.route("/get-block-transfers/:block").get(chain_controller.GetBlockTx);
+
+const verifyBlockTransfers = (req, res, next) => {
+    try {
+        const block = req.params.block
+        if (chain_controller.get_block_transfers_cache.has(block)) {
+            return res.status(200).json(chain_controller.get_block_transfers_cache.get(block));
+        }
+        return next();
+    } catch (err) {
+        throw new Error(err);
+    }
+};
+router.route("/get-block-transfers/:block").get(verifyBlockTransfers, chain_controller.GetBlockTx);
 router.route("/get-state-root-hash/:block").get(chain_controller.GetStateRootHash);
 router.route("/get-range-block").get(chain_controller.GetRangeBlock);
-router.route("/get-block-deploy/:block").get(chain_controller.GetBlockDeployTx);
+
+const verifyBlockDeploys = (req, res, next) => {
+    try {
+        const block = req.params.block
+        if (chain_controller.get_block_deploys_cache.has(block)) {
+            return res.status(200).json(chain_controller.get_block_deploys_cache.get(block));
+        }
+        return next();
+    } catch (err) {
+        throw new Error(err);
+    }
+};
+router.route("/get-block-deploy/:block").get(verifyBlockDeploys, chain_controller.GetBlockDeployTx);
 
 // router for transaction
 router.route("/count-transfers").get(chain_controller.CountTransfers);

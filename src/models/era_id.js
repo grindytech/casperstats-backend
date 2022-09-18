@@ -22,6 +22,30 @@ async function GerEraIdByDate(from, to) {
     })
 }
 
+async function GetDateByEra(era) {
+    return new Promise((resolve, reject) => {
+        var sql = `SELECT timestamp FROM era_id WHERE era = ${era}`;
+        pool.query(sql, function (err, result) {
+            if (err) {
+                reject(err);
+            }
+            resolve(result[0].timestamp);
+        });
+    })
+}
+
+async function GetLatestEra () {
+    return new Promise((resolve, reject) => {
+        var sql = `SELECT MAX(era) as latest_era FROM era_id`;
+        pool.query(sql, function (err, result) {
+            if (err) {
+                reject(err);
+            }
+            resolve(result[0].latest_era);
+        });
+    })
+}
+
 module.exports = {
-    GerEraIdByDate
+    GerEraIdByDate, GetDateByEra, GetLatestEra
 }

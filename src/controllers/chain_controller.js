@@ -1,5 +1,6 @@
-const { GetBlocksByValidator } = require('../models/block_model');
-const { GetTotalNumberOfTransfers, GetTransfers } = require('../models/transfer');
+const { GetBlocksByValidator, GetBlockHeight, GetBlockByHeight, GetRangeBlock, GetLatestBlock } = require('../models/block_model');
+const { GetTotalNumberOfTransfers, GetTransfers, GetTransfersByDeployHash } = require('../models/transfer');
+const { GetAllDeployByHash } = require('../models/deploy')
 const {
   GetDeployhashes, GetDeploy, GetBlock,
   GetTransfersInBlock,
@@ -11,15 +12,19 @@ const request = require('request');
 
 const NodeCache = require("node-cache");
 const get_block_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_BLOCK || 20 });
+const get_block_deploys_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_BLOCK_DEPLOYS || 20 });
+const get_block_transfers_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_BLOCK_TRANSFERS || 20 });
 
 require('dotenv').config();
 
 module.exports = {
   get_block_cache,
+  get_block_deploys_cache,
+  get_block_transfers_cache,
   GetBlock: async function (req, res) {
     const b = req.params.block; // Hex-encoded block hash or height of the block. If not given, the last block added to the chain as known at the given node will be used
     const url = await GetNetWorkRPC();
-    const height = await GetHeight(url);
+    const height = await GetBlockHeight();
 
     // Check valid block input
     if (isNaN(b)) {
@@ -56,7 +61,7 @@ module.exports = {
   },
 
   GetBlockTx: async function (req, res) {
-    let b = req.params.block; // Hex-encoded block hash or height of the block. If not given, the last block added to the chain as known at the given node will be used
+    const b = req.params.block; // Hex-encoded block hash or height of the block. If not given, the last block added to the chain as known at the given node will be used
 
     let params;
     // check b is a number or string to change the params
@@ -65,14 +70,45 @@ module.exports = {
     } else {
       params = [{ "Height": parseInt(b) }]
     }
-    const url = await GetNetWorkRPC();
-    RequestRPC(url, RpcApiName.get_block_transfers, params).then(value => {
+    let hash;
+    if(isNaN(b)){
+      hash = b;
+    }else{
+      hash = (await GetBlockByHeight(b)).hash;
+    }
+    // const url = await GetNetWorkRPC();
+    // RequestRPC(url, RpcApiName.get_block_transfers, params).then(value => {
+    //   res.status(200);
+    //   res.json(value.result.transfers);
+    // }).catch(err => {
+    //   console.log(err);
+    //   res.status(500).send("Can not get tx data");
+    // })
+
+    let transfers = [];
+    try{
+      const deploy_hash = await GetAllDeployByHash(hash);
+      if(deploy_hash.length > 0){
+        for (let i=0; i< deploy_hash.length; i++) {
+          const transfer = await GetTransfersByDeployHash(deploy_hash[i].deploy_hash);
+          if(transfer != null){
+            if(transfer.from){
+              transfer.from = "account-hash-"+transfer.from;
+            }
+            if(transfer.to){
+              transfer.to = "account-hash-"+transfer.to;
+            }
+            transfers.push(transfer);
+          }
+        }
+      }
+      get_block_transfers_cache.set(b, transfers);
       res.status(200);
-      res.json(value.result.transfers);
-    }).catch(err => {
+      res.json(transfers);
+    }catch (err){
       console.log(err);
-      res.status(500).send("Can not get tx data");
-    })
+      res.status(500).send("can not get block_transfer");
+    }
   },
 
   GetStateRootHash: async function (req, res) {
@@ -101,12 +137,13 @@ module.exports = {
 
     try {
       const url = await GetNetWorkRPC();
-      let height = await GetHeight(url);
-      let datas = [];
-      for (let i = height; i > height - num; i--) {
-        let block_data = await GetBlock(url, i);
-        datas.push(block_data.result.block);
-      }
+      let datas = await GetLatestBlock(num);
+      // let height = await GetBlockHeight();
+      // let datas = [];
+      // for (let i = height; i > height - num; i--) {
+      //   let block_data = await GetBlockByHeight(i);
+      //   datas.push(block_data);
+      // }
       res.status(200);
       res.json(datas);
 
@@ -121,15 +158,18 @@ module.exports = {
     let end = Number(req.query.end);
 
     try {
-      const url = await GetNetWorkRPC();
-      let height = await GetHeight(url);
-      let data = {};
-      data["current_height"] = height;
-      data["result"] = [];
-      for (let i = end; i >= start; i--) {
-        let block_data = await GetBlock(url, i);
-        data.result.push(block_data.result.block);
-      }
+      let height = await GetBlockHeight();
+      let data = {
+        current_height: 0,
+        result: []
+      };
+      data.current_height = height;
+      let block_data = await GetRangeBlock(start,end);
+      // for (let i = end; i >= start; i--) {
+      //   let block_data = await GetBlockByHeight(i);
+      //   data.result.push(block_data);
+      // }
+      data.result = block_data;
       res.status(200);
       res.json(data);
     } catch (err) {
@@ -139,15 +179,24 @@ module.exports = {
   },
 
   GetBlockDeployTx: async function (req, res) {
-    let b = req.params.block;
+    const b = req.params.block;
+    let hash;
     try {
+      if(isNaN(b)){
+        hash = b
+      }else{
+        hash = (await GetBlockByHeight(b)).hash;
+      }
       const url = await GetNetWorkRPC();
       let deploy_hashes = await GetDeployhashes(url, b);
+      //let deploy_hashes = await GetAllDeployByHash(hash); //edited
+      console.log(deploy_hashes);
       let data = [];
       for (let i = 0; i < deploy_hashes.length; i++) {
         let deploy_data = await GetDeploy(url, deploy_hashes[i]);
         data.push(deploy_data);
       }
+      get_block_deploys_cache.set(b, data)
       res.status(200);
       res.json(data);
     } catch (err) {
@@ -202,10 +251,10 @@ module.exports = {
         delete data[i]["state_root_hash"];
         delete data[i]["validator"];
 
-        const deploys = await GetDeploysInBlock(url, data[i].height);
-        const transfers = await GetTransfersInBlock(url, data[i].height);
-        data[i]["deploys"] = deploys.deploy_hashes.length + deploys.transfer_hashes.length;
-        data[i]["transfers"] = transfers.transfers.length;
+        // const deploys = await GetDeploysInBlock(url, data[i].height);
+        // const transfers = await GetTransfersInBlock(url, data[i].height);
+        // data[i]["deploys"] = deploys.deploy_hashes.length + deploys.transfer_hashes.length;
+        // data[i]["transfers"] = transfers.transfers.length;
       }
       res.status(200);
       res.json(data);

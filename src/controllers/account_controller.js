@@ -6,22 +6,23 @@ require('dotenv').config();
 const { GetHolder, GetTotalNumberOfAccount, GetPublicKeyByAccountHash } = require('../models/account');
 const { GetTransfersByAccountHash } = require('../models/transfer');
 const { GetTimestampByEraFromSwtichBlock } = require("../models/block_model");
-const { GetTimestampByEra } = require("../models/era");
+const { GetTimestampByEra, GetRewardByPublicKey } = require("../models/era");
 const { GetDeploysByPublicKey, GetDeployOfPublicKeyByType, CountDeployByType } = require('../models/deploy');
 const { GetAccountHash, RequestRPC, GetBalanceByAccountHash, GetNetWorkRPC, GetEra } = require('../utils/common');
-const { GetRewardByPublicKey, GetPublicKeyRewardByDate, GetLatestEra,
+const { GetValidatorReward, GetDelegatorReward, GetPublicKeyRewardByDate, GetLatestEra,
   GetPublicKeyRewardByEra,
   GetLatestTimestampByPublicKey } = require('../models/era');
 const { GerEraIdByDate } = require('../models/era_id');
 const { GetValidatorInformation } = require('../utils/validator');
 const { GetDeployByRPC } = require('../utils/chain');
+const { GetValidator } = require("../models/validator");
+const { GetTotalStakeAsDelegator } = require("../models/delegator");
 
 require('dotenv').config();
 
 const NodeCache = require("node-cache");
 const { GetEraByBlockHash } = require('../models/block_model');
-const get_rich_accounts_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_RICH_ACCOUNTS || 60 });
-
+const get_rich_accounts_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_RICH_ACCOUNTS || 300 });
 module.exports = {
   get_rich_accounts_cache,
 
@@ -30,56 +31,105 @@ module.exports = {
     try {
       const url = await GetNetWorkRPC();
       // modify param
-      {
-        account = account.replace("/\n/g", '');
-        account = account.replace("account-hash-", '');
+
+      let account_hash;
+      try{
+        account_hash = await GetAccountHash(account);
+        account_hash = account_hash.replace("account-hash-", "");
+      }catch (err) {
+        account_hash = account;
       }
 
-      let account_data = await GetHolder(account);
+      // {
+      //   account = account.replace("/\n/g", '');
+      //   account = account.replace("account-hash-", '');
+      // }
+
+      let account_data = await GetHolder(account_hash);
+      let transferrable = 0;
+      let total_staked_as_delegator = math.bignumber("0");
+      let total_staked_as_validator = math.bignumber("0");
+
+      //if database has the account, query from the database else request from rpc
       if (account_data.length == 1) {
         account_data = account_data[0];
-      } else {
-        account_data = await GetAccountData(account);
-      }
-
-      let transferrable = 0;
-      {
-        try {
-          transferrable = (await GetBalanceByAccountHash(url, "account-hash-" + account_data.account_hash)).balance_value;
-          
-          console.log("transferrable: ", transferrable);
-        } catch (err) {
-          transferrable = 0;
-        }
-      }
-
-      // Total staked
-      let total_staked = math.bignumber("0");
-      try {
-        if (account_data.public_key_hex) {
-          const auction_info = await RequestRPC(url, RpcApiName.get_auction_info, []);
-          const bids = auction_info.result.auction_state.bids;
-          if (bids) {
-            for (let i = 0; i < bids.length; i++) {
-              if (bids[i].public_key.toLowerCase() == account_data.public_key_hex.toLowerCase()) {
-                total_staked = math.add(total_staked, math.bignumber(bids[i].bid.staked_amount));
-              }
-              const delegators = bids[i].bid.delegators;
-              if (delegators) {
-                for (let j = 0; j < delegators.length; j++) {
-                  if (delegators[j].public_key.toLowerCase() == account_data.public_key_hex.toLowerCase()) {
-                    total_staked = math.add(total_staked, math.bignumber(delegators[j].staked_amount));
-                  }
-                }
-              }
-            }
+        transferrable = account_data.balance;
+        if(account_data.public_key_hex != null || account_data.public_key_hex != undefined){
+          let validator = await GetValidator(account_data.public_key_hex);
+          if(validator.length >0){
+            total_staked_as_validator = validator[0].self_stake
+          }
+          let delegator = await GetTotalStakeAsDelegator(account_data.public_key_hex);
+          if(delegator){
+            total_staked_as_delegator = delegator.toString();
           }
         }
-      } catch (err) {
-        console.log("Get Total Stake Error: ", err.message);
-        total_staked = math.bignumber("0");
+      } else {
+        account_data = await GetAccountData(account);
+        {
+          try {
+            transferrable = (await GetBalanceByAccountHash(url, "account-hash-" + account_data.account_hash)).balance_value;
+            
+            console.log("transferrable: ", transferrable);
+          } catch (err) {
+            transferrable = 0;
+          }
+        }
+
+        //total_staked
+        // try {
+        //   if (account_data.public_key_hex) {
+        //     const auction_info = await RequestRPC(url, RpcApiName.get_auction_info, []);
+        //     const bids = auction_info.result.auction_state.bids;
+        //     if (bids) {
+        //       for (let i = 0; i < bids.length; i++) {
+        //         if (bids[i].public_key.toLowerCase() == account_data.public_key_hex.toLowerCase()) {
+        //           total_staked = math.add(total_staked, math.bignumber(bids[i].bid.staked_amount));
+        //         }
+        //         const delegators = bids[i].bid.delegators;
+        //         if (delegators) {
+        //           for (let j = 0; j < delegators.length; j++) {
+        //             if (delegators[j].public_key.toLowerCase() == account_data.public_key_hex.toLowerCase()) {
+        //               total_staked = math.add(total_staked, math.bignumber(delegators[j].staked_amount));
+        //             }
+        //           }
+        //         }
+        //       }
+        //     }
+        //   }
+        // } catch (err) {
+        //   console.log("Get Total Stake Error: ", err.message);
+        //   total_staked = math.bignumber("0");
+        // }
+
       }
-      // Total reward
+
+      // Total validator reward
+      // let total_validator_reward = 0;
+      // try {
+      //   if (account_data.public_key_hex) {
+      //     total_validator_reward = (await GetValidatorReward(account_data.public_key_hex.toLowerCase())).total_validator_reward;
+      //   }
+      //   if (total_validator_reward == null) {
+      //     total_validator_reward = 0;
+      //   }
+      // } catch (err) {
+      //   total_validator_reward = 0;
+      // }
+
+      // // Total delegator reward
+      // let total_delegator_reward = 0;
+      // try {
+      //   if (account_data.public_key_hex) {
+      //     total_delegator_reward = (await GetDelegatorReward(account_data.public_key_hex.toLowerCase())).total_delegator_reward;
+      //   }
+      //   if (total_delegator_reward == null) {
+      //     total_delegator_reward = 0;
+      //   }
+      // } catch (err) {
+      //   total_delegator_reward = 0;
+      // }
+
       let total_reward = 0;
       try {
         if (account_data.public_key_hex) {
@@ -107,9 +157,13 @@ module.exports = {
         account_data.name = await GetAccountName(account_data.public_key_hex.toLowerCase());
       } catch (err) { }
 
-      account_data.balance = (Number(transferrable) + Number(total_staked)).toString();
+      account_data.balance = (Number(transferrable) + Number(total_staked_as_delegator)+ Number(total_staked_as_validator)).toString();
       account_data.transferrable = transferrable.toString();
-      account_data.total_staked = total_staked.toString();
+      account_data.total_staked_as_delegator = total_staked_as_delegator.toString();
+      account_data.total_staked_as_validator = total_staked_as_validator.toString();
+      account_data.total_staked = (Number(total_staked_as_delegator)+ Number(total_staked_as_validator)).toString();
+      // account_data.total_validator_reward = total_validator_reward.toString();
+      // account_data.total_delegator_reward = total_delegator_reward.toString();
       account_data.total_reward = total_reward.toString();
       account_data.unbonding = unbonding.toString();
       res.json(account_data);
@@ -120,7 +174,6 @@ module.exports = {
   },
 
   CountHolders: async function (req, res) {
-    const account = req.params.account;
 
     GetTotalNumberOfAccount().then(value => {
       res.json(value);

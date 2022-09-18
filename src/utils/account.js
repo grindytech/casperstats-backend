@@ -11,6 +11,9 @@ const { GetAllKnownAddress } = require("../models/address");
 const { GetInflowOfAddressByDate, GetOutflowOfAddressByDate } = require("../models/transfer");
 const {GetAddress} = require('../models/address');
 const { GetValidatorInformation } = require("./validator");
+const { GetAllValidator } = require("../models/validator");
+const { GetAllDelegator } = require("../models/delegator");
+const { GetLatestEra } = require("../models/era_id");
 
 
 async function GetAccountData(address) {
@@ -40,32 +43,28 @@ async function GetAccountData(address) {
 async function GetRichest(start, count) {
 
     let result = [];
-    const url = await common.GetNetWorkRPC();
+    //const url = await common.GetNetWorkRPC();
     {
         // get all accounts
         const accounts = await GetAccounts();
         let stakers = []; // stake order
         {
             // get all staking accounts
-            const auction_info = (await common.RequestRPC(url, RpcApiName.get_auction_info, [])).result;
+            const auction_info = await GetAllValidator();
 
-            // get total bid
-            let bids = auction_info.auction_state.bids;
-
-            for (let i = 0; i < bids.length; i++) {
-                const bid = bids[i].bid;
+            for (let i = 0; i < auction_info.length; i++) {
                 stakers.push({
-                    "public_key_hex": bids[i].public_key,
-                    "staked_amount": bid.staked_amount.toString(),
+                    "public_key_hex": auction_info[i].public_key_hex,
+                    "staked_amount": auction_info[i].self_stake.toString(),
                 })
+            }
 
-                const delegators = bid.delegators;
-                for (let j = 0; j < delegators.length; j++) {
-                    stakers.push({
-                        "public_key_hex": delegators[j].public_key,
-                        "staked_amount": delegators[j].staked_amount.toString(),
-                    })
-                }
+            const delegators = await GetAllDelegator()
+            for (let j = 0; j < delegators.length; j++) {
+                stakers.push({
+                    "public_key_hex": delegators[j].public_key,
+                    "staked_amount": delegators[j].staked_amount.toString(),
+                })
             }
         }
 
@@ -94,7 +93,8 @@ async function GetRichest(start, count) {
                 return value.public_key_hex != public_key_hex;
             })
         }
-        result = accounts.concat(stakers);
+        //result = accounts.concat(stakers);
+        result = accounts;
     }
 
     result.sort((first, second) => {
@@ -113,23 +113,23 @@ async function GetRichest(start, count) {
     result = result.slice(Number(start), Number(start) + Number(count));
 
     // add more information for genesis account
-    {
-        for (let i = 0; i < result.length; i++) {
-            if (result[i].account_hash == undefined) {
-                result[i].account_hash = await common.GetAccountHash(result[i].public_key_hex);
+    // {
+    //     for (let i = 0; i < result.length; i++) {
+    //         if (result[i].account_hash == undefined) {
+    //             result[i].account_hash = await common.GetAccountHash(result[i].public_key_hex);
 
-                result[i].balance = result[i].staked_amount;
-                result[i].active_date = "";
-                result[i].transferrable = (await common.GetBalanceByAccountHash(url, "account-hash-" + result[i].account_hash)).balance_value;
-            }
-        }
-    }
+    //             result[i].active_date = "";
+    //             result[i].transferrable = (await common.GetBalanceByAccountHash(url, "account-hash-" + result[i].account_hash)).balance_value;
+    //             result[i].balance = (Number(result[i].staked_amount) + Number(result[i].transferrable)).toString();
+    //         }
+    //     }
+    // }
     return result;
 }
 
 async function GetUnstakingAmount(url, public_key) {
     const deploys = await GetAllDeployOfPublicKeyByType(public_key, "undelegate");
-    const current_era = await common.GetEra(url);
+    const current_era = await GetLatestEra();
     let total = 0;
     for (let i = 0; i < deploys.length; i++) {
         if (deploys[i].status == "success") {

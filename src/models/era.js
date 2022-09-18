@@ -44,6 +44,52 @@ async function GetRewardByPublicKey(public_key) {
     })
 }
 
+async function GetRangeEraRewards (public_key, start, count) {
+    return new Promise((resolve, reject) => {
+        var sql = `SELECT era, SUM(amount) as amount FROM era WHERE validator = '${public_key}' GROUP BY era LIMIT ${start}, ${count}`;
+        pool.query(sql, function(err, result) {
+            if(err){
+                reject(err);
+            }
+            resolve(result);
+        })
+    })
+}
+
+async function GetValidatorReward(public_key) {
+    return new Promise((resolve, reject) => {
+
+        var sql = `SELECT CAST(SUM(CAST(era.amount AS UNSIGNED INTEGER)) as CHAR) as total_validator_reward FROM era WHERE validator = '${public_key}' AND delegator = ""`;
+        pool.query(sql, function (err, result) {
+            if (err) {
+                reject(err);
+            }
+            if (result && result.length > 0) {
+                resolve(result[0]);
+            } else {
+                resolve({ total_validator_reward: 0 })
+            }
+        });
+    })
+}
+
+async function GetDelegatorReward(public_key) {
+    return new Promise((resolve, reject) => {
+
+        var sql = `SELECT CAST(SUM(CAST(era.amount AS UNSIGNED INTEGER)) as CHAR) as total_delegator_reward FROM era WHERE delegator = '${public_key}'`;
+        pool.query(sql, function (err, result) {
+            if (err) {
+                reject(err);
+            }
+            if (result && result.length > 0) {
+                resolve(result[0]);
+            } else {
+                resolve({ total_delegator_reward: 0 })
+            }
+        });
+    })
+}
+
 async function GetTotalRewardByEra(era_id) {
     return new Promise((resolve, reject) => {
         var sql = `SELECT CAST(SUM(CAST(era.amount AS UNSIGNED INTEGER)) as CHAR) as total_reward FROM era WHERE era = '${era_id}'`;
@@ -224,8 +270,9 @@ async function GetLatestTimestampByPublicKey(public_key) {
 module.exports = {
     GetTotalRewardByPublicKey, GetTotalRewardByEra,
     GetLatestEra, GetPublicKeyTotalRewardByDate,
-    GetTotalDelegator, GetTotalReward, GetRewardByPublicKey,
+    GetTotalDelegator, GetTotalReward, GetValidatorReward,
     GetPublicKeyRewardByDate, GetPublicKeyRewardByEra,
     GetTimestampByEra, GetLatestEraByDate, GetEraValidatorOfPublicKey,
-    GetLatestTimestampByPublicKey
+    GetLatestTimestampByPublicKey,GetRangeEraRewards,
+    GetDelegatorReward,GetRewardByPublicKey
 }

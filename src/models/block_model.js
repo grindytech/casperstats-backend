@@ -36,27 +36,60 @@ async function GetSwitchBlockByDate(date) {
     })
 }
 
-async function GetBlockHashByHeight(height) {
+async function GetBlockByHeight(height) {
     return new Promise((resolve, reject) => {
 
-        var sql = `SELECT hash FROM block WHERE height = ${height}`;
+        var sql = `SELECT * FROM block WHERE height = '${height}'`;
         pool.query(sql, function (err, result) {
             if (err) {
                 reject(err);
             }
-            if (result.length > 0) {
-                resolve(result[0]);
-            } else {
-                resolve("");
-            }
+            resolve(result[0]);
         });
     })
 }
 
 
+
+async function GetBlockHeightByHash (hash) {
+    return new Promise ((resolve, reject) => {
+        var sql = `SELECT height FROM block WHERE hash = '${hash}'`;
+        pool.query(sql, function(err, result) {
+            if(err){
+                reject(err)
+            }
+            resolve(result);
+        })
+    })
+}
+
+async function GetLatestBlock(count) {
+    return new Promise ((resolve, reject) => {
+        var sql = `SELECT * FROM block ORDER BY height DESC LIMIT 0, ${count}`;
+        pool.query(sql, function(err, result) {
+            if(err){
+                reject(err)
+            }
+            resolve(result);
+        })
+    })
+}
+
+async function GetRangeBlock(start, end) {
+    return new Promise ((resolve, reject) => {
+        var sql = `SELECT * FROM block WHERE height BETWEEN ${start} AND ${end} ORDER BY height DESC`;
+        pool.query(sql, function(err, result) {
+            if(err){
+                reject(err)
+            }
+            resolve(result);
+        })
+    })
+}
+
 async function GetBlockHeight() {
     return new Promise((resolve, reject) => {
-        var sql = `SELECT height FROM block WHERE height = (SELECT MAX(height) FROM block)`;
+        var sql = `SELECT MAX(height) as height FROM block`;
         pool.query(sql, function (err, result, fields) {
             if (err) resolve(false);
             if (result != undefined && result.length > 0) {
@@ -83,7 +116,7 @@ async function GetEraByBlockHash(hash) {
             }
         });
     })
-}
+} 
 
 async function GetTimestampByEraFromSwtichBlock(era) {
     return new Promise((resolve, reject) => {
@@ -102,6 +135,7 @@ async function GetTimestampByEraFromSwtichBlock(era) {
 
 module.exports = {
     GetBlocksByValidator, GetSwitchBlockByDate,
-    GetBlockHashByHeight, GetBlockHeight, GetEraByBlockHash,
-    GetTimestampByEraFromSwtichBlock
+    GetBlockByHeight, GetBlockHeight, GetEraByBlockHash,
+    GetTimestampByEraFromSwtichBlock, GetBlockHeightByHash, GetRangeBlock,
+    GetLatestBlock
 }

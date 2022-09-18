@@ -36,6 +36,18 @@ async function GetAllDeployByPublicKey(public_key) {
     })
 }
 
+async function GetAllDeployByHash(hash) {
+    return new Promise((resolve, reject) => {
+        var sql=`SELECT * FROM deploy WHERE hash = '${hash}'`;
+        pool.query(sql, function (err, result) {
+            if(err){
+                reject(err);
+            }
+            resolve(result);
+        })
+    })
+}
+
 async function GetDeployOfPublicKeyByType(public_key, type, start, count) {
     return new Promise((resolve, reject) => {
 
@@ -90,6 +102,18 @@ async function GetDeployByDate(type, from, to) {
     })
 }
 
+async function GetDeployByDeployHash(deploy_hash) {
+    return new Promise((resolve, reject) => {
+        var sql = `SELECT * FROM deploy WHERE deploy_hash = '${deploy_hash}'`;
+        pool.query(sql, function (err, result) {
+            if(err){
+                reject(err);
+            }
+            resolve(result);
+        });
+    })
+}
+
 async function GetLatestDeployCostByType(type) {
     return new Promise((resolve, reject) => {
         var sql = `SELECT cost FROM deploy WHERE type = '${type}' AND status = 'success' ORDER BY timestamp DESC LIMIT 1`;
@@ -123,7 +147,8 @@ async function GetLatestDeployByType() {
 }
 
 module.exports = {
-    GetDeploysByPublicKey, GetAllDeployByPublicKey,
+    GetDeploysByPublicKey, GetAllDeployByPublicKey, GetAllDeployByHash,
     GetDeployOfPublicKeyByType, CountDeployByType, GetAllDeployOfPublicKeyByType,
-    GetDeployByDate, GetLatestDeployCostByType, GetLatestDeployByType
+    GetDeployByDate, GetLatestDeployCostByType, GetLatestDeployByType,
+    GetDeployByDeployHash
 }

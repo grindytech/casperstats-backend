@@ -4,7 +4,7 @@ require('dotenv').config();
 
 module.exports = {
 
-    GetValidator: async function (req, res) {
+    GetValidatorInfo: async function (req, res) {
         const public_key = req.params.address;
         GetValidatorInformation(public_key).then(value => {
             res.status(200).json(value);
@@ -17,8 +17,8 @@ module.exports = {
 
     },
 
-    GetValidators: async function (req, res) {
-        validator_db.GetValidatorsWithNameAndPublicKey().then(value => {
+    GetValidatorsInfo: async function (req, res) {
+        validator_db.GetValidatorsInfoWithNameAndPublicKey().then(value => {
             res.status(200).json(value);
         }).catch(err => {
             console.log(err);
@@ -26,7 +26,7 @@ module.exports = {
         })
     },
 
-    AddValidator: async function (req, res) {
+    AddValidatorInfo: async function (req, res) {
         const public_key = req.body.public_key;
         const name = req.body.name;
         const email = req.body.email;
@@ -41,7 +41,7 @@ module.exports = {
         // parser link
         const links = `[{\"tag\": \"Twitter\", \"link\": \"${twitter}\"}, {\"tag\": \"Facebook\", \"link\": \"${facebook}\"}, { \"tag\": \"Telegram\", \"link\": \"${telegram}\"}, {\"tag\": \"Github\", \"link\": \"${github}\"}]`
 
-        validator_db.InsertValidator(public_key, name, email, icon, website, links, details).then(result => {
+        validator_db.InsertValidatorInfo(public_key, name, email, icon, website, links, details).then(result => {
             res.status(200).json(result);
         }).catch(err => {
             console.log(err);
@@ -51,10 +51,10 @@ module.exports = {
         })
     },
 
-    UpdateValidator: async function (req, res) {
+    UpdateValidatorInfo: async function (req, res) {
         const public_key = req.body.public_key;
 
-        let validator = await validator_db.GetValidator(public_key);
+        let validator = await validator_db.GetValidatorInfo(public_key);
         if (validator == undefined || validator == null || validator.length < 1) {
             res.status(500).json("Validator not found");
             return;
@@ -115,10 +115,10 @@ module.exports = {
 
     },
 
-    DeleteValidator: async function (req, res) {
+    DeleteValidatorInfo: async function (req, res) {
         const public_key = req.params.address;
 
-        validator_db.DeleteValidator(public_key).then(result => {
+        validator_db.DeleteValidatorInfo(public_key).then(result => {
             res.status(200).json(result);
         }).catch(err => {
             console.log(err);
@@ -127,7 +127,7 @@ module.exports = {
     },
 
     Init: async function (req, res) {
-        validator_db.CreateValidatorTable().then(result => {
+        validator_db.CreateValidatorInfoTable().then(result => {
             res.status(200).json(result);
         }).catch(err => {
             res.status(500).json(err);
@@ -135,7 +135,7 @@ module.exports = {
     },
 
     Drop: async function (req, res) {
-        validator_db.DropValidator().then(result => {
+        validator_db.DropValidatorInfo().then(result => {
             res.status(200).json(result);
         }).catch(err => {
             res.status(500).json(err);
