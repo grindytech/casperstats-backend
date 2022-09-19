@@ -14,6 +14,8 @@ const { GetValidatorInformation } = require("./validator");
 const { GetAllValidator } = require("../models/validator");
 const { GetAllDelegator } = require("../models/delegator");
 const { GetLatestEra } = require("../models/era_id");
+const NodeCache = require("node-cache");
+const get_all_accounts_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_RICH_ACCOUNTS || 1800 });
 
 
 async function GetAccountData(address) {
@@ -41,77 +43,83 @@ async function GetAccountData(address) {
 }
 
 async function GetRichest(start, count) {
-
+    
     let result = [];
-    //const url = await common.GetNetWorkRPC();
-    {
-        // get all accounts
-        const accounts = await GetAccounts();
-        let stakers = []; // stake order
+    if(get_all_accounts_cache.has(`richest account`)){
+        let data = get_all_accounts_cache.get(`richest account`);
+        result = data.slice(Number(start), Number(start) + Number(count));
+    }else{
+        //const url = await common.GetNetWorkRPC();
         {
-            // get all staking accounts
-            const auction_info = await GetAllValidator();
+            // get all accounts
+            const accounts = await GetAccounts();
+            let stakers = []; // stake order
+            {
+                // get all staking accounts
+                const auction_info = await GetAllValidator();
 
-            for (let i = 0; i < auction_info.length; i++) {
-                stakers.push({
-                    "public_key_hex": auction_info[i].public_key_hex,
-                    "staked_amount": auction_info[i].self_stake.toString(),
+                for (let i = 0; i < auction_info.length; i++) {
+                    stakers.push({
+                        "public_key_hex": auction_info[i].public_key_hex,
+                        "staked_amount": auction_info[i].self_stake.toString(),
+                    })
+                }
+
+                const delegators = await GetAllDelegator()
+                for (let j = 0; j < delegators.length; j++) {
+                    stakers.push({
+                        "public_key_hex": delegators[j].public_key,
+                        "staked_amount": delegators[j].staked_amount.toString(),
+                    })
+                }
+            }
+
+            // merge stakers to accounts
+            for (let i = 0; i < accounts.length; i++) {
+                const public_key_hex = accounts[i].public_key_hex;
+                let staked_amount = 0;
+                const transferrable = accounts[i].balance === null ? 0 : accounts[i].balance;
+                const filter_pk = stakers.filter(value => {
+                    return value.public_key_hex == public_key_hex;
+                })
+
+                for (let j = 0; j < filter_pk.length; j++) {
+                    staked_amount += Number(filter_pk[j].staked_amount);
+                }
+                let total_balance = (Number(transferrable) + Number(staked_amount));
+                if (!total_balance) {
+                    total_balance = 0;
+                }
+                accounts[i].balance = total_balance.toString();
+                accounts[i].transferrable = transferrable.toString();
+                accounts[i].staked_amount = staked_amount.toString();
+
+                // remove account that just merge from stakers
+                stakers = stakers.filter(value => {
+                    return value.public_key_hex != public_key_hex;
                 })
             }
-
-            const delegators = await GetAllDelegator()
-            for (let j = 0; j < delegators.length; j++) {
-                stakers.push({
-                    "public_key_hex": delegators[j].public_key,
-                    "staked_amount": delegators[j].staked_amount.toString(),
-                })
-            }
+            //result = accounts.concat(stakers);
+            result = accounts;
         }
 
-        // merge stakers to accounts
-        for (let i = 0; i < accounts.length; i++) {
-            const public_key_hex = accounts[i].public_key_hex;
-            let staked_amount = 0;
-            const transferrable = accounts[i].balance === null ? 0 : accounts[i].balance;
-            const filter_pk = stakers.filter(value => {
-                return value.public_key_hex == public_key_hex;
-            })
-
-            for (let j = 0; j < filter_pk.length; j++) {
-                staked_amount += Number(filter_pk[j].staked_amount);
+        result.sort((first, second) => {
+            let first_balance = first.balance;
+            if (!first_balance) {
+                first_balance = first.staked_amount;
             }
-            let total_balance = (Number(transferrable) + Number(staked_amount));
-            if (!total_balance) {
-                total_balance = 0;
-            }
-            accounts[i].balance = total_balance.toString();
-            accounts[i].transferrable = transferrable.toString();
-            accounts[i].staked_amount = staked_amount.toString();
 
-            // remove account that just merge from stakers
-            stakers = stakers.filter(value => {
-                return value.public_key_hex != public_key_hex;
-            })
-        }
-        //result = accounts.concat(stakers);
-        result = accounts;
+            let second_balance = second.balance;
+            if (!second_balance) {
+                second_balance = second.staked_amount;
+            }
+            return math.compare(second_balance, first_balance);
+        })
+
+        get_all_accounts_cache.set(`richest account`, result);
+
+        result = result.slice(Number(start), Number(start) + Number(count));
     }
-
-    result.sort((first, second) => {
-        let first_balance = first.balance;
-        if (!first_balance) {
-            first_balance = first.staked_amount;
-        }
-
-        let second_balance = second.balance;
-        if (!second_balance) {
-            second_balance = second.staked_amount;
-        }
-        return math.compare(second_balance, first_balance);
-    })
-
-    result = result.slice(Number(start), Number(start) + Number(count));
-
     // add more information for genesis account
     // {
     //     for (let i = 0; i < result.length; i++) {
