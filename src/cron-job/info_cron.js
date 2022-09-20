@@ -1,17 +1,8 @@
 const cron = require('node-cron');
-const router = require('express').Router();
 const { GetEconomicsCache, GetStatsCache, GetVolumeCache, GetStakingVolumeCache, 
     GetStakingTxVolumeCache, GetExchangeVolumeCache} = require('../controllers/info_controller');
-const state_controller = require('../controllers/state_controller');
-require('dotenv').config();
 
-
-async function start(){
-    // Get validator
-    // CronJobGetBids();
-    // CronJobGetCurrentEra();
-    // CronJobGetNextEra();
-
+async function start() {
     // Get Stats
     CronJobGetStats();
 
@@ -31,45 +22,9 @@ async function start(){
     CronJobGetExchangeVolume();
 }
 
-async function CronJobGetBids(){
-    cron.schedule(' * */2 * * *', function() {
-        try{
-            //router
-            console.log("reset get-bids-cache successful")
-        }catch (err) {
-            console.log(err)
-        }
-
-    });
-}
-
-async function CronJobGetCurrentEra(){
-    cron.schedule('1 * */2 * * *', function() {
-        try{
-            state_controller.GetCurrentEraValidators;
-            console.log("reset get-current-era-validator-cache successful")
-        }catch (err) {
-            console.log(err)
-        }
-
-    });
-}
-
-async function CronJobGetNextEra(){
-    cron.schedule('2 * */2 * * *', function() {
-        try{
-            state_controller.GetNextEraValidators;
-            console.log("reset get-next-era-validator-cache successful")
-        }catch (err) {
-            console.log(err)
-        }
-
-    });
-}
-
 async function CronJobGetStats() {
     await GetStatsCache();
-    cron.schedule('3 */5 * * * *', async function() {
+    cron.schedule('3 */3 * * * *', async function() {
         try{
             await GetStatsCache();
             console.log("Update get-stats-cache successfull");
@@ -81,9 +36,9 @@ async function CronJobGetStats() {
 
 async function CronJobGetEconomics() {
     await GetEconomicsCache();
-    cron.schedule('4 */3 * * * *', async function() {
+    cron.schedule('4 */2 * * * *', async function() {
         try{
-            
+            await GetEconomicsCache();
             console.log("Update get-economics-cache successfull");
         }catch (err){
             console.log(err);
@@ -103,7 +58,7 @@ async function CronJobGetDailyVolume() {
 }
 
 async function CronJobGetDelegateVolume() {
-    cron.schedule('6 */10 * * * *', async function() {
+    cron.schedule('6 */11 * * * *', async function() {
         try{
             await GetStakingVolumeCache("delegate", 60);
             console.log("Update get-delegate-volume-cache successfull");
@@ -114,7 +69,7 @@ async function CronJobGetDelegateVolume() {
 }
 
 async function CronJobGetUndelegateVolume() {
-    cron.schedule('7 */10 * * * *', async function() {
+    cron.schedule('7 */11 * * * *', async function() {
         try{
             await GetStakingVolumeCache("undelegate", 60);
             console.log("Update get-undelegate-volume-cache successfull");
@@ -125,7 +80,7 @@ async function CronJobGetUndelegateVolume() {
 }
 
 async function CronJobGetDelegateTxVolume() {
-    cron.schedule('6 */10 * * * *', async function() {
+    cron.schedule('6 */11 * * * *', async function() {
         try{
             await GetStakingTxVolumeCache("delegate", 60);
             console.log("Update get-delegate-tx-volume-cache successfull");
@@ -136,7 +91,7 @@ async function CronJobGetDelegateTxVolume() {
 }
 
 async function CronJobGetUndelegateTxVolume() {
-    cron.schedule('7 */10 * * * *', async function() {
+    cron.schedule('7 */11 * * * *', async function() {
         try{
             await GetStakingTxVolumeCache("undelegate", 60);
             console.log("Update get-undelegate-tx-volume-cache successfull");
@@ -157,6 +112,4 @@ async function CronJobGetExchangeVolume() {
     })
 }
 
-module.exports = {
-    start
-}
+module.exports = { start }

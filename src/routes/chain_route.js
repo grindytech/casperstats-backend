@@ -14,7 +14,20 @@ const verifyBlock = (req, res, next) => {
 };
 
 router.route("/get-block/:block").get(verifyBlock, chain_controller.GetBlock);
-router.route("/get-latest-blocks/:number").get(chain_controller.GetLatestBlocks);
+
+const verifyLatestBlock = (req, res, next) => {
+    try {
+        const num = req.params.number
+        if (chain_controller.get_latest_block_cache.has(num)) {
+            return res.status(200).json(chain_controller.get_latest_block_cache.get(num));
+        }
+        return next();
+    } catch (err) {
+        throw new Error(err);
+    }
+};
+
+router.route("/get-latest-blocks/:number").get(verifyLatestBlock, chain_controller.GetLatestBlocks);
 
 const verifyBlockTransfers = (req, res, next) => {
     try {
@@ -46,7 +59,20 @@ router.route("/get-block-deploy/:block").get(verifyBlockDeploys, chain_controlle
 
 // router for transaction
 router.route("/count-transfers").get(chain_controller.CountTransfers);
-router.route("/get-latest-txs/").get(chain_controller.GetLatestTx);
+
+const verifyLatestTx = (req, res, next) => {
+    try {
+        const start = req.query.start
+        const count = req.query.count
+        if (chain_controller.get_latest_tx_cache.has(`'${start}'-'${count}'`)) {
+            return res.status(200).json(chain_controller.get_latest_tx_cache.get(`'${start}'-'${count}'`));
+        }
+        return next();
+    } catch (err) {
+        throw new Error(err);
+    }
+};
+router.route("/get-latest-txs/").get(verifyLatestTx, chain_controller.GetLatestTx);
 
 // blocks
 router.route("/get-proposer-blocks").get(chain_controller.GetBlocksByProposer);

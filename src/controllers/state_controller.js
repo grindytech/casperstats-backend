@@ -12,13 +12,55 @@ const { GetRangeDelegator } = require("../models/delegator");
 const { GetRangeEraRewards, GetLatestEra } = require("../models/era");
 const { GetDateByEra } = require("../models/era_id");
 
-const get_validators_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_VALIDATORS || 300 });
+const get_validators_cache = new NodeCache();
 const get_bids_cache = new NodeCache();
 const get_current_era_validators_cache = new NodeCache();
 const get_validator_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_VALIDATOR || 300 });
 const get_range_delegator_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_RANGE_DELEGATOR || 300});
 const get_range_era_rewards_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_RANGE_ERA_REWARDS || 300});
 const get_next_era_validators_cache = new NodeCache();
+
+async function GetBidsCache() {
+    try{
+        const bids = await GetBids();
+        get_bids_cache.set("get-bids", bids);
+        return bids;
+    }catch (err) {
+        console.log(err);
+    }
+}
+
+async function GetCurrentEraValidatorsCache(){
+    try {
+        const url = await GetNetWorkRPC();
+        const era_validators = await GetCurrentEraValidators(url);
+        get_current_era_validators_cache.set("get-current-era-validators", era_validators);
+        return era_validators;
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+async function GetNextEraValidatorsCache() {
+    try {
+        const url = await GetNetWorkRPC();
+        const era_validators = await GetNextEraValidators(url);
+        get_next_era_validators_cache.set("get-next-era-validators", era_validators);
+        return era_validators;
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+async function GetValidatorsCache(number) {
+    try {
+        const validators = await GetValidators(number);
+        get_validators_cache.set(number, validators);
+        return validators;
+    } catch (err) {
+        res.send(err);
+    }
+}
 
 module.exports = {
     get_validators_cache,
@@ -28,6 +70,10 @@ module.exports = {
     get_range_delegator_cache,
     get_range_era_rewards_cache,
     get_next_era_validators_cache,
+    GetBidsCache,GetCurrentEraValidatorsCache,
+    GetNextEraValidatorsCache,
+    GetValidatorsCache,
+
 
     GetBalanceAccountHash: async function (req, res) {
         const account_hash = req.params.account_hash;
@@ -85,8 +131,7 @@ module.exports = {
     GetValidators: async function (req, res) {
         const number = req.params.number;
         try {
-            const validators = await GetValidators(number);
-            get_validators_cache.set(number, validators);
+            const validators = await GetValidatorsCache(number);
             res.status(200).json(validators);
         } catch (err) {
             res.send(err);
@@ -96,9 +141,7 @@ module.exports = {
     GetCurrentEraValidators: async function (req, res) {
 
         try {
-            const url = await GetNetWorkRPC();
-            const era_validators = await GetCurrentEraValidators(url);
-            get_current_era_validators_cache.set("get-current-era-validators", era_validators);
+            const era_validators = await GetCurrentEraValidatorsCache();
             res.status(200).json(era_validators);
         } catch (err) {
             res.send(err);
@@ -108,9 +151,7 @@ module.exports = {
 
     GetNextEraValidators: async function (req, res) {
         try {
-            const url = await GetNetWorkRPC();
-            const era_validators = await GetNextEraValidators(url);
-            get_next_era_validators_cache.set("get-next-era-validators", era_validators);
+            const era_validators = await GetNextEraValidatorsCache()
             res.status(200).json(era_validators);
         } catch (err) {
             res.send(err);
@@ -132,8 +173,7 @@ module.exports = {
             //     }
             // }
 
-            const bids = await GetBids();
-            get_bids_cache.set("get-bids", bids);
+            const bids = await GetBidsCache();
             res.status(200).json(bids);
 
         } catch (err) {

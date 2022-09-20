@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const routes = require('./routes');
 const bodyParser = require('body-parser');
-const cron = require('./cron-job/cron');
+const cron = require('./cron-job');
 
 require('dotenv').config();
 

@@ -95,6 +95,9 @@ async function GetTopValidators(number_of_validator) {
     })
 
     top_validators = validators.slice(0, number_of_validator);
+    for(let i=0;i<top_validators.length; i++){
+        top_validators[i].information = await GetValidatorInformation(top_validators[i].public_key_hex);
+    }
     const result = {
         validators: top_validators,
     }

@@ -22,9 +22,21 @@ require('dotenv').config();
 
 const NodeCache = require("node-cache");
 const { GetEraByBlockHash } = require('../models/block_model');
-const get_rich_accounts_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_RICH_ACCOUNTS || 300 });
+const get_rich_accounts_cache = new NodeCache();
+
+
+async function GetRangeRichestCache(start, count) {
+  try{
+    const value = await GetRichest(start, count)
+    get_rich_accounts_cache.set(`start: ${start} count ${count}`, value);
+    return value;
+  }catch (err) {
+    console.log(err);
+  }
+}
 module.exports = {
   get_rich_accounts_cache,
+  GetRangeRichestCache,
 
   GetAccount: async function (req, res) {
     let account = req.params.account;
@@ -268,16 +280,16 @@ module.exports = {
   },
 
   GetRichAccounts: async function (req, res) {
-    const start = req.query.start;
-    const count = req.query.count;
+    try{
+      const start = req.query.start;
+      const count = req.query.count;
 
-    GetRichest(start, count).then(value => {
-      get_rich_accounts_cache.set(`start: ${start} count ${count}`, value);
+      const value = await GetRangeRichestCache(start, count)
       res.status(200);
       res.json(value);
-    }).catch(err => {
+    }catch(err) {
       res.status(500).send("Can not get rich list");
-    })
+    }
   },
 
   GetRewards: async function (req, res) {

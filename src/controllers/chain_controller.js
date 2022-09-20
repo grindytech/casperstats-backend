@@ -14,13 +14,47 @@ const NodeCache = require("node-cache");
 const get_block_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_BLOCK || 20 });
 const get_block_deploys_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_BLOCK_DEPLOYS || 20 });
 const get_block_transfers_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_BLOCK_TRANSFERS || 20 });
+const get_latest_block_cache = new NodeCache();
+const get_latest_tx_cache = new NodeCache();
 
 require('dotenv').config();
+
+
+async function GetLatestBlocksCache(num) {
+  try {
+    let datas = await GetLatestBlock(num);
+    get_latest_block_cache.set(num, datas)
+    return datas;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+async function GetLatestTxCache(start, count) {
+  try {
+    let result = await GetTransfers(start, count);
+
+    for (let i = 0; i < result.length; i++) {
+      if (result[i].to_address === "null") {
+        result[i].to_address = null;
+      }
+    }
+    get_latest_tx_cache.set(`'${start}'-'${count}'`, result)
+    return result;
+  } catch (err) {
+    console.log(err);
+  }
+}
 
 module.exports = {
   get_block_cache,
   get_block_deploys_cache,
   get_block_transfers_cache,
+  get_latest_block_cache,
+  get_latest_tx_cache,
+  GetLatestBlocksCache,
+  GetLatestTxCache,
+
   GetBlock: async function (req, res) {
     const b = req.params.block; // Hex-encoded block hash or height of the block. If not given, the last block added to the chain as known at the given node will be used
     const url = await GetNetWorkRPC();
@@ -136,14 +170,7 @@ module.exports = {
     let num = req.params.number; // Number of block
 
     try {
-      const url = await GetNetWorkRPC();
-      let datas = await GetLatestBlock(num);
-      // let height = await GetBlockHeight();
-      // let datas = [];
-      // for (let i = height; i > height - num; i--) {
-      //   let block_data = await GetBlockByHeight(i);
-      //   datas.push(block_data);
-      // }
+      const datas = await GetLatestBlocksCache(num);
       res.status(200);
       res.json(datas);
 
@@ -221,13 +248,7 @@ module.exports = {
     try {
       const start = req.query.start;
       const count = req.query.count;
-      let result = await GetTransfers(start, count);
-
-      for (let i = 0; i < result.length; i++) {
-        if (result[i].to_address === "null") {
-          result[i].to_address = null;
-        }
-      }
+      let result = await GetLatestTxCache(start, count);
 
       res.status(200);
       res.json(result);
