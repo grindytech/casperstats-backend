@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const routes = require('./routes');
 const bodyParser = require('body-parser');
+const cron = require('./cron-job/cron');
 
 require('dotenv').config();
 
@@ -39,6 +40,8 @@ app.get('/favicon.ico', (req, res) => {
 
 app.use(express.json());
 app.use(routes);
+
+cron.start();
 
 app.listen(PORT, HOST,  () => {
   console.log(`Server is running on port: ${PORT} ${HOST}`);

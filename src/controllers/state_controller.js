@@ -3,7 +3,7 @@ const { RequestRPC, QueryState, GetBalance,
 const { GetValidators, GetCurrentEraValidators, GetNextEraValidators,
     GetBids, GetValidatorData, GetValidatorInformation, GetRangeBids } = require('../utils/validator');
 const { RpcApiName } = require('../utils/constant');
-
+const cron = require("node-cron");
 require('dotenv').config();
 
 const NodeCache = require("node-cache");
@@ -13,12 +13,12 @@ const { GetRangeEraRewards, GetLatestEra } = require("../models/era");
 const { GetDateByEra } = require("../models/era_id");
 
 const get_validators_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_VALIDATORS || 300 });
-const get_bids_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_ERA_VALIDATORS || 7200 });
-const get_current_era_validators_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_ERA_VALIDATORS || 7200 });
+const get_bids_cache = new NodeCache();
+const get_current_era_validators_cache = new NodeCache();
 const get_validator_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_VALIDATOR || 300 });
 const get_range_delegator_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_RANGE_DELEGATOR || 300});
 const get_range_era_rewards_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_RANGE_ERA_REWARDS || 300});
-const get_next_era_validators_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_ERA_VALIDATORS || 7200 });
+const get_next_era_validators_cache = new NodeCache();
 
 module.exports = {
     get_validators_cache,
@@ -98,7 +98,7 @@ module.exports = {
         try {
             const url = await GetNetWorkRPC();
             const era_validators = await GetCurrentEraValidators(url);
-            get_current_era_validators_cache.set("get-era-validators", era_validators);
+            get_current_era_validators_cache.set("get-current-era-validators", era_validators);
             res.status(200).json(era_validators);
         } catch (err) {
             res.send(err);
@@ -110,7 +110,7 @@ module.exports = {
         try {
             const url = await GetNetWorkRPC();
             const era_validators = await GetNextEraValidators(url);
-            get_next_era_validators_cache.set("get-era-validators", era_validators);
+            get_next_era_validators_cache.set("get-next-era-validators", era_validators);
             res.status(200).json(era_validators);
         } catch (err) {
             res.send(err);
@@ -122,18 +122,19 @@ module.exports = {
             // const url = await GetNetWorkRPC();
             // const block = await RequestRPC(url, RpcApiName.get_block, []);
             
-            const era_id = await GetLatestEra();
-            if(get_bids_cache.has(`era_id: '${era_id}'`)){
-                res.status(200).json(get_bids_cache.get(`era_id: '${era_id}'`))
-            }else{
-                const current_era_id = era_id - 1;
-                if(get_bids_cache.has(`era_id: '${current_era_id}'`)){
-                    get_bids_cache.del(`era_id: '${current_era_id}'`);
-                }
-                const bids = await GetBids();
-                get_bids_cache.set(`era_id: '${era_id}'`, bids);
-                res.status(200).json(bids);
-            }
+            // const era_id = await GetLatestEra();
+            // if(get_bids_cache.has(`era_id: '${era_id}'`)){
+            //     res.status(200).json(get_bids_cache.get(`era_id: '${era_id}'`))
+            // }else{
+            //     const current_era_id = era_id - 1;
+            //     if(get_bids_cache.has(`era_id: '${current_era_id}'`)){
+            //         get_bids_cache.del(`era_id: '${current_era_id}'`);
+            //     }
+            // }
+
+            const bids = await GetBids();
+            get_bids_cache.set("get-bids", bids);
+            res.status(200).json(bids);
 
         } catch (err) {
             res.send(err);

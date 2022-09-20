@@ -195,7 +195,9 @@ const GetCurrentEraValidators = async (url) => {
             const validator_info = await GetValidatorInfo(auction_info[i].public_key_hex);
             if(validator_info != null){
                 result.validators[i].name = validator_info[0].name;
-                result.validators[i].icon = process.env.ICON_IMAGE_URL + validator_info[0].icon
+                if(validator_info[0].icon){
+                    result.validators[i].icon = process.env.ICON_IMAGE_URL + validator_info[0].icon
+                }
             }
         }catch {}
     }
@@ -237,7 +239,9 @@ const GetNextEraValidators = async (url) => {
             const validator_info = await GetValidatorInfo(auction_info[i].public_key_hex);
             if(validator_info != null){
                 result.validators[i].name = validator_info[0].name;
-                result.validators[i].icon = process.env.ICON_IMAGE_URL + validator_info[0].icon
+                if(validator_info[0].icon){
+                    result.validators[i].icon = process.env.ICON_IMAGE_URL + validator_info[0].icon
+                }
             }
         }catch {}
     }
@@ -270,7 +274,9 @@ const GetBids = async () => {
             const validator_info = await GetValidatorInfo(auction_info[i].public_key_hex);
             if(validator_info != null) {
                 auction_info[i].name = validator_info[0].name;
-                auction_info[i].icon = process.env.ICON_IMAGE_URL + validator_info[0].icon
+                if(validator_info[0].icon){
+                    auction_info[i].icon = process.env.ICON_IMAGE_URL + validator_info[0].icon
+                }
             }
        }catch {}
     }
@@ -279,8 +285,7 @@ const GetBids = async () => {
         return math.compare(Number(second.total_bid), Number(first.total_bid));
     })
     result.validators = auction_info;
-    
-    console.log(result);
+
     return result;
 }
 

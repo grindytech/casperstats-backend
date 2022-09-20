@@ -27,8 +27,8 @@ router.route("/get-transfer-volume/:count").get(verifyGetTransferVolume, info_co
 const verifyGetVolume = (req, res, next) => {
     try {
         const count = req.params.count;
-        if (info_controller.get_volume_cache.has(count)) {
-            return res.status(200).json(info_controller.get_volume_cache.get(count));
+        if (info_controller.get_volume_cache.has(`get-volume-${count}`)) {
+            return res.status(200).json(info_controller.get_volume_cache.get(`get-volume-${count}`));
         }
         return next();
     } catch (err) {
@@ -65,7 +65,17 @@ const verifyGetStakingTxVolume = (req, res, next) => {
 };
 router.route("/get-staking-tx-volume").get(verifyGetStakingTxVolume, info_controller.GetStakingTxVolume);
 
-router.route("/get-stats").get(info_controller.GetStats);
+//cache for get stats
+const verifyGetStats = (req, res, next) => {
+    try{
+        if(info_controller.get_stats_cache.has("get-stats")) {
+            return res.status(200).json(info_controller.get_stats_cache.get("get-stats"));
+        }
+    }catch (err){
+        throw new Error(err);
+    }
+}
+router.route("/get-stats").get(verifyGetStats, info_controller.GetStats);
 
 // cache for economics
 const verifyEconomics = (req, res, next) => {

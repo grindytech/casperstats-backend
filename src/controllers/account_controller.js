@@ -105,42 +105,42 @@ module.exports = {
       }
 
       // Total validator reward
-      // let total_validator_reward = 0;
-      // try {
-      //   if (account_data.public_key_hex) {
-      //     total_validator_reward = (await GetValidatorReward(account_data.public_key_hex.toLowerCase())).total_validator_reward;
-      //   }
-      //   if (total_validator_reward == null) {
-      //     total_validator_reward = 0;
-      //   }
-      // } catch (err) {
-      //   total_validator_reward = 0;
-      // }
-
-      // // Total delegator reward
-      // let total_delegator_reward = 0;
-      // try {
-      //   if (account_data.public_key_hex) {
-      //     total_delegator_reward = (await GetDelegatorReward(account_data.public_key_hex.toLowerCase())).total_delegator_reward;
-      //   }
-      //   if (total_delegator_reward == null) {
-      //     total_delegator_reward = 0;
-      //   }
-      // } catch (err) {
-      //   total_delegator_reward = 0;
-      // }
-
-      let total_reward = 0;
+      let total_validator_reward = 0;
       try {
         if (account_data.public_key_hex) {
-          total_reward = (await GetRewardByPublicKey(account_data.public_key_hex.toLowerCase())).total_reward;
+          total_validator_reward = (await GetValidatorReward(account_data.public_key_hex.toLowerCase())).total_validator_reward;
         }
-        if (total_reward == null) {
-          total_reward = 0;
+        if (total_validator_reward == null) {
+          total_validator_reward = 0;
         }
       } catch (err) {
-        total_reward = 0;
+        total_validator_reward = 0;
       }
+
+      // // Total delegator reward
+      let total_delegator_reward = 0;
+      try {
+        if (account_data.public_key_hex) {
+          total_delegator_reward = (await GetDelegatorReward(account_data.public_key_hex.toLowerCase())).total_delegator_reward;
+        }
+        if (total_delegator_reward == null) {
+          total_delegator_reward = 0;
+        }
+      } catch (err) {
+        total_delegator_reward = 0;
+      }
+
+      let total_reward = math.add(Number(total_validator_reward), Number(total_delegator_reward));
+      // try {
+      //   if (account_data.public_key_hex) {
+      //     total_reward = (await GetRewardByPublicKey(account_data.public_key_hex.toLowerCase())).total_reward;
+      //   }
+      //   if (total_reward == null) {
+      //     total_reward = 0;
+      //   }
+      // } catch (err) {
+      //   total_reward = 0;
+      // }
 
       // unbonding
       let unbonding = 0;
@@ -162,8 +162,8 @@ module.exports = {
       account_data.total_staked_as_delegator = total_staked_as_delegator.toString();
       account_data.total_staked_as_validator = total_staked_as_validator.toString();
       account_data.total_staked = (Number(total_staked_as_delegator)+ Number(total_staked_as_validator)).toString();
-      // account_data.total_validator_reward = total_validator_reward.toString();
-      // account_data.total_delegator_reward = total_delegator_reward.toString();
+      account_data.total_validator_reward = total_validator_reward.toString();
+      account_data.total_delegator_reward = total_delegator_reward.toString();
       account_data.total_reward = total_reward.toString();
       account_data.unbonding = unbonding.toString();
       res.json(account_data);

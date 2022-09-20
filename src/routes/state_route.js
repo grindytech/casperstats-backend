@@ -12,8 +12,8 @@ router.route("/get-auction-info").get(state_controller.GetAuctionInfo);
 //cache for get-current-era-validators
 const verifyGetCurrentEraValidators = (req, res, next) => {
     try {
-        if (state_controller.get_current_era_validators_cache.has("get-era-validators")) {
-            return res.status(200).json(state_controller.get_current_era_validators_cache.get("get-era-validators"));
+        if (state_controller.get_current_era_validators_cache.has("get-current-era-validators")) {
+            return res.status(200).json(state_controller.get_current_era_validators_cache.get("get-current-era-validators"));
         }
         return next();
     } catch (err) {
@@ -25,8 +25,8 @@ router.route("/get-current-era-validators").get(verifyGetCurrentEraValidators, s
 //cache for get-next-era-validators
 const verifyGetNextEraValidators = (req, res, next) => {
     try {
-        if (state_controller.get_next_era_validators_cache.has("get-era-validators")) {
-            return res.status(200).json(state_controller.get_next_era_validators_cache.get("get-era-validators"));
+        if (state_controller.get_next_era_validators_cache.has("get-next-era-validators")) {
+            return res.status(200).json(state_controller.get_next_era_validators_cache.get("get-next-era-validators"));
         }
         return next();
     } catch (err) {
@@ -46,7 +46,8 @@ const verifyGetBids = (req, res, next) => {
         throw new Error(err);
     }
 };
-router.route('/get-bids').get(state_controller.GetBids);
+
+router.route('/get-bids').get(verifyGetBids, state_controller.GetBids);
 router.route('/get-range-bids').get(state_controller.getRangeBids)
 
 // cache for get-validators
