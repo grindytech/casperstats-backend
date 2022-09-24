@@ -22,7 +22,7 @@ const verifyLatestBlock = (req, res, next) => {
             return res.status(200).json(chain_controller.get_latest_block_cache.get(num));
         }
         return next();
-    } catch (err) {
+    } catch (err) {  
         throw new Error(err);
     }
 };

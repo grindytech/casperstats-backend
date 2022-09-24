@@ -4,7 +4,7 @@ const { RpcApiName, ELEMENT_TYPE } = require('./constant');
 const account_fn = require('./account');
 const { GetHeight, RequestRPC, GetAccountHash, Execute, GetNetWorkRPC } = require("./common");
 const request = require('request');
-const { GetNumberOfTransfersByDate } = require("../models/transfer");
+const { GetNumberOfTransfersByDate, GetTransfersByDeployHash } = require("../models/transfer");
 const { GetDeployByDeployHash } = require("../models/deploy");
 const { GetBlockHeightByHash } = require("../models/block_model");
 const { GetAllValidator } = require("../models/validator");
@@ -63,25 +63,53 @@ async function get_deploy_type(deploy_data) {
     return type;
 }
 
-const GetDeploy = async (url, hex) => {
-    //let deploy_data = await GetDeployByRPC(url, hex);
+const GetDeploy = async (hex) => {
+    let result = {
+        account: "",
+        block_hash: "",
+        block_height: 0,
+        cost: "",
+        gas_price: 0,
+        timestamp: "",
+        status: "",
+        amount: "",
+        to_address: null,
+        type: "",
+        error_message: null,
+    }
     let deploy_data = await GetDeployByDeployHash(hex); //edited
-    // const result = deploy_data.result;
-    // // add more common information to header
-    // if (result.execution_results.length > 0) {
-    //     let first_block_hash = result.execution_results[0].block_hash;
-    //     const first_block_height = await GetBlockHeightByBlock(url, first_block_hash);
-    //     let total_cost = await GetTotalDeployCost(result.execution_results);
+    if(deploy_data){
+        deploy_data = deploy_data[0];
+    }
+    result.account = deploy_data.public_key;
+    result.block_hash = deploy_data.deploy_hash;
+    let block_height = await GetBlockHeightByHash(deploy_data.hash);
+    if(block_height) {
+        block_height = block_height[0].height;
+    }
+    result.block_height = block_height;
 
-    //     result.deploy.header["block_hash"] = first_block_hash;
-    //     result.deploy.header["block_height"] = first_block_height;
-    //     result.deploy.header["cost"] = total_cost.toString();
-    //     // add type
-    //     const type = await get_deploy_type(deploy_data.result);
-    //     result.deploy.header["type"] = type;
-    // }
-    // return result;
-    return deploy_data[0];
+    result.cost = deploy_data.cost;
+
+    result.gas_price = deploy_data.gas_price;
+
+    result.timestamp = deploy_data.timestamp;
+
+    result.status = deploy_data.status;
+    if(deploy_data.error_message != null){
+        result.error_message = deploy_data.error_message;
+    }
+
+    result.amount = deploy_data.amount;
+    
+    result.type = deploy_data.type;
+
+    if(result.type === 'transfer'){
+        let transfer_data = await GetTransfersByDeployHash(deploy_data.deploy_hash);
+        result.to_address = transfer_data.to;
+    }
+
+    return result;
 }
 
 const GetDeployFromRPC = async (url, hex) =>{

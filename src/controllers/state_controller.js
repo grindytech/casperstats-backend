@@ -21,45 +21,55 @@ const get_range_era_rewards_cache = new NodeCache({ stdTTL: process.env.CACHE_GE
 const get_next_era_validators_cache = new NodeCache();
 
 async function GetBidsCache() {
+    let bids
     try{
-        const bids = await GetBids();
+        bids = await GetBids();
         get_bids_cache.set("get-bids", bids);
-        return bids;
+        
     }catch (err) {
         console.log(err);
     }
+    return bids;
 }
 
 async function GetCurrentEraValidatorsCache(){
+    let era_validators;
     try {
         const url = await GetNetWorkRPC();
-        const era_validators = await GetCurrentEraValidators(url);
+        era_validators = await GetCurrentEraValidators(url);
         get_current_era_validators_cache.set("get-current-era-validators", era_validators);
-        return era_validators;
+        
     } catch (err) {
         console.log(err);
     }
+
+    return era_validators;
 }
 
 async function GetNextEraValidatorsCache() {
+    let era_validators;
     try {
         const url = await GetNetWorkRPC();
-        const era_validators = await GetNextEraValidators(url);
+        era_validators = await GetNextEraValidators(url);
         get_next_era_validators_cache.set("get-next-era-validators", era_validators);
-        return era_validators;
+        
     } catch (err) {
         console.log(err);
     }
+
+    return era_validators;
 }
 
 async function GetValidatorsCache(number) {
+    let validators;
     try {
-        const validators = await GetValidators(number);
+        validators = await GetValidators(number);
         get_validators_cache.set(number, validators);
-        return validators;
+        
     } catch (err) {
         res.send(err);
     }
+    return validators;
 }
 
 module.exports = {

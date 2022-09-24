@@ -322,6 +322,17 @@ module.exports = {
         })
     },
 
+    GetDeployInfo: async function (req, res) {
+        let hex = req.params.hex; // Hex-encoded deploy hash
+        GetDeploy(hex).then(value => {
+            res.status(200).json(value);
+        }).catch(err => {
+            console.log(err);
+            res.send(err) 
+        })
+    },
+
+
     GetListDeploys: async function (req, res) {
         let id = req.query.id; // JSON-RPC identifier, applied to the request and returned in the response. If not provided, a random integer will be assigned
         let b = req.query.b; // Hex-encoded block hash or height of the block. If not given, the last block added to the chain as known at the given node will be used
