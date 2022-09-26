@@ -65,7 +65,8 @@ async function get_deploy_type(deploy_data) {
 
 const GetDeploy = async (hex) => {
     let result = {
-        account: "",
+        deploy_hash: "",
+        public_key: "",
         block_hash: "",
         block_height: 0,
         cost: "",
@@ -81,7 +82,8 @@ const GetDeploy = async (hex) => {
     if(deploy_data){
         deploy_data = deploy_data[0];
     }
-    result.account = deploy_data.public_key;
+    result.deploy_hash = hex;
+    result.public_key = deploy_data.public_key;
     result.block_hash = deploy_data.deploy_hash;
     let block_height = await GetBlockHeightByHash(deploy_data.hash);
     if(block_height) {

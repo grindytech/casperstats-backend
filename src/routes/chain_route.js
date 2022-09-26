@@ -27,7 +27,7 @@ const verifyLatestBlock = (req, res, next) => {
     }
 };
 
-router.route("/get-latest-blocks/:number").get(verifyLatestBlock, chain_controller.GetLatestBlocks);
+router.route("/get-latest-blocks/:number").get(chain_controller.GetLatestBlocks);
 
 const verifyBlockTransfers = (req, res, next) => {
     try {
@@ -72,7 +72,7 @@ const verifyLatestTx = (req, res, next) => {
         throw new Error(err);
     }
 };
-router.route("/get-latest-txs/").get(verifyLatestTx, chain_controller.GetLatestTx);
+router.route("/get-latest-txs/").get(chain_controller.GetLatestTx);
 
 // blocks
 router.route("/get-proposer-blocks").get(chain_controller.GetBlocksByProposer);

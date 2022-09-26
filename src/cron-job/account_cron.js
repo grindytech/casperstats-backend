@@ -9,7 +9,7 @@ async function start() {
 }
 
 async function CronJobGetRichest() {
-    cron.schedule('9 */10 * * * *', async function() {
+    cron.schedule('9 10 * * * *', async function() {
         try{
             await GetRichestCache();
             console.log("Update get-richest-list-cache successful");
@@ -20,7 +20,7 @@ async function CronJobGetRichest() {
 }
 
 async function CronJobGetRangeRichest() {
-    cron.schedule('10 */11 * * * *', async function() {
+    cron.schedule('10 11 * * * *', async function() {
         try{
             await GetRangeRichestCache(0,20);
             console.log("Update get-range-richest-list-cache successful")

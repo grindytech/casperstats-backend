@@ -10,10 +10,9 @@ async function start() {
 }
 
 async function CronJobGetLatestBlock(num) {
-    cron.schedule('*/15 * * * * *', async function() {
+    cron.schedule('*/4 * * * * *', async function() {
         try{
             await GetLatestBlocksCache(num);
-            console.log("Update get-latest-block successfull");
         }catch (err) {
             console.log(err);
         }

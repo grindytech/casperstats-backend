@@ -9,8 +9,9 @@ async function start() {
 async function CronJobGetLatestTx() {
     cron.schedule('*/20 * * * * *', async function() {
         try{
+
             await GetLatestTxCache(0, 19);
-            console.log("Update get-latest-tx-cache successful");
+            
         }catch (err) {
             console.log(err);
         }

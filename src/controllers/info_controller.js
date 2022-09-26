@@ -18,6 +18,7 @@ const { GetBlockHeight } = require('../models/block_model');
 const { GetTotalStakeCurrentEra, GetTotalActiveValidator, GetTotalValidator, GetCurrentEraValidator, GetTotalActiveBids } = require('../models/validator');
 const { GetTotalDelegator } = require("../models/delegator");
 const { GetStats } = require("../models/stats");
+const { GetEraUpdateTime } = require('../models/timestamp');
 const get_stats_cache = new NodeCache();
 const economics_cache = new NodeCache();
 
@@ -27,6 +28,29 @@ const get_volume_cache = new NodeCache();
 const get_staking_volume_cache = new NodeCache();
 const get_staking_tx_volume_cache = new NodeCache();
 const exchange_volume_cache = new NodeCache();
+const get_total_reward = new NodeCache();
+
+let total_reward_timestamp;
+
+async function GetTotalRewardCache() {
+    let total_reward;
+    try{
+        let timestamp = await GetEraUpdateTime();
+        if(get_total_reward.has(`total-reward-'${timestamp}'`)){
+            total_reward_timestamp = timestamp;
+            return total_reward = get_total_reward.get(`total-reward-'${timestamp}'`);
+        }
+        total_reward = (await GetTotalReward()).total_reward;
+        get_total_reward.set(`total-reward-'${timestamp}'`,total_reward);
+        get_total_reward.del(`total-reward-'${total_reward_timestamp}'`);
+        total_reward_timestamp = timestamp;
+        console.log("Update get_total_reward successful");
+    }catch (err) {
+        console.log(err)
+    }
+
+    return total_reward;
+}
 
 async function GetEconomicsCache() {
     let economics = {}
@@ -50,10 +74,16 @@ async function GetEconomicsCache() {
             economics.total_stake = total_stake.toString();
             economics.total_active_validators = await GetTotalActiveValidator();
             economics.total_bid_validators = await GetTotalValidator();
+            economics.total_active_bids = await GetTotalActiveBids();
             economics.total_delegators = await GetTotalDelegator();
 
             // total reward
-            let total_reward = (await GetTotalReward()).total_reward;
+            let total_reward
+            if(get_total_reward.has(`total-reward-'${total_reward_timestamp}'`)){
+                total_reward = get_total_reward.get(`total-reward-'${total_reward_timestamp}'`);
+            }else{
+                total_reward = await GetTotalRewardCache();
+            }
             economics.total_reward = total_reward;
             economics_cache.set("economics", economics);
         } catch (err) {
@@ -310,6 +340,7 @@ module.exports = {
     GetStakingVolumeCache,
     GetStakingTxVolumeCache,
     GetExchangeVolumeCache,
+    GetTotalRewardCache,
 
     GetDeploy: async function (req, res) {
         let hex = req.params.hex; // Hex-encoded deploy hash

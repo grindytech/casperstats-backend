@@ -11,39 +11,65 @@ const { RpcApiName } = require('../utils/constant');
 const request = require('request');
 
 const NodeCache = require("node-cache");
+const { GetDeployUpdateTime, GetBlockUpdateTime } = require('../models/timestamp');
 const get_block_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_BLOCK || 20 });
 const get_block_deploys_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_BLOCK_DEPLOYS || 20 });
 const get_block_transfers_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_BLOCK_TRANSFERS || 20 });
-const get_latest_block_cache = new NodeCache();
+const get_latest_block_cache = new NodeCache({ stdTTL: 50 });
 const get_latest_tx_cache = new NodeCache();
+let deploy_timestamp;
+let block_timestamp;
 
 require('dotenv').config();
 
 
 async function GetLatestBlocksCache(num) {
+  let datas;
   try {
-    let datas = await GetLatestBlock(num);
-    get_latest_block_cache.set(num, datas)
-    return datas;
+    let timestamp = await GetBlockUpdateTime();
+
+    if(get_latest_block_cache.has(`'${num}'-'${timestamp}'`)){
+      block_timestamp = timestamp;
+      return datas = get_latest_block_cache.get(`'${num}'-'${timestamp}'`);
+    }
+
+    datas = await GetLatestBlock(num);
+    get_latest_block_cache.set(`'${num}'-'${timestamp}'`, datas);
+    block_timestamp = timestamp;
+
   } catch (err) {
     console.log(err);
   }
+
+  return datas;
 }
 
 async function GetLatestTxCache(start, count) {
+  let result
+  
   try {
-    let result = await GetTransfers(start, count);
+    let timestamp = await GetDeployUpdateTime();
+    if(get_latest_tx_cache.has(`'${start}'-'${count}'-'${timestamp}'`)){
+      deploy_timestamp = timestamp;
+      return result = get_latest_tx_cache.get(`'${start}'-'${count}'-'${timestamp}'`);
+    }
+    result = await GetTransfers(start, count);
 
     for (let i = 0; i < result.length; i++) {
       if (result[i].to_address === "null") {
         result[i].to_address = null;
       }
     }
-    get_latest_tx_cache.set(`'${start}'-'${count}'`, result)
-    return result;
+    get_latest_tx_cache.set(`'${start}'-'${count}'-'${timestamp}'`, result)
+    get_latest_tx_cache.del(`'${start}'-'${count}'-'${deploy_timestamp}'`)
+    deploy_timestamp = timestamp;
+
+    
   } catch (err) {
     console.log(err);
   }
+
+  return result;
 }
 
 module.exports = {
@@ -170,7 +196,13 @@ module.exports = {
     let num = req.params.number; // Number of block
 
     try {
-      const datas = await GetLatestBlocksCache(num);
+      let datas
+      if(get_latest_block_cache.has(`'${num}'-'${block_timestamp}'`)){
+        datas = get_latest_block_cache.get(`'${num}'-'${block_timestamp}'`);
+      }else{
+        datas = await GetLatestBlocksCache(num);
+      }
+      
       res.status(200);
       res.json(datas);
 
@@ -220,7 +252,7 @@ module.exports = {
       console.log(deploy_hashes);
       let data = [];
       for (let i = 0; i < deploy_hashes.length; i++) {
-        let deploy_data = await GetDeploy(url, deploy_hashes[i]);
+        let deploy_data = await GetDeploy(deploy_hashes[i]);
         data.push(deploy_data);
       }
       get_block_deploys_cache.set(b, data)
@@ -248,8 +280,13 @@ module.exports = {
     try {
       const start = req.query.start;
       const count = req.query.count;
-      let result = await GetLatestTxCache(start, count);
-
+      let result;
+      if(get_latest_tx_cache.has(`'${start}'-'${count}'-'${deploy_timestamp}'`)){
+        result = get_latest_tx_cache.get(`'${start}'-'${count}'-'${deploy_timestamp}'`);
+      }else{
+        result = await GetLatestTxCache(start, count);
+      }
+      
       res.status(200);
       res.json(result);
     } catch (err) {

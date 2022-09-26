@@ -7,10 +7,9 @@ async function start() {
 }
 
 async function CronJobGetValidators() {
-    cron.schedule('15 0 * * * *', async function() {
+    cron.schedule('15 */10 * * * *', async function() {
         try{
             await GetValidatorsCache(10);
-            console.log("Update get-validators successfull");
         } catch(err) {
             console.log(err)
         }
