@@ -25,7 +25,7 @@ async function GetTransfers(start, count) {
 
 async function GetTransfersByDeployHash(deploy_hash) {
     return new Promise((resolve, reject) => {
-        var sql = `SELECT deploy_hash, timestamp, from_address AS 'from', to_address AS 'to', value, fee, from_balance, to_balance FROM transfer WHERE deploy_hash = '${deploy_hash}'`;
+        var sql = `SELECT deploy_hash, timestamp, from_address AS 'from', to_address AS 'to', value AS 'amount', fee, from_balance, to_balance FROM transfer WHERE deploy_hash = '${deploy_hash}'`;
         pool.query(sql, function(err, result) {
             if(err){
                 reject(err);

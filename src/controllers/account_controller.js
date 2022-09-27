@@ -22,9 +22,21 @@ require('dotenv').config();
 
 const NodeCache = require("node-cache");
 const { GetEraByBlockHash } = require('../models/block_model');
-const get_rich_accounts_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_RICH_ACCOUNTS || 300 });
+const get_rich_accounts_cache = new NodeCache();
+
+
+async function GetRangeRichestCache(start, count) {
+  try{
+    const value = await GetRichest(start, count)
+    get_rich_accounts_cache.set(`start: ${start} count ${count}`, value);
+    return value;
+  }catch (err) {
+    console.log(err);
+  }
+}
 module.exports = {
   get_rich_accounts_cache,
+  GetRangeRichestCache,
 
   GetAccount: async function (req, res) {
     let account = req.params.account;
@@ -105,42 +117,42 @@ module.exports = {
       }
 
       // Total validator reward
-      // let total_validator_reward = 0;
-      // try {
-      //   if (account_data.public_key_hex) {
-      //     total_validator_reward = (await GetValidatorReward(account_data.public_key_hex.toLowerCase())).total_validator_reward;
-      //   }
-      //   if (total_validator_reward == null) {
-      //     total_validator_reward = 0;
-      //   }
-      // } catch (err) {
-      //   total_validator_reward = 0;
-      // }
-
-      // // Total delegator reward
-      // let total_delegator_reward = 0;
-      // try {
-      //   if (account_data.public_key_hex) {
-      //     total_delegator_reward = (await GetDelegatorReward(account_data.public_key_hex.toLowerCase())).total_delegator_reward;
-      //   }
-      //   if (total_delegator_reward == null) {
-      //     total_delegator_reward = 0;
-      //   }
-      // } catch (err) {
-      //   total_delegator_reward = 0;
-      // }
-
-      let total_reward = 0;
+      let total_validator_reward = 0;
       try {
         if (account_data.public_key_hex) {
-          total_reward = (await GetRewardByPublicKey(account_data.public_key_hex.toLowerCase())).total_reward;
+          total_validator_reward = (await GetValidatorReward(account_data.public_key_hex.toLowerCase())).total_validator_reward;
         }
-        if (total_reward == null) {
-          total_reward = 0;
+        if (total_validator_reward == null) {
+          total_validator_reward = 0;
         }
       } catch (err) {
-        total_reward = 0;
+        total_validator_reward = 0;
       }
+
+      // // Total delegator reward
+      let total_delegator_reward = 0;
+      try {
+        if (account_data.public_key_hex) {
+          total_delegator_reward = (await GetDelegatorReward(account_data.public_key_hex.toLowerCase())).total_delegator_reward;
+        }
+        if (total_delegator_reward == null) {
+          total_delegator_reward = 0;
+        }
+      } catch (err) {
+        total_delegator_reward = 0;
+      }
+
+      let total_reward = math.add(Number(total_validator_reward), Number(total_delegator_reward));
+      // try {
+      //   if (account_data.public_key_hex) {
+      //     total_reward = (await GetRewardByPublicKey(account_data.public_key_hex.toLowerCase())).total_reward;
+      //   }
+      //   if (total_reward == null) {
+      //     total_reward = 0;
+      //   }
+      // } catch (err) {
+      //   total_reward = 0;
+      // }
 
       // unbonding
       let unbonding = 0;
@@ -162,8 +174,8 @@ module.exports = {
       account_data.total_staked_as_delegator = total_staked_as_delegator.toString();
       account_data.total_staked_as_validator = total_staked_as_validator.toString();
       account_data.total_staked = (Number(total_staked_as_delegator)+ Number(total_staked_as_validator)).toString();
-      // account_data.total_validator_reward = total_validator_reward.toString();
-      // account_data.total_delegator_reward = total_delegator_reward.toString();
+      account_data.total_validator_reward = total_validator_reward.toString();
+      account_data.total_delegator_reward = total_delegator_reward.toString();
       account_data.total_reward = total_reward.toString();
       account_data.unbonding = unbonding.toString();
       res.json(account_data);
@@ -268,16 +280,16 @@ module.exports = {
   },
 
   GetRichAccounts: async function (req, res) {
-    const start = req.query.start;
-    const count = req.query.count;
+    try{
+      const start = req.query.start;
+      const count = req.query.count;
 
-    GetRichest(start, count).then(value => {
-      get_rich_accounts_cache.set(`start: ${start} count ${count}`, value);
+      const value = await GetRangeRichestCache(start, count)
       res.status(200);
       res.json(value);
-    }).catch(err => {
+    }catch(err) {
       res.status(500).send("Can not get rich list");
-    })
+    }
   },
 
   GetRewards: async function (req, res) {
