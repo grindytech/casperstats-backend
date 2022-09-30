@@ -15,7 +15,7 @@ const { GetAllValidator } = require("../models/validator");
 const { GetAllDelegator } = require("../models/delegator");
 const { GetLatestEra } = require("../models/era_id");
 const NodeCache = require("node-cache");
-const get_all_accounts_cache = new NodeCache();
+const get_all_accounts_cache = new NodeCache({stdTTL: process.env.CACHE_GET_RICH_ACCOUNTS || 3600});
 
 
 async function GetAccountData(address) {

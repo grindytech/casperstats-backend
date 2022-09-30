@@ -22,7 +22,7 @@ require('dotenv').config();
 
 const NodeCache = require("node-cache");
 const { GetEraByBlockHash } = require('../models/block_model');
-const get_rich_accounts_cache = new NodeCache();
+const get_rich_accounts_cache = new NodeCache({stdTTL: process.env.CACHE_GET_RICH_ACCOUNTS || 3600});
 
 
 async function GetRangeRichestCache(start, count) {

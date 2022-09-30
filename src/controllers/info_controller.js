@@ -19,16 +19,16 @@ const { GetTotalStakeCurrentEra, GetTotalActiveValidator, GetTotalValidator, Get
 const { GetTotalDelegator } = require("../models/delegator");
 const { GetStats } = require("../models/stats");
 const { GetEraUpdateTime } = require('../models/timestamp');
-const get_stats_cache = new NodeCache();
-const economics_cache = new NodeCache();
+const get_stats_cache = new NodeCache({stdTTL: process.env.CACHE_GET_STATS || 300});
+const economics_cache = new NodeCache({stdTTL: process.env.CACHE_ECONOMICS || 240});
 
 const transfer_volume_cache = new NodeCache({ stdTTL: process.env.CACHE_TRANSFER_VOLUME || 1800 });
-const get_volume_cache = new NodeCache();
+const get_volume_cache = new NodeCache({stdTTL: process.env.CACHE_VOLUME || 4200});
 
-const get_staking_volume_cache = new NodeCache();
-const get_staking_tx_volume_cache = new NodeCache();
-const exchange_volume_cache = new NodeCache();
-const get_total_reward = new NodeCache();
+const get_staking_volume_cache = new NodeCache({stdTTL: process.env.CACHE_GET_UNDELEGATE_VOLUME || 4200});
+const get_staking_tx_volume_cache = new NodeCache({stdTTL: process.env.CACHE_GET_TX_UNDELEGATE_VOLUME || 4200});
+const exchange_volume_cache = new NodeCache({stdTTL: process.env.CACHE_EXCHANGE_VOLUME || 4200});
+const get_total_reward = new NodeCache({stdTTL: process.env.CACHE_GET_TOTAL_REWARD || 450});
 
 let total_reward_timestamp;
 
@@ -127,7 +127,6 @@ async function GetStatsCache() {
             stats.holders_change = (Number(holders) - Number(last_holders)) / Number(holders) * 100;
         }
 
-
         // validator
         {
             const era_validators = await GetCurrentEraValidator();
@@ -204,7 +203,6 @@ async function GetStatsCache() {
 
         // transfers
         {
-
             const count = 60;
             const data = await GetTransfersVolume(count);
             stats.transfers = data;
@@ -228,6 +226,7 @@ async function GetVolumeCache(count) {
             let the_date = new Date();
             the_date.setDate(datetime.getDate() - i);
             the_date = the_date.toISOString().slice(0, 10);
+            console.log(the_date)
             let data = await GetVolumeByDate(the_date, the_date);
             data = data[0];
 
@@ -259,10 +258,12 @@ async function GetStakingVolumeCache(type, count) {
             the_date.setDate(datetime.getDate() - i);
             the_date = the_date.toISOString().slice(0, 10);
             let deploys = await GetDeployByDate(type, the_date, the_date);
+
             let amount = 0;
             for (deploy of deploys) {
                 amount += Number(deploy.amount);
             }
+
             const paser_data = [
                 Math.floor(new Date(the_date).getTime()),
                 amount
@@ -297,6 +298,7 @@ async function GetStakingTxVolumeCache(type, count) {
             ]
             result.push(paser_data);
         }
+        
         get_staking_tx_volume_cache.set(`${type}-${count}`, result);
     } catch (err) {
         console.log(`Can not get ${type} tx volume`);

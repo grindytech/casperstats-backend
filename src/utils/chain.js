@@ -78,34 +78,35 @@ const GetDeploy = async (hex) => {
         type: "",
         error_message: null,
     }
+
     let deploy_data = await GetDeployByDeployHash(hex); //edited
     if(deploy_data){
         deploy_data = deploy_data[0];
     }
-    result.deploy_hash = hex;
-    result.public_key = deploy_data.public_key;
-    result.block_hash = deploy_data.deploy_hash;
+
+    // Get block height
     let block_height = await GetBlockHeightByHash(deploy_data.hash);
     if(block_height) {
         block_height = block_height[0].height;
     }
-    result.block_height = block_height;
 
-    result.cost = deploy_data.cost;
-
-    result.gas_price = deploy_data.gas_price;
-
-    result.timestamp = deploy_data.timestamp;
-
-    result.status = deploy_data.status;
+    // Get error_message
     if(deploy_data.error_message != null){
         result.error_message = deploy_data.error_message;
     }
 
+    result.deploy_hash = hex;
+    result.public_key = deploy_data.public_key;
+    result.block_hash = deploy_data.deploy_hash;
+    result.block_height = block_height;
+    result.cost = deploy_data.cost;
+    result.gas_price = deploy_data.gas_price;
+    result.timestamp = deploy_data.timestamp;
+    result.status = deploy_data.status;
     result.amount = deploy_data.amount;
-    
     result.type = deploy_data.type;
 
+    // Get to_address if type is transfer
     if(result.type === 'transfer'){
         let transfer_data = await GetTransfersByDeployHash(deploy_data.deploy_hash);
         result.to_address = transfer_data.to;

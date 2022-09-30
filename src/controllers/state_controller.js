@@ -13,13 +13,13 @@ const { GetRangeEraRewards, GetLatestEra } = require("../models/era");
 const { GetDateByEra } = require("../models/era_id");
 const { GetValidatorUpdateTime } = require('../models/timestamp');
 
-const get_validators_cache = new NodeCache();
-const get_bids_cache = new NodeCache();
-const get_current_era_validators_cache = new NodeCache();
+const get_validators_cache = new NodeCache({stdTTL: process.env.CACHE_GET_BIDS || 7200});
+const get_bids_cache = new NodeCache({stdTTL: process.env.CACHE_GET_BIDS || 7200});
+const get_current_era_validators_cache = new NodeCache({stdTTL: process.env.CACHE_GET_ERA_VALIDATORS || 7200});
 const get_validator_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_VALIDATOR || 300 });
 const get_range_delegator_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_RANGE_DELEGATOR || 300});
 const get_range_era_rewards_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_RANGE_ERA_REWARDS || 300});
-const get_next_era_validators_cache = new NodeCache();
+const get_next_era_validators_cache = new NodeCache({stdTTL: process.env.CACHE_GET_ERA_VALIDATORS || 7200});
 let validator_timestamp;
 let current_era_validator_timestamp;
 let next_era_validator_timestamp;

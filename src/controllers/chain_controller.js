@@ -15,8 +15,8 @@ const { GetDeployUpdateTime, GetBlockUpdateTime } = require('../models/timestamp
 const get_block_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_BLOCK || 20 });
 const get_block_deploys_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_BLOCK_DEPLOYS || 20 });
 const get_block_transfers_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_BLOCK_TRANSFERS || 20 });
-const get_latest_block_cache = new NodeCache({ stdTTL: 50 });
-const get_latest_tx_cache = new NodeCache();
+const get_latest_block_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_LATEST_BLOCKS || 60 });
+const get_latest_tx_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_LATEST_BLOCKS || 50 });
 let deploy_timestamp;
 let block_timestamp;
 
