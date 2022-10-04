@@ -3,7 +3,7 @@ dotenv.config();
 const { RpcApiName } = require("./constant");
 const request = require("request");
 const { exec } = require("child_process");
-const {Sequelize} = require("sequelize");
+const { Sequelize } = require("sequelize");
 
 var db_config = {
     host: process.env.HOST,
