@@ -6,7 +6,7 @@ async function start() {
     CronJobGetLatestBlock(20);
 
     // Get-10-latest-block
-    CronJobGetLatestBlock(10);
+    CronJobGetLatestBlock(15);
 }
 
 async function CronJobGetLatestBlock(num) {

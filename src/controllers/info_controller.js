@@ -3,7 +3,7 @@ const { GetDeploy, GetType, GetTransfersVolume, GetDeployFromRPC } = require('..
 const { RpcApiName, ELEMENT_TYPE } = require('../utils/constant');
 const { Execute, RequestRPC, GetNetWorkRPC } = require('../utils/common');
 require('dotenv').config();
-const cron = require('node-cron');
+
 const { GetTotalNumberOfAccount, GetNumberOfAccountFromDate } = require('../models/account');
 const { GetNumberOfTransfersByDate, GetVolumeByDate, GetInflowOfAddressByDate, GetOutflowOfAddressByDate } = require('../models/transfer');
 const CoinGecko = require('coingecko-api');
@@ -19,14 +19,14 @@ const { GetTotalStakeCurrentEra, GetTotalActiveValidator, GetTotalValidator, Get
 const { GetTotalDelegator } = require("../models/delegator");
 const { GetStats } = require("../models/stats");
 const { GetEraUpdateTime } = require('../models/timestamp');
+const { GetBlockchainDataByKey } = require('../models/blockchain');
+
 const get_stats_cache = new NodeCache({stdTTL: process.env.CACHE_GET_STATS || 300});
 const economics_cache = new NodeCache({stdTTL: process.env.CACHE_ECONOMICS || 240});
 
-const transfer_volume_cache = new NodeCache({ stdTTL: process.env.CACHE_TRANSFER_VOLUME || 1800 });
+const blockchain_data_cache = new NodeCache({ stdTTL: process.env.CACHE_BLOCKCHAIN_DATA || 1800 });
 const get_volume_cache = new NodeCache({stdTTL: process.env.CACHE_VOLUME || 4200});
 
-const get_staking_volume_cache = new NodeCache({stdTTL: process.env.CACHE_GET_UNDELEGATE_VOLUME || 4200});
-const get_staking_tx_volume_cache = new NodeCache({stdTTL: process.env.CACHE_GET_TX_UNDELEGATE_VOLUME || 4200});
 const exchange_volume_cache = new NodeCache({stdTTL: process.env.CACHE_EXCHANGE_VOLUME || 4200});
 const get_total_reward = new NodeCache({stdTTL: process.env.CACHE_GET_TOTAL_REWARD || 450});
 
@@ -226,7 +226,6 @@ async function GetVolumeCache(count) {
             let the_date = new Date();
             the_date.setDate(datetime.getDate() - i);
             the_date = the_date.toISOString().slice(0, 10);
-            console.log(the_date)
             let data = await GetVolumeByDate(the_date, the_date);
             data = data[0];
 
@@ -245,66 +244,22 @@ async function GetVolumeCache(count) {
     return result;
 }
 
-async function GetStakingVolumeCache(type, count) {
-    let result = [];
-    try {
-        if (type != "delegate" && type != "undelegate") {
-            console.log("Can not get this type");
-            return;
-        }
-        var datetime = new Date();
-        for (let i = 0; i < count; i++) {
-            let the_date = new Date();
-            the_date.setDate(datetime.getDate() - i);
-            the_date = the_date.toISOString().slice(0, 10);
-            let deploys = await GetDeployByDate(type, the_date, the_date);
+async function GetBlockchainDataCache(type){
+    let blockchain_data = [];
+    const result = await GetBlockchainDataByKey(type);
 
-            let amount = 0;
-            for (deploy of deploys) {
-                amount += Number(deploy.amount);
-            }
-
-            const paser_data = [
-                Math.floor(new Date(the_date).getTime()),
-                amount
-            ]
-            result.push(paser_data);
+    if(result.length > 0){
+        for(let i = result.length - 1; i >= 0; i--){
+            const data = [
+                Math.floor(result[i].timestamp),
+                Number(result[i].value)
+            ];
+            blockchain_data.push(data);
         }
-        get_staking_volume_cache.set(`${type}-${count}`, result);
-    } catch (err) {
-        console.log(`Can not get ${type} volume`);
     }
+    blockchain_data_cache.set(`${type}`, blockchain_data);
 
-    return result;
-}
-
-async function GetStakingTxVolumeCache(type, count) {
-    let result = [];
-    try {
-        if (type !== "delegate" && type !== "undelegate") {
-            console.log("Can not get this type");
-            return;
-        }
-        var datetime = new Date();
-        
-        for (let i = 0; i < count; i++) {
-            let the_date = new Date();
-            the_date.setDate(datetime.getDate() - i);
-            the_date = the_date.toISOString().slice(0, 10);
-            let data = await GetDeployByDate(type, the_date, the_date);
-            const paser_data = [
-                Math.floor(new Date(the_date).getTime()),
-                data.length
-            ]
-            result.push(paser_data);
-        }
-        
-        get_staking_tx_volume_cache.set(`${type}-${count}`, result);
-    } catch (err) {
-        console.log(`Can not get ${type} tx volume`);
-    }
-
-    return result;
+    return blockchain_data;
 }
 
 async function GetExchangeVolumeCache(count) {
@@ -331,18 +286,15 @@ async function GetExchangeVolumeCache(count) {
 module.exports = {
     get_stats_cache,
     economics_cache,
-    transfer_volume_cache,
+    blockchain_data_cache,
     get_volume_cache,
-    get_staking_volume_cache,
-    get_staking_tx_volume_cache,
     exchange_volume_cache,
     GetEconomicsCache,
     GetStatsCache,
     GetVolumeCache,
-    GetStakingVolumeCache,
-    GetStakingTxVolumeCache,
     GetExchangeVolumeCache,
     GetTotalRewardCache,
+    GetBlockchainDataCache,
 
     GetDeploy: async function (req, res) {
         let hex = req.params.hex; // Hex-encoded deploy hash
@@ -364,7 +316,6 @@ module.exports = {
             res.send(err) 
         })
     },
-
 
     GetListDeploys: async function (req, res) {
         let id = req.query.id; // JSON-RPC identifier, applied to the request and returned in the response. If not provided, a random integer will be assigned
@@ -411,11 +362,15 @@ module.exports = {
         res.status(200).json("comming soon");
     },
 
-    GetTransferVolume: async function (req, res) {
+    GetBlockchainData: async function (req, res) {
         try {
-            const count = req.params.count;
-            const result = await GetTransfersVolume(count);
-            transfer_volume_cache.set(`transfer-volume-${count}`, result);
+            const type = req.query.type;
+            // Check if type is valid
+            if(type !== "transfer" && type !== "transfer_tx" && type !== "staking" && type !== "staking_tx" && type !== "unstaking" && type !== "unstaking_tx") {
+                res.json("Can not get this type: " + type);
+                return;
+            }
+            const result = await GetBlockchainDataCache(type);
             res.json(result);
         } catch (err) {
             res.send(err);
@@ -429,29 +384,6 @@ module.exports = {
             res.json(result);
         } catch (err) {
             res.send(err);
-        }
-    },
-
-    GetStakingVolume: async function (req, res) {
-        try {
-            const count = req.query.count;
-            const type = req.query.type;
-            const result = await GetStakingVolumeCache(type, count);
-            res.json(result);
-        } catch (err) {
-            res.status(400).send(`Can not get ${type} volume`);
-        }
-    },
-
-    GetStakingTxVolume: async function (req, res) {
-        try {
-            const count = req.query.count;
-            const type = req.query.type;
-            const result = await GetStakingTxVolumeCache(type, count);
-            res.json(result);
-        } catch (err) {
-            console.log(err);
-            res.send(`Can not get ${type} tx volume`);
         }
     },
 

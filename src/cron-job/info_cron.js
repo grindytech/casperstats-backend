@@ -1,6 +1,7 @@
 const cron = require('node-cron');
-const { GetEconomicsCache, GetStatsCache, GetVolumeCache, GetStakingVolumeCache, 
-    GetStakingTxVolumeCache, GetExchangeVolumeCache, GetTotalRewardCache} = require('../controllers/info_controller');
+const { GetEconomicsCache, GetStatsCache, GetStakingVolumeCache, 
+    GetStakingTxCache, GetExchangeVolumeCache, GetTotalRewardCache,
+    GetTransferVolumeCache, GetTransferTxsCache} = require('../controllers/info_controller');
 
 async function start() {
     // Get Stats
@@ -8,17 +9,19 @@ async function start() {
 
     // Get Total Reward
     CronJobGetTotalReward();
+
     // Get Economics
     CronJobGetEconomics();
 
-    // Get daily volume
-    CronJobGetDailyVolume();
+    // Get daily volume chart
+    // CronJobGetTransferVolume();
+    // CronJobGetTransferTxs();
 
-    // Get staking volume
-    CronJobGetDelegateVolume();
-    CronJobGetUndelegateVolume();
-    CronJobGetDelegateTxVolume();
-    CronJobGetUndelegateTxVolume();
+    // Get staking volume chart
+    // CronJobGetDelegateVolume();
+    // CronJobGetUndelegateVolume();
+    // CronJobGetDelegateTxVolume();
+    // CronJobGetUndelegateTxVolume();
 
     // Get exchange volume
     CronJobGetExchangeVolume();
@@ -58,11 +61,22 @@ async function CronJobGetEconomics() {
     })
 }
 
-async function CronJobGetDailyVolume() {
+async function CronJobGetTransferVolume() {
     cron.schedule('5 10 * * * *', async function() {
         try{
-            await GetVolumeCache(60);
-            console.log("Update get-volume-cache successfull");
+            await GetTransferVolumeCache();
+            console.log("Update get-transfer-volume-cache successfull");
+        }catch (err){
+            console.log(err);
+        }
+    })
+}
+
+async function CronJobGetTransferTxs() {
+    cron.schedule('5 10 * * * *', async function() {
+        try{
+            await GetTransferTxsCache();
+            console.log("Update get-transfer-tx-cache successfull");
         }catch (err){
             console.log(err);
         }
@@ -72,7 +86,7 @@ async function CronJobGetDailyVolume() {
 async function CronJobGetDelegateVolume() {
     cron.schedule('6 11 * * * *', async function() {
         try{
-            await GetStakingVolumeCache("delegate", 60);
+            await GetStakingVolumeCache("delegate");
             console.log("Update get-delegate-volume-cache successfull");
         }catch (err){
             console.log(err);
@@ -83,7 +97,7 @@ async function CronJobGetDelegateVolume() {
 async function CronJobGetUndelegateVolume() {
     cron.schedule('7 11 * * * *', async function() {
         try{
-            await GetStakingVolumeCache("undelegate", 60);
+            await GetStakingVolumeCache("undelegate");
             console.log("Update get-undelegate-volume-cache successfull");
         }catch (err){
             console.log(err);
@@ -94,7 +108,7 @@ async function CronJobGetUndelegateVolume() {
 async function CronJobGetDelegateTxVolume() {
     cron.schedule('6 11 * * * *', async function() {
         try{
-            await GetStakingTxVolumeCache("delegate", 60);
+            await GetStakingTxCache("delegate");
             console.log("Update get-delegate-tx-volume-cache successfull");
         }catch (err){
             console.log(err);
@@ -105,7 +119,7 @@ async function CronJobGetDelegateTxVolume() {
 async function CronJobGetUndelegateTxVolume() {
     cron.schedule('7 11 * * * *', async function() {
         try{
-            await GetStakingTxVolumeCache("undelegate", 60);
+            await GetStakingTxCache("undelegate");
             console.log("Update get-undelegate-tx-volume-cache successfull");
         }catch (err){
             console.log(err);

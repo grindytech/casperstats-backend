@@ -1,8 +1,9 @@
 const dotenv = require("dotenv");
 dotenv.config();
-const { RpcApiName } = require('./constant');
-const request = require('request');
+const { RpcApiName } = require("./constant");
+const request = require("request");
 const { exec } = require("child_process");
+const {Sequelize} = require("sequelize");
 
 var db_config = {
     host: process.env.HOST,
@@ -10,6 +11,34 @@ var db_config = {
     password: process.env.PASSWORD,
     database: process.env.DATABASE_NAME
 }
+
+var db_config_sequelize = {
+    host: process.env.HOST,
+    user: process.env.DB_USER,
+    password: process.env.PASSWORD,
+    database: process.env.STATS_DB_NAME,
+    dialect: 'mysql',
+    pool: {
+        max: 100,
+        min: 0,
+        acquire: 30000,
+        idle: 10000
+    }
+}
+
+const sequelize = new Sequelize(db_config_sequelize.database, db_config_sequelize.user, db_config_sequelize.password, {
+    host: db_config_sequelize.host,
+    dialect: db_config_sequelize.dialect,
+    pool: {
+       max: db_config_sequelize.pool.max,
+       min: db_config_sequelize.pool.min,
+       acquire: db_config_sequelize.pool.acquire,
+       idle: db_config_sequelize.pool.idle
+    }, 
+    define: {
+       freezeTableName: true
+    }
+})
 
 async function GetAccountHash(address) {
     return new Promise((resolve, reject) => {
@@ -251,6 +280,6 @@ module.exports = {
     GetLatestStateRootHash, Execute, GetBalance,
     GetAccountHash, RequestRPC, GetBalanceByAccountHash,
     db_config, GetBalanceByState, GetNetWorkRPC, auth,
-    GetEra
+    GetEra, sequelize
 }
 

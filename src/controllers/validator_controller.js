@@ -1,6 +1,6 @@
 const validator_db = require('../models/validator');
 const { GetValidatorInformation } = require('../utils/validator');
-require('dotenv').config();
+require('dotenv').config(); 
 
 module.exports = {
 
@@ -14,7 +14,6 @@ module.exports = {
                 error: "Can not get validator"
             });
         })
-
     },
 
     GetValidatorsInfo: async function (req, res) {

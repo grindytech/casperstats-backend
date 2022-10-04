@@ -163,8 +163,9 @@ module.exports = {
     },
 
     GetAuctionInfo: async function (req, res) {
+        const block = Number(req.query.block);
         const url = await GetNetWorkRPC();
-        RequestRPC(url, RpcApiName.get_auction_info, []).then(value => {
+        RequestRPC(url, RpcApiName.get_auction_info, [{"Height": block}]).then(value => {
             res.status(200);
             res.json(value.result);
         }).catch(err => {
