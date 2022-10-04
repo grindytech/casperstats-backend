@@ -26,13 +26,7 @@ async function getBlockchainDataByKey(key) {
     where: {
       key: key,
     },
-  })
-    .then((result) => {
-      return result;
-    })
-    .catch((err) => {
-      return err;
-    });
+  });
 }
 
 module.exports = {

@@ -294,7 +294,7 @@ async function GetVolumeCache(count) {
 
 async function GetBlockchainDataCache(type) {
   let blockchain_data = [];
-  const result = await GetBlockchainDataByKey(type);
+  const result = await getBlockchainDataByKey(type);
 
   if (result.length > 0) {
     for (let i = result.length - 1; i >= 0; i--) {
@@ -428,7 +428,7 @@ module.exports = {
         res.json("Can not get this type: " + type);
         return;
       }
-      const result = await getBlockchainDataByKey(type);
+      const result = await GetBlockchainDataCache(type);
       res.json(result);
     } catch (err) {
       res.send(err);
