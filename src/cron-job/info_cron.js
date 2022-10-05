@@ -33,6 +33,12 @@ async function start() {
 
   // Get exchange volume
   cronJobGetExchangeVolume();
+
+  // Get auction info
+  cronJobGetTotalBid();
+  cronJobGetActiveBid();
+  cronJobGetTotalValidator();
+  cronJobGetTotalDelegator();
 }
 
 async function cronJobGetStats() {
@@ -162,6 +168,50 @@ async function cronJobGetExchangeVolume() {
     try {
       await GetExchangeVolumeCache(10);
       console.log("Update get-exchange-volume-cache successfull");
+    } catch (err) {
+      console.log(err);
+    }
+  });
+}
+
+async function cronJobGetTotalBid() {
+  cron.schedule("9 10 * * * *", async function () {
+    try {
+      await getBlockchainDataCache("bid");
+      console.log("Update get-total-bid-cache successfull");
+    } catch (err) {
+      console.log(err);
+    }
+  });
+}
+
+async function cronJobGetActiveBid() {
+  cron.schedule("10 10 * * * *", async function () {
+    try {
+      await getBlockchainDataCache("active_bid");
+      console.log("Update get-total-active-bid-cache successfull");
+    } catch (err) {
+      console.log(err);
+    }
+  });
+}
+
+async function cronJobGetTotalValidator() {
+  cron.schedule("11 10 * * * *", async function () {
+    try {
+      await getBlockchainDataCache("validator");
+      console.log("Update get-total-validator-cache successfull");
+    } catch (err) {
+      console.log(err);
+    }
+  });
+}
+
+async function cronJobGetTotalDelegator() {
+  cron.schedule("12 10 * * * *", async function () {
+    try {
+      await getBlockchainDataCache("delegator");
+      console.log("Update get-total-delegator-cache successfull");
     } catch (err) {
       console.log(err);
     }

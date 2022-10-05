@@ -54,6 +54,7 @@ const verifyGetStats = (req, res, next) => {
         .status(200)
         .json(info_controller.get_stats_cache.get("get-stats"));
     }
+    return next();
   } catch (err) {
     throw new Error(err);
   }
