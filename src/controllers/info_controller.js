@@ -283,24 +283,29 @@ async function GetVolumeCache(count) {
   return result;
 }
 
-async function GetBlockchainDataCache(type) {
+async function getBlockchainDataCache(type) {
   let blockchain_data = [];
   const result = await getBlockchainDataByKey(type);
 
-  if (result.length > 0) {
-    if (type.includes("_tx")) {
-      for (let i = result.length - 1; i >= 0; i--) {
-        const data = [Math.floor(result[i].timestamp), Number(result[i].value)];
-        blockchain_data.push(data);
-      }
-    } else {
-      for (let i = result.length - 1; i >= 0; i--) {
-        const data = [
-          Math.floor(result[i].timestamp),
-          Number((Number(result[i].value) / 1000000000).toFixed(2)),
-        ];
-        blockchain_data.push(data);
-      }
+  // Return error if type is invalid
+  if (result.length == 0) {
+    return { error: "Could not find data with given type" };
+  }
+
+  // Get group of given type
+  const group = result[0].group;
+  if (group === "volume") {
+    for (let i = result.length - 1; i >= 0; i--) {
+      const data = [
+        Math.floor(result[i].timestamp),
+        Number((Number(result[i].value) / 1000000000).toFixed(2)),
+      ];
+      blockchain_data.push(data);
+    }
+  } else {
+    for (let i = result.length - 1; i >= 0; i--) {
+      const data = [Math.floor(result[i].timestamp), Number(result[i].value)];
+      blockchain_data.push(data);
     }
   }
   blockchain_data_cache.set(`${type}`, blockchain_data);
@@ -340,7 +345,7 @@ module.exports = {
   GetVolumeCache,
   GetExchangeVolumeCache,
   GetTotalRewardCache,
-  GetBlockchainDataCache,
+  getBlockchainDataCache,
 
   GetDeploy: async function (req, res) {
     let hex = req.params.hex; // Hex-encoded deploy hash
@@ -417,21 +422,7 @@ module.exports = {
   GetBlockchainData: async function (req, res) {
     try {
       const type = req.query.type;
-      // Check if type is valid
-      if (
-        type !== "transfer" &&
-        type !== "transfer_tx" &&
-        type !== "staking" &&
-        type !== "staking_tx" &&
-        type !== "unstaking" &&
-        type !== "unstaking_tx" &&
-        type !== "deploy" &&
-        type !== "deploy_tx"
-      ) {
-        res.json("Can not get this type: " + type);
-        return;
-      }
-      const result = await GetBlockchainDataCache(type);
+      const result = await getBlockchainDataCache(type);
       res.json(result);
     } catch (err) {
       res.send(err);

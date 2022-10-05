@@ -4,6 +4,9 @@ const { sequelize } = require("../utils/common");
 const Blockchain = sequelize.define(
   "blockchain",
   {
+    group: {
+      type: Sequelize.STRING(25),
+    },
     key: {
       type: Sequelize.STRING(25),
       primaryKey: true,

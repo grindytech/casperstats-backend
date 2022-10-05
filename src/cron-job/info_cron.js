@@ -4,7 +4,7 @@ const {
   GetStatsCache,
   GetExchangeVolumeCache,
   GetTotalRewardCache,
-  GetBlockchainDataCache,
+  getBlockchainDataCache,
 } = require("../controllers/info_controller");
 
 async function start() {
@@ -72,7 +72,7 @@ async function cronJobGetEconomics() {
 async function cronJobGetDeployVolume() {
   cron.schedule("9 10 * * * *", async function () {
     try {
-      await GetBlockchainDataCache("deploy");
+      await getBlockchainDataCache("deploy");
       console.log("Update get-deploy-volume-cache successfull");
     } catch (err) {
       console.log(err);
@@ -83,7 +83,7 @@ async function cronJobGetDeployVolume() {
 async function cronJobGetDeployTxs() {
   cron.schedule("9 10 * * * *", async function () {
     try {
-      await GetBlockchainDataCache("deploy_tx");
+      await getBlockchainDataCache("deploy_tx");
       console.log("Update get-deploy-tx-cache successfull");
     } catch (err) {
       console.log(err);
@@ -94,7 +94,7 @@ async function cronJobGetDeployTxs() {
 async function cronJobGetTransferVolume() {
   cron.schedule("5 10 * * * *", async function () {
     try {
-      await GetBlockchainDataCache("transfer");
+      await getBlockchainDataCache("transfer");
       console.log("Update get-transfer-volume-cache successfull");
     } catch (err) {
       console.log(err);
@@ -105,7 +105,7 @@ async function cronJobGetTransferVolume() {
 async function cronJobGetTransferTxs() {
   cron.schedule("5 10 * * * *", async function () {
     try {
-      await GetBlockchainDataCache("transfer_tx");
+      await getBlockchainDataCache("transfer_tx");
       console.log("Update get-transfer-tx-cache successfull");
     } catch (err) {
       console.log(err);
@@ -116,7 +116,7 @@ async function cronJobGetTransferTxs() {
 async function cronJobGetStakingVolume() {
   cron.schedule("6 10 * * * *", async function () {
     try {
-      await GetBlockchainDataCache("staking");
+      await getBlockchainDataCache("staking");
       console.log("Update get-staking-volume-cache successfull");
     } catch (err) {
       console.log(err);
@@ -127,7 +127,7 @@ async function cronJobGetStakingVolume() {
 async function cronJobGetUnstakingVolume() {
   cron.schedule("7 10 * * * *", async function () {
     try {
-      await GetBlockchainDataCache("unstaking");
+      await getBlockchainDataCache("unstaking");
       console.log("Update get-unstaking-volume-cache successfull");
     } catch (err) {
       console.log(err);
@@ -138,7 +138,7 @@ async function cronJobGetUnstakingVolume() {
 async function cronJobGetStakingTxVolume() {
   cron.schedule("6 10 * * * *", async function () {
     try {
-      await GetBlockchainDataCache("staking_tx");
+      await getBlockchainDataCache("staking_tx");
       console.log("Update get-staking-tx-volume-cache successfull");
     } catch (err) {
       console.log(err);
@@ -149,7 +149,7 @@ async function cronJobGetStakingTxVolume() {
 async function cronJobGetUnstakingTxVolume() {
   cron.schedule("7 10 * * * *", async function () {
     try {
-      await GetBlockchainDataCache("unstaking_tx");
+      await getBlockchainDataCache("unstaking_tx");
       console.log("Update get-unstaking-tx-volume-cache successfull");
     } catch (err) {
       console.log(err);
