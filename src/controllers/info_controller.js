@@ -5,8 +5,8 @@ const {
   GetDeployFromRPC,
 } = require("../utils/chain");
 
-const { RpcApiName, ELEMENT_TYPE } = require("../utils/constant");
-const { Execute, RequestRPC, GetNetWorkRPC } = require("../utils/common");
+const { ELEMENT_TYPE } = require("../utils/constant");
+const { Execute, GetNetWorkRPC } = require("../utils/common");
 require("dotenv").config();
 
 const {
@@ -16,16 +16,9 @@ const {
 const {
   GetNumberOfTransfersByDate,
   GetVolumeByDate,
-  GetInflowOfAddressByDate,
-  GetOutflowOfAddressByDate,
 } = require("../models/transfer");
 const CoinGecko = require("coingecko-api");
-const {
-  GetEraValidators,
-  GetAPY,
-  GetTotalStake,
-  GetTokenMetrics,
-} = require("../utils/validator");
+const { GetAPY } = require("../utils/validator");
 const {
   GetDexAddressesTraffic,
   GetExchangeVolumeByDate,
@@ -34,7 +27,6 @@ const { GetTotalReward } = require("../models/era");
 const CoinGeckoClient = new CoinGecko();
 
 const NodeCache = require("node-cache");
-const { GetDeployByDate } = require("../models/deploy");
 const { GetBlockHeight } = require("../models/block_model");
 const {
   GetTotalStakeCurrentEra,
@@ -154,7 +146,6 @@ async function GetStatsCache() {
     transfers: [], // last 60 days transfer
   };
   try {
-    const url = await GetNetWorkRPC();
     // holder
     {
       var datetime = new Date();
@@ -297,9 +288,19 @@ async function GetBlockchainDataCache(type) {
   const result = await getBlockchainDataByKey(type);
 
   if (result.length > 0) {
-    for (let i = result.length - 1; i >= 0; i--) {
-      const data = [Math.floor(result[i].timestamp), Number(result[i].value)];
-      blockchain_data.push(data);
+    if (type.includes("_tx")) {
+      for (let i = result.length - 1; i >= 0; i--) {
+        const data = [Math.floor(result[i].timestamp), Number(result[i].value)];
+        blockchain_data.push(data);
+      }
+    } else {
+      for (let i = result.length - 1; i >= 0; i--) {
+        const data = [
+          Math.floor(result[i].timestamp),
+          Number((Number(result[i].value) / 1000000000).toFixed(2)),
+        ];
+        blockchain_data.push(data);
+      }
     }
   }
   blockchain_data_cache.set(`${type}`, blockchain_data);
@@ -423,7 +424,9 @@ module.exports = {
         type !== "staking" &&
         type !== "staking_tx" &&
         type !== "unstaking" &&
-        type !== "unstaking_tx"
+        type !== "unstaking_tx" &&
+        type !== "deploy" &&
+        type !== "deploy_tx"
       ) {
         res.json("Can not get this type: " + type);
         return;
