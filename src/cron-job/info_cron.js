@@ -17,11 +17,15 @@ async function start() {
   // Get Economics
   cronJobGetEconomics();
 
-  // Get daily volume chart
+  // Get daily deploy volume chart
+  cronJobGetDeployVolume();
+  cronJobGetDeployTxs();
+
+  // Get daily transfer volume chart
   cronJobGetTransferVolume();
   cronJobGetTransferTxs();
 
-  // Get staking volume chart
+  // Get daily staking volume chart
   cronJobGetStakingVolume();
   cronJobGetUnstakingVolume();
   cronJobGetStakingTxVolume();
@@ -65,6 +69,28 @@ async function cronJobGetEconomics() {
   });
 }
 
+async function cronJobGetDeployVolume() {
+  cron.schedule("9 10 * * * *", async function () {
+    try {
+      await GetBlockchainDataCache("deploy");
+      console.log("Update get-deploy-volume-cache successfull");
+    } catch (err) {
+      console.log(err);
+    }
+  });
+}
+
+async function cronJobGetDeployTxs() {
+  cron.schedule("9 10 * * * *", async function () {
+    try {
+      await GetBlockchainDataCache("deploy_tx");
+      console.log("Update get-deploy-tx-cache successfull");
+    } catch (err) {
+      console.log(err);
+    }
+  });
+}
+
 async function cronJobGetTransferVolume() {
   cron.schedule("5 10 * * * *", async function () {
     try {
@@ -88,7 +114,7 @@ async function cronJobGetTransferTxs() {
 }
 
 async function cronJobGetStakingVolume() {
-  cron.schedule("6 11 * * * *", async function () {
+  cron.schedule("6 10 * * * *", async function () {
     try {
       await GetBlockchainDataCache("staking");
       console.log("Update get-staking-volume-cache successfull");
@@ -99,7 +125,7 @@ async function cronJobGetStakingVolume() {
 }
 
 async function cronJobGetUnstakingVolume() {
-  cron.schedule("7 11 * * * *", async function () {
+  cron.schedule("7 10 * * * *", async function () {
     try {
       await GetBlockchainDataCache("unstaking");
       console.log("Update get-unstaking-volume-cache successfull");
@@ -110,7 +136,7 @@ async function cronJobGetUnstakingVolume() {
 }
 
 async function cronJobGetStakingTxVolume() {
-  cron.schedule("6 11 * * * *", async function () {
+  cron.schedule("6 10 * * * *", async function () {
     try {
       await GetBlockchainDataCache("staking_tx");
       console.log("Update get-staking-tx-volume-cache successfull");
@@ -121,7 +147,7 @@ async function cronJobGetStakingTxVolume() {
 }
 
 async function cronJobGetUnstakingTxVolume() {
-  cron.schedule("7 11 * * * *", async function () {
+  cron.schedule("7 10 * * * *", async function () {
     try {
       await GetBlockchainDataCache("unstaking_tx");
       console.log("Update get-unstaking-tx-volume-cache successfull");
