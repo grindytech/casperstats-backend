@@ -45,7 +45,7 @@ const sequelize = new Sequelize(
   }
 );
 
-async function GetAccountHash(address) {
+async function getAccountHash(address) {
   return new Promise((resolve, reject) => {
     let command = `${process.env.CASPER_CLIENT} account-address`;
     if (address) {
@@ -68,15 +68,15 @@ async function GetAccountHash(address) {
   });
 }
 
-const GetBalance = async (url, address) => {
+const getBalance = async (url, address) => {
   let s = await GetLatestStateRootHash(url); // get latest root hash
   try {
-    let URef = await QueryState(address, s); // URef for address
+    let URef = await queryState(address, s); // URef for address
     let main_purse = URef.result.stored_value.Account.main_purse;
 
     let params = [s, main_purse];
 
-    let result = await RequestRPC(url, RpcApiName.get_balance, params);
+    let result = await requestRPC(url, RpcApiName.get_balance, params);
     return result;
   } catch (err) {
     throw {
@@ -87,32 +87,32 @@ const GetBalance = async (url, address) => {
   }
 };
 
-const GetBalanceByAccountHash = async (url, account_hash) => {
+const getBalanceByAccountHash = async (url, account_hash) => {
   let s = await GetLatestStateRootHash(url); //Hex-encoded hash of the state root
 
-  const state = await QueryState(account_hash, s);
+  const state = await queryState(account_hash, s);
   const main_purse = state.result.stored_value.Account.main_purse;
 
   let params = [s, main_purse];
-  const result = await RequestRPC(url, RpcApiName.get_balance, params);
+  const result = await requestRPC(url, RpcApiName.get_balance, params);
   return {
     balance_value: result.result.balance_value,
   };
 };
 
-const GetBalanceByState = async (url, account_hash, s) => {
-  const state = await QueryState(account_hash, s);
+const getBalanceByState = async (url, account_hash, s) => {
+  const state = await queryState(account_hash, s);
   const main_purse = state.result.stored_value.Account.main_purse;
 
   let params = [s, main_purse];
-  const result = await RequestRPC(url, RpcApiName.get_balance, params);
+  const result = await requestRPC(url, RpcApiName.get_balance, params);
   return result.result.balance_value;
 };
 
 async function GetAccountData(url, address) {
   const account = {};
-  account["balance"] = await GetBalance(url, address);
-  account["account_hash"] = await GetAccountHash(address);
+  account["balance"] = await getBalance(url, address);
+  account["account_hash"] = await getAccountHash(address);
 
   return account;
 }
@@ -132,7 +132,7 @@ const Execute = async (command) => {
   });
 };
 
-const RequestRPC = async (url, method, params, id = undefined) => {
+const requestRPC = async (url, method, params, id = undefined) => {
   return new Promise((resolve, reject) => {
     let body = "";
     if (id == undefined) {
@@ -172,7 +172,7 @@ const RequestRPC = async (url, method, params, id = undefined) => {
 
 const GetLatestStateRootHash = async (url) => {
   return new Promise((resolve, reject) => {
-    RequestRPC(url, RpcApiName.get_state_root_hash, [])
+    requestRPC(url, RpcApiName.get_state_root_hash, [])
       .then((value) => {
         resolve(value.result.state_root_hash);
       })
@@ -196,8 +196,8 @@ const GetLatestStateRootHash = async (url) => {
  * @param {number} id optional
  * @return {object}.
  */
-const QueryState = async (key, state = "", id = undefined) => {
-  const rpc_url = await GetNetWorkRPC();
+const queryState = async (key, state = "", id = undefined) => {
+  const rpc_url = await getNetWorkRPC();
 
   if (state == "") {
     state = await GetLatestStateRootHash(rpc_url);
@@ -223,14 +223,14 @@ const QueryState = async (key, state = "", id = undefined) => {
 const GetHeight = async (url) => {
   let params = [{}];
 
-  let block_data = await RequestRPC(url, RpcApiName.get_block, params);
+  let block_data = await requestRPC(url, RpcApiName.get_block, params);
   let height = block_data.result.block.header.height;
   return height;
 };
 
-const GetEra = async (url) => {
+const getEra = async (url) => {
   let params = [{}];
-  let block_data = await RequestRPC(url, RpcApiName.get_block, params);
+  let block_data = await requestRPC(url, RpcApiName.get_block, params);
   let era_id = block_data.result.block.header.era_id;
   return era_id;
 };
@@ -263,10 +263,10 @@ async function GetNetworkStatus(URL) {
 }
 
 /**
- * GetNetWorkRPC return Network RPC URL, prevent connection lost
+ * getNetWorkRPC return Network RPC URL, prevent connection lost
  * @returns active URL string ortherwise
  */
-async function GetNetWorkRPC() {
+async function getNetWorkRPC() {
   const URLs = JSON.parse(process.env.NETWORK_RPC_URLS);
   // check array
   if (Array.isArray(URLs) == false) {
@@ -292,17 +292,17 @@ const auth = (user, password) => {
 module.exports = {
   GetAccountData,
   GetHeight,
-  QueryState,
+  queryState,
   GetLatestStateRootHash,
   Execute,
-  GetBalance,
-  GetAccountHash,
-  RequestRPC,
-  GetBalanceByAccountHash,
+  getBalance,
+  getAccountHash,
+  requestRPC,
+  getBalanceByAccountHash,
   db_config,
-  GetBalanceByState,
-  GetNetWorkRPC,
+  getBalanceByState,
+  getNetWorkRPC,
   auth,
-  GetEra,
+  getEra,
   sequelize,
 };

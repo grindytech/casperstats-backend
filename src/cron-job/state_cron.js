@@ -1,49 +1,46 @@
-
-const cron = require('node-cron');
-const { GetBidsCache, GetCurrentEraValidatorsCache, GetNextEraValidatorsCache } = require('../controllers/state_controller');
-
+const cron = require("node-cron");
+const {
+  getBidsCache,
+  getCurrentEraValidatorsCache,
+  getNextEraValidatorsCache,
+} = require("../controllers/state_controller");
+const { CRONJOB_TIME } = require("../utils/constant");
 
 async function start() {
-    // Get validator
-    CronJobGetBids();
-    CronJobGetCurrentEra();
-    CronJobGetNextEra();
+  // Get validator
+  cronJobGetBids();
+  cronJobGetCurrentEra();
+  cronJobGetNextEra();
 }
 
-async function CronJobGetBids(){
-    cron.schedule('*/10 * * * *', async function() {
-        try{
-            await GetBidsCache();
-            
-        }catch (err) {
-            console.log(err)
-        }
-
-    });
+async function cronJobGetBids() {
+  cron.schedule(CRONJOB_TIME.EVERY_10_MINUTES, async function () {
+    try {
+      await getBidsCache();
+    } catch (err) {
+      console.log(err);
+    }
+  });
 }
 
-async function CronJobGetCurrentEra(){
-    cron.schedule('*/10 * * * *',async function() {
-        try{
-            await GetCurrentEraValidatorsCache();
-            
-        }catch (err) {
-            console.log(err)
-        }
-
-    });
+async function cronJobGetCurrentEra() {
+  cron.schedule(CRONJOB_TIME.EVERY_10_MINUTES, async function () {
+    try {
+      await getCurrentEraValidatorsCache();
+    } catch (err) {
+      console.log(err);
+    }
+  });
 }
 
-async function CronJobGetNextEra(){
-    cron.schedule('*/10 * * * *', async function() {
-        try{
-            await GetNextEraValidatorsCache();
-            
-        }catch (err) {
-            console.log(err)
-        }
-
-    });
+async function cronJobGetNextEra() {
+  cron.schedule(CRONJOB_TIME.EVERY_10_MINUTES, async function () {
+    try {
+      await getNextEraValidatorsCache();
+    } catch (err) {
+      console.log(err);
+    }
+  });
 }
 
-module.exports = { start }
+module.exports = { start };

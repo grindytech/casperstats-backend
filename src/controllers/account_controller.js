@@ -1,54 +1,79 @@
-const { RpcApiName } = require('../utils/constant');
-const { GetAccountData, GetRichest, GetUnstakingAmount, 
-  GetAccountName, WithoutTime } = require('../utils/account');
-const math = require('mathjs');
-require('dotenv').config();
-const { GetHolder, GetTotalNumberOfAccount, GetPublicKeyByAccountHash } = require('../models/account');
-const { GetTransfersByAccountHash } = require('../models/transfer');
-const { GetTimestampByEraFromSwtichBlock } = require("../models/block_model");
-const { GetTimestampByEra, GetRewardByPublicKey } = require("../models/era");
-const { GetDeploysByPublicKey, GetDeployOfPublicKeyByType, CountDeployByType } = require('../models/deploy');
-const { GetAccountHash, RequestRPC, GetBalanceByAccountHash, GetNetWorkRPC, GetEra } = require('../utils/common');
-const { GetValidatorReward, GetDelegatorReward, GetPublicKeyRewardByDate, GetLatestEra,
-  GetPublicKeyRewardByEra,
-  GetLatestTimestampByPublicKey } = require('../models/era');
-const { GerEraIdByDate } = require('../models/era_id');
-const { GetValidatorInformation } = require('../utils/validator');
-const { GetDeployByRPC } = require('../utils/chain');
-const { GetValidator } = require("../models/validator");
-const { GetTotalStakeAsDelegator } = require("../models/delegator");
+const { RpcApiName } = require("../utils/constant");
+const {
+  getAccountData,
+  getRichest,
+  getUnstakingAmount,
+  getAccountName,
+  withoutTime,
+} = require("../utils/account");
+const math = require("mathjs");
+require("dotenv").config();
+const {
+  getHolder,
+  getTotalNumberOfAccount,
+  getPublicKeyByAccountHash,
+} = require("../models/account");
+const { getTransfersByAccountHash } = require("../models/transfer");
+const { getTimestampByEraFromSwtichBlock } = require("../models/block_model");
+const { getTimestampByEra } = require("../models/era");
+const {
+  getDeploysByPublicKey,
+  getDeployOfPublicKeyByType,
+  countDeployByType,
+} = require("../models/deploy");
+const {
+  getAccountHash,
+  getEra,
+  requestRPC,
+  getNetWorkRPC,
+  getBalanceByAccountHash,
+} = require("../utils/common");
+const {
+  getValidatorReward,
+  getDelegatorReward,
+  getPublicKeyRewardByDate,
+  getLatestEra,
+  getPublicKeyRewardByEra,
+  getLatestTimestampByPublicKey,
+} = require("../models/era");
+const { gerEraIdByDate } = require("../models/era_id");
+const { getValidatorInformation } = require("../utils/validator");
+const { getDeployByRPC } = require("../utils/chain");
+const { getValidator } = require("../models/validator");
+const { getTotalStakeAsDelegator } = require("../models/delegator");
 
-require('dotenv').config();
+require("dotenv").config();
 
 const NodeCache = require("node-cache");
-const { GetEraByBlockHash } = require('../models/block_model');
-const get_rich_accounts_cache = new NodeCache({stdTTL: process.env.CACHE_GET_RICH_ACCOUNTS || 3600});
+const { getEraByBlockHash } = require("../models/block_model");
+const get_rich_accounts_cache = new NodeCache({
+  stdTTL: process.env.CACHE_GET_RICH_ACCOUNTS || 3600,
+});
 
-
-async function GetRangeRichestCache(start, count) {
-  try{
-    const value = await GetRichest(start, count)
+async function getRangeRichestCache(start, count) {
+  try {
+    const value = await getRichest(start, count);
     get_rich_accounts_cache.set(`start: ${start} count ${count}`, value);
     return value;
-  }catch (err) {
+  } catch (err) {
     console.log(err);
   }
 }
 module.exports = {
   get_rich_accounts_cache,
-  GetRangeRichestCache,
+  getRangeRichestCache,
 
-  GetAccount: async function (req, res) {
+  getAccount: async function (req, res) {
     let account = req.params.account;
     try {
-      const url = await GetNetWorkRPC();
+      const url = await getNetWorkRPC();
       // modify param
 
       let account_hash;
-      try{
-        account_hash = await GetAccountHash(account);
+      try {
+        account_hash = await getAccountHash(account);
         account_hash = account_hash.replace("account-hash-", "");
-      }catch (err) {
+      } catch (err) {
         account_hash = account;
       }
 
@@ -57,7 +82,7 @@ module.exports = {
       //   account = account.replace("account-hash-", '');
       // }
 
-      let account_data = await GetHolder(account_hash);
+      let account_data = await getHolder(account_hash);
       let transferrable = 0;
       let total_staked_as_delegator = math.bignumber("0");
       let total_staked_as_validator = math.bignumber("0");
@@ -66,22 +91,32 @@ module.exports = {
       if (account_data.length == 1) {
         account_data = account_data[0];
         transferrable = account_data.balance;
-        if(account_data.public_key_hex != null || account_data.public_key_hex != undefined){
-          let validator = await GetValidator(account_data.public_key_hex);
-          if(validator.length >0){
-            total_staked_as_validator = validator[0].self_stake
+        if (
+          account_data.public_key_hex != null ||
+          account_data.public_key_hex != undefined
+        ) {
+          let validator = await getValidator(account_data.public_key_hex);
+          if (validator.length > 0) {
+            total_staked_as_validator = validator[0].self_stake;
           }
-          let delegator = await GetTotalStakeAsDelegator(account_data.public_key_hex);
-          if(delegator){
+          let delegator = await getTotalStakeAsDelegator(
+            account_data.public_key_hex
+          );
+          if (delegator) {
             total_staked_as_delegator = delegator.toString();
           }
         }
       } else {
-        account_data = await GetAccountData(account);
+        account_data = await getAccountData(account);
         {
           try {
-            transferrable = (await GetBalanceByAccountHash(url, "account-hash-" + account_data.account_hash)).balance_value;
-            
+            transferrable = (
+              await getBalanceByAccountHash(
+                url,
+                "account-hash-" + account_data.account_hash
+              )
+            ).balance_value;
+
             console.log("transferrable: ", transferrable);
           } catch (err) {
             transferrable = 0;
@@ -91,7 +126,7 @@ module.exports = {
         //total_staked
         // try {
         //   if (account_data.public_key_hex) {
-        //     const auction_info = await RequestRPC(url, RpcApiName.get_auction_info, []);
+        //     const auction_info = await requestRPC(url, RpcApiName.get_auction_info, []);
         //     const bids = auction_info.result.auction_state.bids;
         //     if (bids) {
         //       for (let i = 0; i < bids.length; i++) {
@@ -113,14 +148,15 @@ module.exports = {
         //   console.log("Get Total Stake Error: ", err.message);
         //   total_staked = math.bignumber("0");
         // }
-
       }
 
       // Total validator reward
       let total_validator_reward = 0;
       try {
         if (account_data.public_key_hex) {
-          total_validator_reward = (await GetValidatorReward(account_data.public_key_hex.toLowerCase())).total_validator_reward;
+          total_validator_reward = (
+            await getValidatorReward(account_data.public_key_hex.toLowerCase())
+          ).total_validator_reward;
         }
         if (total_validator_reward == null) {
           total_validator_reward = 0;
@@ -133,7 +169,9 @@ module.exports = {
       let total_delegator_reward = 0;
       try {
         if (account_data.public_key_hex) {
-          total_delegator_reward = (await GetDelegatorReward(account_data.public_key_hex.toLowerCase())).total_delegator_reward;
+          total_delegator_reward = (
+            await getDelegatorReward(account_data.public_key_hex.toLowerCase())
+          ).total_delegator_reward;
         }
         if (total_delegator_reward == null) {
           total_delegator_reward = 0;
@@ -142,7 +180,10 @@ module.exports = {
         total_delegator_reward = 0;
       }
 
-      let total_reward = math.add(Number(total_validator_reward), Number(total_delegator_reward));
+      let total_reward = math.add(
+        Number(total_validator_reward),
+        Number(total_delegator_reward)
+      );
       // try {
       //   if (account_data.public_key_hex) {
       //     total_reward = (await GetRewardByPublicKey(account_data.public_key_hex.toLowerCase())).total_reward;
@@ -158,7 +199,10 @@ module.exports = {
       let unbonding = 0;
       {
         try {
-          unbonding = await GetUnstakingAmount(url, account_data.public_key_hex.toLowerCase());
+          unbonding = await getUnstakingAmount(
+            url,
+            account_data.public_key_hex.toLowerCase()
+          );
         } catch (err) {
           unbonding = 0;
         }
@@ -166,14 +210,24 @@ module.exports = {
 
       // get name
       try {
-        account_data.name = await GetAccountName(account_data.public_key_hex.toLowerCase());
-      } catch (err) { }
+        account_data.name = await getAccountName(
+          account_data.public_key_hex.toLowerCase()
+        );
+      } catch (err) {}
 
-      account_data.balance = (Number(transferrable) + Number(total_staked_as_delegator)+ Number(total_staked_as_validator)).toString();
+      account_data.balance = (
+        Number(transferrable) +
+        Number(total_staked_as_delegator) +
+        Number(total_staked_as_validator)
+      ).toString();
       account_data.transferrable = transferrable.toString();
-      account_data.total_staked_as_delegator = total_staked_as_delegator.toString();
-      account_data.total_staked_as_validator = total_staked_as_validator.toString();
-      account_data.total_staked = (Number(total_staked_as_delegator)+ Number(total_staked_as_validator)).toString();
+      account_data.total_staked_as_delegator =
+        total_staked_as_delegator.toString();
+      account_data.total_staked_as_validator =
+        total_staked_as_validator.toString();
+      account_data.total_staked = (
+        Number(total_staked_as_delegator) + Number(total_staked_as_validator)
+      ).toString();
       account_data.total_validator_reward = total_validator_reward.toString();
       account_data.total_delegator_reward = total_delegator_reward.toString();
       account_data.total_reward = total_reward.toString();
@@ -185,18 +239,18 @@ module.exports = {
     }
   },
 
-  CountHolders: async function (req, res) {
-
-    GetTotalNumberOfAccount().then(value => {
-      res.json(value);
-    }).catch(err => {
-      console.log(err);
-      res.status(500).send("Can not get number of holder");
-    })
+  countHolders: async function (req, res) {
+    getTotalNumberOfAccount()
+      .then((value) => {
+        res.json(value);
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).send("Can not get number of holder");
+      });
   },
 
-  GetAccountTransfers: async function (req, res) {
-
+  getAccountTransfers: async function (req, res) {
     const account = req.query.account;
     const start = req.query.start;
     const count = req.query.count;
@@ -205,33 +259,33 @@ module.exports = {
 
     // Get account_hash if possible
     try {
-      const hash = await GetAccountHash(account);
+      const hash = await getAccountHash(account);
       account_hash = hash;
-    } catch (err) { }
+    } catch (err) {}
 
-    GetTransfersByAccountHash(account_hash, start, count).then(value => {
+    getTransfersByAccountHash(account_hash, start, count)
+      .then((value) => {
+        // add type in or out
+        for (let i = 0; i < value.length; i++) {
+          if (value[i].to_address === "null") {
+            value[i].to_address = null;
+          }
 
-      // add type in or out
-      for (let i = 0; i < value.length; i++) {
-
-        if (value[i].to_address === "null") {
-          value[i].to_address = null;
+          if (account_hash == value[i].from_address) {
+            value[i]["type"] = "out";
+          } else {
+            value[i]["type"] = "in";
+          }
         }
-
-        if (account_hash == value[i].from_address) {
-          value[i]["type"] = "out";
-        } else {
-          value[i]["type"] = "in";
-        }
-      }
-      res.json(value);
-    }).catch(err => {
-      console.log(err);
-      res.status(500).send("Can not get transfer deploys history");
-    })
+        res.json(value);
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).send("Can not get transfer deploys history");
+      });
   },
 
-  GetAccountDeploys: async function (req, res) {
+  getAccountDeploys: async function (req, res) {
     const account = req.query.account;
     const start = req.query.start;
     const count = req.query.count;
@@ -239,28 +293,32 @@ module.exports = {
     let public_key_hex = "";
     {
       try {
-        const get_holder = await GetHolder(account);
+        const get_holder = await getHolder(account);
         const holder = get_holder[0];
         public_key_hex = holder.public_key_hex;
       } catch (err) {
         public_key_hex = account;
       }
     }
-    GetDeploysByPublicKey(public_key_hex, start, count).then(value => {
-      res.json(value);
-    }).catch(err => {
-      console.log(err);
-      res.status(500).send("Can not get deploy history");
-    })
-
+    getDeploysByPublicKey(public_key_hex, start, count)
+      .then((value) => {
+        res.json(value);
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).send("Can not get deploy history");
+      });
   },
 
-  GetBalance: async function (req, res) {
+  getBalance: async function (req, res) {
     const public_key = req.params.public_key;
     try {
-      const account_hash = await GetAccountHash(public_key);
-      const url = await GetNetWorkRPC();
-      const balance = await GetBalanceByAccountHash(url, "account-hash-" + account_hash);
+      const account_hash = await getAccountHash(public_key);
+      const url = await getNetWorkRPC();
+      const balance = await getBalanceByAccountHash(
+        url,
+        "account-hash-" + account_hash
+      );
       res.status(200).json(balance);
     } catch (err) {
       console.log(err);
@@ -268,10 +326,10 @@ module.exports = {
     }
   },
 
-  GetAccountHash: async function (req, res) {
+  getAccountHash: async function (req, res) {
     const public_key = req.params.public_key;
     try {
-      const account_hash = await GetAccountHash(public_key);
+      const account_hash = await getAccountHash(public_key);
       res.status(200).json(account_hash);
     } catch (err) {
       console.log(err);
@@ -279,15 +337,15 @@ module.exports = {
     }
   },
 
-  GetRichAccounts: async function (req, res) {
-    try{
+  getRichAccounts: async function (req, res) {
+    try {
       const start = req.query.start;
       const count = req.query.count;
 
-      const value = await GetRangeRichestCache(start, count)
+      const value = await getRangeRichestCache(start, count);
       res.status(200);
       res.json(value);
-    }catch(err) {
+    } catch (err) {
       res.status(500).send("Can not get rich list");
     }
   },
@@ -298,7 +356,7 @@ module.exports = {
 
     let public_key = account;
     {
-      const public_key_hex = await GetPublicKeyByAccountHash(account);
+      const public_key_hex = await getPublicKeyByAccountHash(account);
       if (public_key_hex != null) {
         public_key = public_key_hex.public_key_hex;
       }
@@ -307,7 +365,8 @@ module.exports = {
     const count = Number(req.query.count);
     try {
       // Get the last date that account has reward
-      const last_date = (await GetLatestTimestampByPublicKey(public_key)).timestamp;
+      const last_date = (await getLatestTimestampByPublicKey(public_key))
+        .timestamp;
       // return if account never stake
       if (last_date == null) {
         res.status(200);
@@ -323,20 +382,19 @@ module.exports = {
         mark_date = mark_date.toISOString().slice(0, 10);
 
         for (let i = 0; i < count; i++) {
-
-          const circle_start = Date.now();
-
           let the_date = new Date();
           the_date.setDate(start_date.getDate() - (start + i));
           the_date = the_date.toISOString().slice(0, 10);
-          let reward = (await GetPublicKeyRewardByDate(public_key, the_date, mark_date)).reward;
+          let reward = (
+            await getPublicKeyRewardByDate(public_key, the_date, mark_date)
+          ).reward;
           if (reward == null) {
             reward = 0;
           }
           rewards.push({
-            "date": (new Date(the_date).getTime()),
-            "reward": reward.toString(),
-          })
+            date: new Date(the_date).getTime(),
+            reward: reward.toString(),
+          });
           mark_date = the_date;
         }
       }
@@ -348,34 +406,36 @@ module.exports = {
     }
   },
 
-  GetEraReward: async function (req, res) {
+  getEraReward: async function (req, res) {
     const count = req.query.count;
     const account = req.query.account;
 
     let public_key = account;
     {
-      const public_key_hex = await GetPublicKeyByAccountHash(account);
+      const public_key_hex = await getPublicKeyByAccountHash(account);
       if (public_key_hex != null) {
         public_key = public_key_hex.public_key_hex;
       }
     }
 
-    const last_era = (await GetLatestEra()).era_id;
+    const last_era = (await getLatestEra()).era_id;
     try {
       let result = [];
       {
         for (let i = 0; i < count; i++) {
           const index_era = Number(last_era) - Number(i);
           // get reward by era
-          let era_reward = (await GetPublicKeyRewardByEra(public_key, index_era)).reward;
+          let era_reward = (
+            await getPublicKeyRewardByEra(public_key, index_era)
+          ).reward;
           if (era_reward == null) {
             era_reward = 0;
           }
-          const timestamp = (await GetTimestampByEra(index_era)).timestamp;
+          const timestamp = (await getTimestampByEra(index_era)).timestamp;
           result.push([
-            (new Date(timestamp).getTime()),
+            new Date(timestamp).getTime(),
             Number((Number(era_reward) / 1000000000).toFixed(2)), //convert to CSPR
-          ])
+          ]);
         }
         res.status(200);
         res.json(result);
@@ -386,13 +446,13 @@ module.exports = {
     }
   },
 
-  GetRewardV2: async function (req, res) {
+  getRewardV2: async function (req, res) {
     // get params
     const account = req.query.account;
 
     let public_key = account;
     {
-      const public_key_hex = await GetPublicKeyByAccountHash(account);
+      const public_key_hex = await getPublicKeyByAccountHash(account);
       if (public_key_hex != null) {
         public_key = public_key_hex.public_key_hex;
       }
@@ -401,7 +461,8 @@ module.exports = {
     const count = Number(req.query.count);
     try {
       // Get the last date that account has reward
-      const last_date = (await GetLatestTimestampByPublicKey(public_key)).timestamp;
+      const last_date = (await getLatestTimestampByPublicKey(public_key))
+        .timestamp;
       // return if account never stake
       if (last_date == null) {
         res.status(200);
@@ -412,21 +473,29 @@ module.exports = {
       // get rewards
       let rewards = [];
       {
-        let mark_date = new Date(start_date.getTime() + ((24 * 60 * 60 * 1000) * (1 - start)));
-        mark_date = WithoutTime(mark_date);
+        let mark_date = new Date(
+          start_date.getTime() + 24 * 60 * 60 * 1000 * (1 - start)
+        );
+        mark_date = withoutTime(mark_date);
         for (let i = 0; i < count; i++) {
-          let the_date = new Date(start_date.getTime() - ((24 * 60 * 60 * 1000) * (start + i)));
-          the_date = WithoutTime(the_date);
-          const era_ids = await GerEraIdByDate(the_date.toISOString(), mark_date.toISOString());
+          let the_date = new Date(
+            start_date.getTime() - 24 * 60 * 60 * 1000 * (start + i)
+          );
+          the_date = withoutTime(the_date);
+          const era_ids = await gerEraIdByDate(
+            the_date.toISOString(),
+            mark_date.toISOString()
+          );
           let total_reward = 0;
           for (const id of era_ids) {
-            let era_reward = (await GetPublicKeyRewardByEra(public_key, id.era)).reward;
+            let era_reward = (await getPublicKeyRewardByEra(public_key, id.era))
+              .reward;
             total_reward += Number(era_reward);
           }
           rewards.push({
-            "date": the_date.getTime(),
-            "reward": total_reward.toString(),
-          })
+            date: the_date.getTime(),
+            reward: total_reward.toString(),
+          });
           mark_date = the_date;
         }
       }
@@ -437,8 +506,7 @@ module.exports = {
     }
   },
 
-
-  GetUndelegate: async function (req, res) {
+  getUndelegate: async function (req, res) {
     const account = req.query.account;
     const start = req.query.start || 0;
     const count = req.query.count || 10;
@@ -446,50 +514,59 @@ module.exports = {
     try {
       let public_key = account;
       {
-        const public_key_hex = await GetPublicKeyByAccountHash(account);
+        const public_key_hex = await getPublicKeyByAccountHash(account);
         if (public_key_hex != null) {
           public_key = public_key_hex.public_key_hex;
         }
       }
 
-      const total = (await CountDeployByType(public_key, "undelegate")).total;
+      const total = (await countDeployByType(public_key, "undelegate")).total;
       if (Number(total) < 1) {
         res.status(200).json({});
         return;
       }
 
-      const url = await GetNetWorkRPC();
+      const url = await getNetWorkRPC();
       let withdraws = [];
-      const deploys = await GetDeployOfPublicKeyByType(public_key, "undelegate", start, count);
-      const current_era = await GetEra(url);
+      const deploys = await getDeployOfPublicKeyByType(
+        public_key,
+        "undelegate",
+        start,
+        count
+      );
+      const current_era = await getEra(url);
       for (let i = 0; i < deploys.length; i++) {
         let withdraw = {};
         withdraw.hash = deploys[i].deploy_hash;
-        const deploy_data = await GetDeployByRPC(url, deploys[i].deploy_hash);
-        const args = deploy_data.result.deploy.session.StoredContractByHash.args;
-        withdraw.unbonder_public_key = args.find(value => {
+        const deploy_data = await getDeployByRPC(url, deploys[i].deploy_hash);
+        const args =
+          deploy_data.result.deploy.session.StoredContractByHash.args;
+        withdraw.unbonder_public_key = args.find((value) => {
           return value[0] == "delegator";
         })[1].parsed;
-        withdraw.validator_public_key = args.find(value => {
+        withdraw.validator_public_key = args.find((value) => {
           return value[0] == "validator";
         })[1].parsed;
-        withdraw.amount = args.find(value => {
+        withdraw.amount = args.find((value) => {
           return value[0] == "amount";
         })[1].parsed;
 
         const status = deploys[i].status == "success" ? true : false;
         withdraw.status = status;
-        const era_of_creation = await GetEraByBlockHash(deploys[i].hash);
+        const era_of_creation = await getEraByBlockHash(deploys[i].hash);
         withdraw.era_of_creation = era_of_creation;
         if (status) {
           const era_of_releasing = Number(era_of_creation) + 8;
           withdraw.era_of_releasing = era_of_releasing;
 
-          const time_of_creation = (await GetTimestampByEraFromSwtichBlock(era_of_creation));
+          const time_of_creation = await getTimestampByEraFromSwtichBlock(
+            era_of_creation
+          );
           if (time_of_creation) {
-            const creation_date = new Date(time_of_creation)
+            const creation_date = new Date(time_of_creation);
             withdraw.time_of_creation = creation_date.getTime();
-            const time_of_releasing = Number(withdraw.time_of_creation) + 57600000;
+            const time_of_releasing =
+              Number(withdraw.time_of_creation) + 57600000;
             withdraw.time_of_releasing = time_of_releasing;
           }
           const is_release = current_era >= era_of_releasing ? true : false;
@@ -497,17 +574,19 @@ module.exports = {
         }
 
         try {
-          const validator_info = await GetValidatorInformation(withdraw.validator_public_key);
+          const validator_info = await getValidatorInformation(
+            withdraw.validator_public_key
+          );
           if (validator_info != null) {
             withdraw.validator_name = validator_info.name;
             withdraw.validator_icon = validator_info.icon;
           }
-        } catch (err) { }
+        } catch (err) {}
         withdraws.push(withdraw);
       }
       res.status(200).json({
         total,
-        "data": withdraws
+        data: withdraws,
       });
     } catch (err) {
       console.log(err);
@@ -515,57 +594,67 @@ module.exports = {
     }
   },
 
-  GetDelegate: async function (req, res) {
+  getDelegate: async function (req, res) {
     const account = req.query.account;
     const start = req.query.start || 0;
     const count = req.query.count || 10;
     try {
       let public_key = account;
       {
-        const public_key_hex = await GetPublicKeyByAccountHash(account);
+        const public_key_hex = await getPublicKeyByAccountHash(account);
         if (public_key_hex != null) {
           public_key = public_key_hex.public_key_hex;
         }
       }
 
-      const total = (await CountDeployByType(public_key, "delegate")).total;
+      const total = (await countDeployByType(public_key, "delegate")).total;
       if (Number(total) < 1) {
         res.status(200).json({});
         return;
       }
 
-      const url = await GetNetWorkRPC();
+      const url = await getNetWorkRPC();
       let withdraws = [];
-      const deploys = await GetDeployOfPublicKeyByType(public_key, "delegate", start, count);
+      const deploys = await getDeployOfPublicKeyByType(
+        public_key,
+        "delegate",
+        start,
+        count
+      );
       for (let i = 0; i < deploys.length; i++) {
         let withdraw = {};
         withdraw.hash = deploys[i].deploy_hash;
-        const deploy_data = await GetDeployByRPC(url, deploys[i].deploy_hash);
-        const args = deploy_data.result.deploy.session.StoredContractByHash.args;
-        withdraw.unbonder_public_key = args.find(value => {
+        const deploy_data = await getDeployByRPC(url, deploys[i].deploy_hash);
+        const args =
+          deploy_data.result.deploy.session.StoredContractByHash.args;
+        withdraw.unbonder_public_key = args.find((value) => {
           return value[0] == "delegator";
         })[1].parsed;
-        withdraw.validator_public_key = args.find(value => {
+        withdraw.validator_public_key = args.find((value) => {
           return value[0] == "validator";
         })[1].parsed;
-        withdraw.amount = args.find(value => {
+        withdraw.amount = args.find((value) => {
           return value[0] == "amount";
         })[1].parsed;
         const status = deploys[i].status == "success" ? true : false;
         withdraw.status = status;
-        withdraw.timestamp = (new Date(deploy_data.result.deploy.header.timestamp)).getTime();
+        withdraw.timestamp = new Date(
+          deploy_data.result.deploy.header.timestamp
+        ).getTime();
         try {
-          const validator_info = await GetValidatorInformation(withdraw.validator_public_key);
+          const validator_info = await getValidatorInformation(
+            withdraw.validator_public_key
+          );
           if (validator_info != null) {
             withdraw.validator_name = validator_info.name;
             withdraw.validator_icon = validator_info.icon;
           }
-        } catch (err) { }
+        } catch (err) {}
         withdraws.push(withdraw);
       }
       res.status(200).json({
         total,
-        "data": withdraws
+        data: withdraws,
       });
     } catch (err) {
       console.log(err);
@@ -573,11 +662,15 @@ module.exports = {
     }
   },
 
-  GetBids: async function (req, res) {
+  getBids: async function (req, res) {
     const public_key = req.query.public_key;
     try {
-      const url = await GetNetWorkRPC();
-      const auction_info = await RequestRPC(url, RpcApiName.get_auction_info, []);
+      const url = await getNetWorkRPC();
+      const auction_info = await requestRPC(
+        url,
+        RpcApiName.get_auction_info,
+        []
+      );
 
       const bids = auction_info.result.auction_state.bids;
 
@@ -586,9 +679,9 @@ module.exports = {
       let delegate_history = [];
       for (let i = 0; i < bids.length; i++) {
         const delegators = bids[i].bid.delegators;
-        let delegated = delegators.filter(value => {
+        let delegated = delegators.filter((value) => {
           return value.public_key.toLowerCase() == public_key.toLowerCase();
-        })
+        });
         if (delegated.length > 0) {
           const validator = bids[i].public_key;
           delegated = delegated[0];
@@ -599,12 +692,12 @@ module.exports = {
           };
           // try to get validator information
           try {
-            const validator_info = await GetValidatorInformation(validator);
+            const validator_info = await getValidatorInformation(validator);
             if (validator_info != null) {
               data.validator_name = validator_info.name;
               data.validator_icon = validator_info.icon;
             }
-          } catch (err) { }
+          } catch (err) {}
           delegate_history.push(data);
         }
       }
@@ -613,5 +706,5 @@ module.exports = {
       console.log(err);
       res.status(500).json("Can not get bid history");
     }
-  }
+  },
 };

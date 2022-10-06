@@ -1,21 +1,20 @@
-const cron = require('node-cron');
-const { GetLatestTxCache } = require('../controllers/chain_controller');
+const cron = require("node-cron");
+const { getLatestTxCache } = require("../controllers/chain_controller");
+const { CRONJOB_TIME } = require("../utils/constant");
 
 async function start() {
-    // Get 20 latest tx
-    CronJobGetLatestTx();
+  // Get 20 latest tx
+  cronJobGetLatestTx();
 }
 
-async function CronJobGetLatestTx() {
-    cron.schedule('*/20 * * * * *', async function() {
-        try{
-
-            await GetLatestTxCache(0, 19);
-            
-        }catch (err) {
-            console.log(err);
-        }
-    })
+async function cronJobGetLatestTx() {
+  cron.schedule(CRONJOB_TIME.EVERY_20_SECONDS, async function () {
+    try {
+      await getLatestTxCache(0, 19);
+    } catch (err) {
+      console.log(err);
+    }
+  });
 }
 
-module.exports={ start }
+module.exports = { start };

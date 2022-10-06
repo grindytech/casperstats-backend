@@ -1,42 +1,66 @@
-const { GetBlocksByValidator, GetBlockHeight, GetBlockByHeight, GetRangeBlock, GetLatestBlock } = require('../models/block_model');
-const { GetTotalNumberOfTransfers, GetTransfers, GetTransfersByDeployHash } = require('../models/transfer');
-const { GetAllDeployByHash } = require('../models/deploy')
 const {
-  GetDeployhashes, GetDeploy, GetBlock,
+  getBlocksByValidator,
+  GetBlockHeight,
+  GetBlockByHeight,
+  GetRangeBlock,
+  GetLatestBlock,
+} = require("../models/block_model");
+const {
+  GetTotalNumberOfTransfers,
+  GetTransfers,
+  GetTransfersByDeployHash,
+} = require("../models/transfer");
+const { GetAllDeployByHash } = require("../models/deploy");
+const {
+  GetDeployhashes,
+  GetDeploy,
+  GetBlock,
   GetTransfersInBlock,
-  GetDeploysInBlock } = require('../utils/chain');
-const common = require('../utils/common');
-const { RequestRPC, GetHeight, GetNetWorkRPC } = require('../utils/common');
-const { RpcApiName } = require('../utils/constant');
-const request = require('request');
+  GetDeploysInBlock,
+} = require("../utils/chain");
+const common = require("../utils/common");
+const { RequestRPC, GetHeight, GetNetWorkRPC } = require("../utils/common");
+const { RpcApiName } = require("../utils/constant");
+const request = require("request");
 
 const NodeCache = require("node-cache");
-const { GetDeployUpdateTime, GetBlockUpdateTime } = require('../models/timestamp');
-const get_block_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_BLOCK || 20 });
-const get_block_deploys_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_BLOCK_DEPLOYS || 20 });
-const get_block_transfers_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_BLOCK_TRANSFERS || 20 });
-const get_latest_block_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_LATEST_BLOCKS || 60 });
-const get_latest_tx_cache = new NodeCache({ stdTTL: process.env.CACHE_GET_LATEST_BLOCKS || 50 });
+const {
+  GetDeployUpdateTime,
+  GetBlockUpdateTime,
+} = require("../models/timestamp");
+const get_block_cache = new NodeCache({
+  stdTTL: process.env.CACHE_GET_BLOCK || 20,
+});
+const get_block_deploys_cache = new NodeCache({
+  stdTTL: process.env.CACHE_GET_BLOCK_DEPLOYS || 20,
+});
+const get_block_transfers_cache = new NodeCache({
+  stdTTL: process.env.CACHE_GET_BLOCK_TRANSFERS || 20,
+});
+const get_latest_block_cache = new NodeCache({
+  stdTTL: process.env.CACHE_GET_LATEST_BLOCKS || 60,
+});
+const get_latest_tx_cache = new NodeCache({
+  stdTTL: process.env.CACHE_GET_LATEST_BLOCKS || 50,
+});
 let deploy_timestamp;
 let block_timestamp;
 
-require('dotenv').config();
+require("dotenv").config();
 
-
-async function GetLatestBlocksCache(num) {
+async function getLatestBlocksCache(num) {
   let datas;
   try {
     let timestamp = await GetBlockUpdateTime();
 
-    if(get_latest_block_cache.has(`'${num}'-'${timestamp}'`)){
+    if (get_latest_block_cache.has(`'${num}'-'${timestamp}'`)) {
       block_timestamp = timestamp;
-      return datas = get_latest_block_cache.get(`'${num}'-'${timestamp}'`);
+      return (datas = get_latest_block_cache.get(`'${num}'-'${timestamp}'`));
     }
 
     datas = await GetLatestBlock(num);
     get_latest_block_cache.set(`'${num}'-'${timestamp}'`, datas);
     block_timestamp = timestamp;
-
   } catch (err) {
     console.log(err);
   }
@@ -44,14 +68,16 @@ async function GetLatestBlocksCache(num) {
   return datas;
 }
 
-async function GetLatestTxCache(start, count) {
-  let result
-  
+async function getLatestTxCache(start, count) {
+  let result;
+
   try {
     let timestamp = await GetDeployUpdateTime();
-    if(get_latest_tx_cache.has(`'${start}'-'${count}'-'${timestamp}'`)){
+    if (get_latest_tx_cache.has(`'${start}'-'${count}'-'${timestamp}'`)) {
       deploy_timestamp = timestamp;
-      return result = get_latest_tx_cache.get(`'${start}'-'${count}'-'${timestamp}'`);
+      return (result = get_latest_tx_cache.get(
+        `'${start}'-'${count}'-'${timestamp}'`
+      ));
     }
     result = await GetTransfers(start, count);
 
@@ -60,11 +86,9 @@ async function GetLatestTxCache(start, count) {
         result[i].to_address = null;
       }
     }
-    get_latest_tx_cache.set(`'${start}'-'${count}'-'${timestamp}'`, result)
-    get_latest_tx_cache.del(`'${start}'-'${count}'-'${deploy_timestamp}'`)
+    get_latest_tx_cache.set(`'${start}'-'${count}'-'${timestamp}'`, result);
+    get_latest_tx_cache.del(`'${start}'-'${count}'-'${deploy_timestamp}'`);
     deploy_timestamp = timestamp;
-
-    
   } catch (err) {
     console.log(err);
   }
@@ -78,8 +102,8 @@ module.exports = {
   get_block_transfers_cache,
   get_latest_block_cache,
   get_latest_tx_cache,
-  GetLatestBlocksCache,
-  GetLatestTxCache,
+  getLatestBlocksCache,
+  getLatestTxCache,
 
   GetBlock: async function (req, res) {
     const b = req.params.block; // Hex-encoded block hash or height of the block. If not given, the last block added to the chain as known at the given node will be used
@@ -88,36 +112,37 @@ module.exports = {
 
     // Check valid block input
     if (isNaN(b)) {
-
       if (b.length != 64) {
         res.send({
-          "code": -32001,
-          "message": "block not known",
-          "data": null
+          code: -32001,
+          message: "block not known",
+          data: null,
         });
         return;
       }
 
-      params = [{ "Hash": b }]
+      params = [{ Hash: b }];
     } else {
       if (parseInt(b) < 0 || parseInt(b) > height) {
         res.send({
-          "code": -32001,
-          "message": "block not known",
-          "data": null
+          code: -32001,
+          message: "block not known",
+          data: null,
         });
         return;
       }
-      params = [{ "Height": parseInt(b) }]
+      params = [{ Height: parseInt(b) }];
     }
-    RequestRPC(url, RpcApiName.get_block, params).then(value => {
-      value.result["current_height"] = height;
-      get_block_cache.set(b, value);
-      res.status(200).json(value);
-    }).catch(err => {
-      console.log(err);
-      res.status(500).send("Can not get block data");
-    })
+    RequestRPC(url, RpcApiName.get_block, params)
+      .then((value) => {
+        value.result["current_height"] = height;
+        get_block_cache.set(b, value);
+        res.status(200).json(value);
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).send("Can not get block data");
+      });
   },
 
   GetBlockTx: async function (req, res) {
@@ -126,14 +151,14 @@ module.exports = {
     let params;
     // check b is a number or string to change the params
     if (isNaN(b)) {
-      params = [{ "Hash": b }]
+      params = [{ Hash: b }];
     } else {
-      params = [{ "Height": parseInt(b) }]
+      params = [{ Height: parseInt(b) }];
     }
     let hash;
-    if(isNaN(b)){
+    if (isNaN(b)) {
       hash = b;
-    }else{
+    } else {
       hash = (await GetBlockByHeight(b)).hash;
     }
     // const url = await GetNetWorkRPC();
@@ -146,17 +171,19 @@ module.exports = {
     // })
 
     let transfers = [];
-    try{
+    try {
       const deploy_hash = await GetAllDeployByHash(hash);
-      if(deploy_hash.length > 0){
-        for (let i=0; i< deploy_hash.length; i++) {
-          const transfer = await GetTransfersByDeployHash(deploy_hash[i].deploy_hash);
-          if(transfer != null){
-            if(transfer.from){
-              transfer.from = "account-hash-"+transfer.from;
+      if (deploy_hash.length > 0) {
+        for (let i = 0; i < deploy_hash.length; i++) {
+          const transfer = await GetTransfersByDeployHash(
+            deploy_hash[i].deploy_hash
+          );
+          if (transfer != null) {
+            if (transfer.from) {
+              transfer.from = "account-hash-" + transfer.from;
             }
-            if(transfer.to){
-              transfer.to = "account-hash-"+transfer.to;
+            if (transfer.to) {
+              transfer.to = "account-hash-" + transfer.to;
             }
             transfers.push(transfer);
           }
@@ -165,7 +192,7 @@ module.exports = {
       get_block_transfers_cache.set(b, transfers);
       res.status(200);
       res.json(transfers);
-    }catch (err){
+    } catch (err) {
       console.log(err);
       res.status(500).send("can not get block_transfer");
     }
@@ -178,34 +205,35 @@ module.exports = {
 
     // check b is a number or string to change the params
     if (isNaN(b)) {
-      params = [{ "Hash": b }]
+      params = [{ Hash: b }];
     } else {
-      params = [{ "Height": parseInt(b) }]
+      params = [{ Height: parseInt(b) }];
     }
     const url = await GetNetWorkRPC();
-    RequestRPC(url, RpcApiName.get_state_root_hash, params).then(value => {
-      res.status(200);
-      res.json(value);
-    }).catch(err => {
-      console.log(err);
-      res.status(500).send("Can not get state_root_hash");
-    })
+    RequestRPC(url, RpcApiName.get_state_root_hash, params)
+      .then((value) => {
+        res.status(200);
+        res.json(value);
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).send("Can not get state_root_hash");
+      });
   },
 
   GetLatestBlocks: async function (req, res) {
     let num = req.params.number; // Number of block
 
     try {
-      let datas
-      if(get_latest_block_cache.has(`'${num}'-'${block_timestamp}'`)){
+      let datas;
+      if (get_latest_block_cache.has(`'${num}'-'${block_timestamp}'`)) {
         datas = get_latest_block_cache.get(`'${num}'-'${block_timestamp}'`);
-      }else{
-        datas = await GetLatestBlocksCache(num);
+      } else {
+        datas = await getLatestBlocksCache(num);
       }
-      
+
       res.status(200);
       res.json(datas);
-
     } catch (err) {
       console.log(err);
       res.status(500).send("Can not get latest block");
@@ -220,10 +248,10 @@ module.exports = {
       let height = await GetBlockHeight();
       let data = {
         current_height: 0,
-        result: []
+        result: [],
       };
       data.current_height = height;
-      let block_data = await GetRangeBlock(start,end);
+      let block_data = await GetRangeBlock(start, end);
       // for (let i = end; i >= start; i--) {
       //   let block_data = await GetBlockByHeight(i);
       //   data.result.push(block_data);
@@ -241,9 +269,9 @@ module.exports = {
     const b = req.params.block;
     let hash;
     try {
-      if(isNaN(b)){
-        hash = b
-      }else{
+      if (isNaN(b)) {
+        hash = b;
+      } else {
         hash = (await GetBlockByHeight(b)).hash;
       }
       const url = await GetNetWorkRPC();
@@ -255,7 +283,7 @@ module.exports = {
         let deploy_data = await GetDeploy(deploy_hashes[i]);
         data.push(deploy_data);
       }
-      get_block_deploys_cache.set(b, data)
+      get_block_deploys_cache.set(b, data);
       res.status(200);
       res.json(data);
     } catch (err) {
@@ -265,15 +293,17 @@ module.exports = {
   },
 
   CountTransfers: async function (req, res) {
-    GetTotalNumberOfTransfers().then(value => {
-      if (value.length === 1) {
-        res.json(value[0]);
-      } else {
-        res.json({});
-      }
-    }).catch(err => {
-      res.send(err);
-    })
+    GetTotalNumberOfTransfers()
+      .then((value) => {
+        if (value.length === 1) {
+          res.json(value[0]);
+        } else {
+          res.json({});
+        }
+      })
+      .catch((err) => {
+        res.send(err);
+      });
   },
 
   GetLatestTx: async function (req, res) {
@@ -281,12 +311,16 @@ module.exports = {
       const start = req.query.start;
       const count = req.query.count;
       let result;
-      if(get_latest_tx_cache.has(`'${start}'-'${count}'-'${deploy_timestamp}'`)){
-        result = get_latest_tx_cache.get(`'${start}'-'${count}'-'${deploy_timestamp}'`);
-      }else{
-        result = await GetLatestTxCache(start, count);
+      if (
+        get_latest_tx_cache.has(`'${start}'-'${count}'-'${deploy_timestamp}'`)
+      ) {
+        result = get_latest_tx_cache.get(
+          `'${start}'-'${count}'-'${deploy_timestamp}'`
+        );
+      } else {
+        result = await getLatestTxCache(start, count);
       }
-      
+
       res.status(200);
       res.json(result);
     } catch (err) {
@@ -302,7 +336,7 @@ module.exports = {
 
     try {
       const url = await GetNetWorkRPC();
-      let data = await GetBlocksByValidator(validator, start, count);
+      let data = await getBlocksByValidator(validator, start, count);
 
       for (let i = 0; i < data.length; i++) {
         delete data[i]["parent_hash"];
@@ -352,27 +386,29 @@ module.exports = {
         const params = [];
         const block_data = await RequestRPC(url, RpcApiName.get_block, params);
         current_height = block_data.result.block.header.height;
-        current_timestamp = (new Date(block_data.result.block.header.timestamp)).getTime();
-
+        current_timestamp = new Date(
+          block_data.result.block.header.timestamp
+        ).getTime();
       }
       let last_timestamp = 0;
       {
-        params = [{ "Height": Number(current_height) - 1}]
+        params = [{ Height: Number(current_height) - 1 }];
         const block_data = await RequestRPC(url, RpcApiName.get_block, params);
-        last_timestamp = (new Date(block_data.result.block.header.timestamp)).getTime();
+        last_timestamp = new Date(
+          block_data.result.block.header.timestamp
+        ).getTime();
       }
 
       const block_time = current_timestamp - last_timestamp;
 
       res.status(200).json({
-        "current_block": current_height,
-        "next_block": Number(current_height) + 1,
-        "block_time": block_time
-      })
-
+        current_block: current_height,
+        next_block: Number(current_height) + 1,
+        block_time: block_time,
+      });
     } catch (err) {
       console.log(err);
       res.status(500).send("Can not get block time");
     }
-  }
+  },
 };

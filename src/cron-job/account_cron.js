@@ -1,33 +1,40 @@
-const cron = require('node-cron');
-const { GetRangeRichestCache } = require('../controllers/account_controller');
-const { GetRichestCache } = require('../utils/account');
+const cron = require("node-cron");
+const { getRangeRichestCache } = require("../controllers/account_controller");
+const { getRichestCache } = require("../utils/account");
+const { CRONJOB_TIME } = require("../utils/constant");
 
 async function start() {
-    // Get richest list
-    CronJobGetRichest();
-    CronJobGetRangeRichest();
+  // Get richest list
+  cronJobGetRichest();
+  cronJobGetRangeRichest();
 }
 
-async function CronJobGetRichest() {
-    cron.schedule('9 10 * * * *', async function() {
-        try{
-            await GetRichestCache();
-            console.log("Update get-richest-list-cache successful");
-        }catch(err) {
-            console.log(err);
-        }
-    })
+async function cronJobGetRichest() {
+  cron.schedule(
+    CRONJOB_TIME.EVERY_1_HOUR_ON_10TH_MINUTE_20TH_SECOND,
+    async function () {
+      try {
+        await getRichestCache();
+        console.log("Update get-richest-list-cache successful");
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  );
 }
 
-async function CronJobGetRangeRichest() {
-    cron.schedule('10 11 * * * *', async function() {
-        try{
-            await GetRangeRichestCache(0,20);
-            console.log("Update get-range-richest-list-cache successful")
-        }catch(err) {
-            console.log(err)
-        }
-    })
+async function cronJobGetRangeRichest() {
+  cron.schedule(
+    CRONJOB_TIME.EVERY_1_HOUR_ON_10TH_MINUTE_50TH_SECOND,
+    async function () {
+      try {
+        await getRangeRichestCache(0, 20);
+        console.log("Update get-range-richest-list-cache successful");
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  );
 }
 
-module.exports = { start }
+module.exports = { start };

@@ -63,7 +63,7 @@ const get_total_reward = new NodeCache({
 
 let total_reward_timestamp;
 
-async function GetTotalRewardCache() {
+async function getTotalRewardCache() {
   let total_reward;
   try {
     let timestamp = await GetEraUpdateTime();
@@ -85,7 +85,7 @@ async function GetTotalRewardCache() {
   return total_reward;
 }
 
-async function GetEconomicsCache() {
+async function getEconomicsCache() {
   let economics = {};
   try {
     const block_height = await GetBlockHeight();
@@ -117,7 +117,7 @@ async function GetEconomicsCache() {
         `total-reward-'${total_reward_timestamp}'`
       );
     } else {
-      total_reward = await GetTotalRewardCache();
+      total_reward = await getTotalRewardCache();
     }
     economics.total_reward = total_reward;
     economics_cache.set("economics", economics);
@@ -127,7 +127,7 @@ async function GetEconomicsCache() {
   return economics;
 }
 
-async function GetStatsCache() {
+async function getStatsCache() {
   let stats = {
     holders: 0,
     holders_change: 0, // last 24 hours
@@ -340,11 +340,11 @@ module.exports = {
   blockchain_data_cache,
   get_volume_cache,
   exchange_volume_cache,
-  GetEconomicsCache,
-  GetStatsCache,
+  getEconomicsCache,
+  getStatsCache,
   GetVolumeCache,
   GetExchangeVolumeCache,
-  GetTotalRewardCache,
+  getTotalRewardCache,
   getBlockchainDataCache,
 
   GetDeploy: async function (req, res) {
@@ -441,7 +441,7 @@ module.exports = {
 
   GetStats: async function (req, res) {
     try {
-      let stats = await GetStatsCache();
+      let stats = await getStatsCache();
       res.status(200);
       res.json(stats);
     } catch (err) {
@@ -451,7 +451,7 @@ module.exports = {
 
   GetEconomics: async function (req, res) {
     try {
-      let economics = await GetEconomicsCache();
+      let economics = await getEconomicsCache();
       res.status(200).json(economics);
     } catch (err) {
       res.send(err);

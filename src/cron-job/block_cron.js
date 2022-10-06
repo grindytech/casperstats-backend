@@ -1,22 +1,23 @@
-const cron = require('node-cron');
-const { GetLatestBlocksCache } = require('../controllers/chain_controller');
+const cron = require("node-cron");
+const { getLatestBlocksCache } = require("../controllers/chain_controller");
+const { CRONJOB_TIME } = require("../utils/constant");
 
 async function start() {
-    // Get-20-latest-block
-    CronJobGetLatestBlock(20);
+  // Get-20-latest-block
+  cronJobGetLatestBlock(20);
 
-    // Get-10-latest-block
-    CronJobGetLatestBlock(15);
+  // Get-10-latest-block
+  cronJobGetLatestBlock(15);
 }
 
-async function CronJobGetLatestBlock(num) {
-    cron.schedule('*/4 * * * * *', async function() {
-        try{
-            await GetLatestBlocksCache(num);
-        }catch (err) {
-            console.log(err);
-        }
-    })
+async function cronJobGetLatestBlock(num) {
+  cron.schedule(CRONJOB_TIME.EVERY_4_SECONDS, async function () {
+    try {
+      await getLatestBlocksCache(num);
+    } catch (err) {
+      console.log(err);
+    }
+  });
 }
 
-module.exports = {start}
+module.exports = { start };
