@@ -10,7 +10,7 @@ const pool = mysql.createPool({
   debug: false,
 });
 
-async function GetBlockUpdateTime() {
+async function getBlockUpdateTime() {
   return new Promise((resolve, reject) => {
     var sql = `SELECT block FROM timestamp`;
     pool.query(sql, function (err, result) {
@@ -22,7 +22,7 @@ async function GetBlockUpdateTime() {
   });
 }
 
-async function GetDeployUpdateTime() {
+async function getDeployUpdateTime() {
   return new Promise((resolve, reject) => {
     var sql = `SELECT deploy FROM timestamp`;
     pool.query(sql, function (err, result) {
@@ -70,8 +70,8 @@ async function getValidatorUpdateTime() {
 }
 
 module.exports = {
-  GetBlockUpdateTime,
-  GetDeployUpdateTime,
+  getBlockUpdateTime,
+  getDeployUpdateTime,
   GetEraUpdateTime,
   GetAccountUpdateTime,
   getValidatorUpdateTime,

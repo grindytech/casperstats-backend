@@ -4,21 +4,21 @@ const { RpcApiName, ELEMENT_TYPE } = require("./constant");
 const account_fn = require("./account");
 const {
   GetHeight,
-  RequestRPC,
-  GetAccountHash,
+  requestRPC,
+  getAccountHash,
   Execute,
-  GetNetWorkRPC,
+  getNetWorkRPC,
 } = require("./common");
 const request = require("request");
 const {
   GetNumberOfTransfersByDate,
-  GetTransfersByDeployHash,
+  getTransfersByDeployHash,
 } = require("../models/transfer");
-const { GetDeployByDeployHash } = require("../models/deploy");
-const { GetBlockHeightByHash } = require("../models/block_model");
+const { getDeployByDeployHash } = require("../models/deploy");
+const { getBlockHeightByHash } = require("../models/block_model");
 const { GetAllValidator } = require("../models/validator");
 
-const GetDeployhashes = async (url, block) => {
+const getDeployhashes = async (url, block) => {
   return new Promise((resolve, reject) => {
     let params;
     // check b is a number or string to change the params
@@ -27,7 +27,7 @@ const GetDeployhashes = async (url, block) => {
     } else {
       params = [{ Height: parseInt(block) }];
     }
-    RequestRPC(url, RpcApiName.get_block, params)
+    requestRPC(url, RpcApiName.get_block, params)
       .then((value) => {
         resolve(value.result.block.body.deploy_hashes);
       })
@@ -72,7 +72,7 @@ async function get_deploy_type(deploy_data) {
   return type;
 }
 
-const GetDeploy = async (hex) => {
+const getDeploy = async (hex) => {
   let result = {
     deploy_hash: "",
     public_key: "",
@@ -88,13 +88,13 @@ const GetDeploy = async (hex) => {
     error_message: null,
   };
 
-  let deploy_data = await GetDeployByDeployHash(hex); //edited
+  let deploy_data = await getDeployByDeployHash(hex); //edited
   if (deploy_data) {
     deploy_data = deploy_data[0];
   }
 
   // Get block height
-  let block_height = await GetBlockHeightByHash(deploy_data.hash);
+  let block_height = await getBlockHeightByHash(deploy_data.hash);
   if (block_height) {
     block_height = block_height[0].height;
   }
@@ -117,24 +117,24 @@ const GetDeploy = async (hex) => {
 
   // Get to_address if type is transfer
   if (result.type === "transfer") {
-    let transfer_data = await GetTransfersByDeployHash(deploy_data.deploy_hash);
+    let transfer_data = await getTransfersByDeployHash(deploy_data.deploy_hash);
     result.to_address = transfer_data.to;
   }
 
   return result;
 };
 
-const GetDeployFromRPC = async (url, hex) => {
+const getDeployFromRPC = async (url, hex) => {
   let deploy_data = await getDeployByRPC(url, hex);
   const result = deploy_data.result;
   // add more common information to header
   if (result.execution_results.length > 0) {
     let first_block_hash = result.execution_results[0].block_hash;
-    let first_block_height = await GetBlockHeightByHash(first_block_hash);
+    let first_block_height = await getBlockHeightByHash(first_block_hash);
     if (first_block_height.length > 0) {
       first_block_height = first_block_height[0].height;
     } else {
-      first_block_height = await GetBlockHeightByBlock(url, first_block_hash);
+      first_block_height = await getBlockHeightByBlock(url, first_block_hash);
     }
     let total_cost = await GetTotalDeployCost(result.execution_results);
 
@@ -174,15 +174,15 @@ const GetTransferDetail = async (transfer_hex) => {
   });
 };
 
-const GetBlockHeightByBlock = async (url, blockhash) => {
+const getBlockHeightByBlock = async (url, blockhash) => {
   let params;
   params = [{ Hash: blockhash }];
-  let block_data = await RequestRPC(url, RpcApiName.get_block, params);
+  let block_data = await requestRPC(url, RpcApiName.get_block, params);
   const height = block_data.result.block.header.height;
   return height;
 };
 
-const GetBlock = async (url, block) => {
+const getBlock = async (url, block) => {
   return new Promise((resolve, reject) => {
     let params;
     // check b is a number or string to change the params
@@ -192,7 +192,7 @@ const GetBlock = async (url, block) => {
       params = [{ Height: parseInt(block) }];
     }
 
-    RequestRPC(url, RpcApiName.get_block, params)
+    requestRPC(url, RpcApiName.get_block, params)
       .then((value) => {
         // add current_height to getblock
         delete value.result.block.proofs;
@@ -204,7 +204,7 @@ const GetBlock = async (url, block) => {
   });
 };
 
-const GetDeploysInBlock = async (url, block) => {
+const getDeploysInBlock = async (url, block) => {
   return new Promise((resolve, reject) => {
     let command = `${process.env.CASPER_CLIENT} list-deploys --node-address ${url}`;
     if (block) {
@@ -234,7 +234,7 @@ const getDeployByRPC = async (url, hex) => {
   });
 };
 
-const GetTransfersInBlock = async (url, block) => {
+const getTransfersInBlock = async (url, block) => {
   return new Promise((resolve, reject) => {
     let params;
     // check block is a number or string to change the params
@@ -244,7 +244,7 @@ const GetTransfersInBlock = async (url, block) => {
       params = [{ Height: parseInt(block) }];
     }
 
-    RequestRPC(url, RpcApiName.get_block_transfers, params)
+    requestRPC(url, RpcApiName.get_block_transfers, params)
       .then((value) => {
         resolve(value.result);
       })
@@ -271,7 +271,7 @@ async function IsBlockHash(url, param) {
     // check block hash
     let params = [{ Hash: param }];
     try {
-      const block_data = await RequestRPC(url, RpcApiName.get_block, params);
+      const block_data = await requestRPC(url, RpcApiName.get_block, params);
       if (block_data.error == undefined || block_data.error == null)
         return true;
     } catch (err) {}
@@ -282,7 +282,7 @@ async function IsBlockHash(url, param) {
 async function IsDeployHash(url, param) {
   if (param.length == 64) {
     try {
-      const value = await GetDeployFromRPC(url, param);
+      const value = await getDeployFromRPC(url, param);
       if (value != null) {
         return true;
       }
@@ -294,7 +294,7 @@ async function IsDeployHash(url, param) {
 async function IsTransferHash(url, param) {
   if (param.length == 64) {
     try {
-      let deploy_info = await GetDeployFromRPC(url, param);
+      let deploy_info = await getDeployFromRPC(url, param);
       if (deploy_info.deploy.header.type == "transfer") {
         return true;
       }
@@ -330,7 +330,7 @@ async function IsAccountHash(param) {
 
 async function IsPublicKeyHex(param) {
   try {
-    await GetAccountHash(param);
+    await getAccountHash(param);
     return true;
   } catch (err) {}
   return false;
@@ -339,7 +339,7 @@ async function IsPublicKeyHex(param) {
 const GetType = async (param) => {
   // clean the input
   const imput = param.replace(/\s+/g, "");
-  const url = await GetNetWorkRPC();
+  const url = await getNetWorkRPC();
 
   const is_blockheight = await IsBlockHeight(url, imput);
   if (is_blockheight) {
@@ -421,15 +421,15 @@ const GetTransfersVolume = async (count) => {
 };
 
 module.exports = {
-  GetDeployhashes,
-  GetDeploy,
+  getDeployhashes,
+  getDeploy,
   GetTransfersFromDeploy,
   GetTransferDetail,
-  GetBlock,
-  GetTransfersInBlock,
+  getBlock,
+  getTransfersInBlock,
   GetType,
-  GetDeploysInBlock,
+  getDeploysInBlock,
   GetTransfersVolume,
   getDeployByRPC,
-  GetDeployFromRPC,
+  getDeployFromRPC,
 };

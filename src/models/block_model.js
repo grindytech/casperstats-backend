@@ -34,7 +34,7 @@ async function GetSwitchBlockByDate(date) {
   });
 }
 
-async function GetBlockByHeight(height) {
+async function getBlockByHeight(height) {
   return new Promise((resolve, reject) => {
     var sql = `SELECT * FROM block WHERE height = '${height}'`;
     pool.query(sql, function (err, result) {
@@ -46,7 +46,7 @@ async function GetBlockByHeight(height) {
   });
 }
 
-async function GetBlockHeightByHash(hash) {
+async function getBlockHeightByHash(hash) {
   return new Promise((resolve, reject) => {
     var sql = `SELECT height FROM block WHERE hash = '${hash}'`;
     pool.query(sql, function (err, result) {
@@ -58,7 +58,7 @@ async function GetBlockHeightByHash(hash) {
   });
 }
 
-async function GetLatestBlock(count) {
+async function getLatestBlock(count) {
   return new Promise((resolve, reject) => {
     var sql = `SELECT * FROM block ORDER BY height DESC LIMIT 0, ${count}`;
     pool.query(sql, function (err, result) {
@@ -70,7 +70,7 @@ async function GetLatestBlock(count) {
   });
 }
 
-async function GetRangeBlock(start, end) {
+async function getRangeBlock(start, end) {
   return new Promise((resolve, reject) => {
     var sql = `SELECT * FROM block WHERE height BETWEEN ${start} AND ${end} ORDER BY height DESC`;
     pool.query(sql, function (err, result) {
@@ -82,7 +82,7 @@ async function GetRangeBlock(start, end) {
   });
 }
 
-async function GetBlockHeight() {
+async function getBlockHeight() {
   return new Promise((resolve, reject) => {
     var sql = `SELECT MAX(height) as height FROM block`;
     pool.query(sql, function (err, result, fields) {
@@ -130,11 +130,11 @@ async function getTimestampByEraFromSwtichBlock(era) {
 module.exports = {
   getBlocksByValidator,
   GetSwitchBlockByDate,
-  GetBlockByHeight,
-  GetBlockHeight,
+  getBlockByHeight,
+  getBlockHeight,
   getEraByBlockHash,
   getTimestampByEraFromSwtichBlock,
-  GetBlockHeightByHash,
-  GetRangeBlock,
-  GetLatestBlock,
+  getBlockHeightByHash,
+  getRangeBlock,
+  getLatestBlock,
 };

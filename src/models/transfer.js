@@ -10,7 +10,7 @@ const pool = mysql.createPool({
   debug: false,
 });
 
-async function GetTransfers(start, count) {
+async function getTransfers(start, count) {
   return new Promise((resolve, reject) => {
     var sql = `SELECT * FROM transfer ORDER BY timestamp DESC LIMIT ${start}, ${count}`;
     pool.query(sql, function (err, result) {
@@ -22,7 +22,7 @@ async function GetTransfers(start, count) {
   });
 }
 
-async function GetTransfersByDeployHash(deploy_hash) {
+async function getTransfersByDeployHash(deploy_hash) {
   return new Promise((resolve, reject) => {
     var sql = `SELECT deploy_hash, timestamp, from_address AS 'from', to_address AS 'to', value AS 'amount', fee, from_balance, to_balance FROM transfer WHERE deploy_hash = '${deploy_hash}'`;
     pool.query(sql, function (err, result) {
@@ -46,7 +46,7 @@ async function getTransfersByAccountHash(account_hash, start, count) {
   });
 }
 
-async function GetTotalNumberOfTransfers() {
+async function getTotalNumberOfTransfers() {
   return new Promise((resolve, reject) => {
     var sql = `SELECT COUNT(*) AS number_of_transfers FROM transfer`;
     pool.query(sql, function (err, result) {
@@ -120,11 +120,11 @@ async function GetOutflowOfAddressByDate(account_hash, from, to) {
 
 module.exports = {
   getTransfersByAccountHash,
-  GetTotalNumberOfTransfers,
+  getTotalNumberOfTransfers,
   GetNumberOfTransfersByDate,
   GetVolumeByDate,
-  GetTransfers,
+  getTransfers,
   GetInflowOfAddressByDate,
   GetOutflowOfAddressByDate,
-  GetTransfersByDeployHash,
+  getTransfersByDeployHash,
 };

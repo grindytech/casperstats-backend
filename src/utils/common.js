@@ -220,7 +220,7 @@ const queryState = async (key, state = "", id = undefined) => {
   });
 };
 
-const GetHeight = async (url) => {
+const getHeight = async (url) => {
   let params = [{}];
 
   let block_data = await requestRPC(url, RpcApiName.get_block, params);
@@ -291,7 +291,7 @@ const auth = (user, password) => {
 
 module.exports = {
   GetAccountData,
-  GetHeight,
+  getHeight,
   queryState,
   GetLatestStateRootHash,
   Execute,
