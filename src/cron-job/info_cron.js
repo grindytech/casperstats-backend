@@ -1,127 +1,261 @@
-const cron = require('node-cron');
-const { GetEconomicsCache, GetStatsCache, GetVolumeCache, GetStakingVolumeCache, 
-    GetStakingTxVolumeCache, GetExchangeVolumeCache, GetTotalRewardCache} = require('../controllers/info_controller');
+const cron = require("node-cron");
+const {
+  getEconomicsCache,
+  getStatsCache,
+  GetExchangeVolumeCache,
+  getTotalRewardCache,
+  getBlockchainDataCache,
+} = require("../controllers/info_controller");
+const { CRONJOB_TIME } = require("../utils/constant");
 
 async function start() {
-    // Get Stats
-    CronJobGetStats();
+  // Get Stats
+  cronJobGetStats();
 
-    // Get Total Reward
-    CronJobGetTotalReward();
-    // Get Economics
-    CronJobGetEconomics();
+  // Get Total Reward
+  cronJobGetTotalReward();
 
-    // Get daily volume
-    CronJobGetDailyVolume();
+  // Get Economics
+  cronJobGetEconomics();
 
-    // Get staking volume
-    CronJobGetDelegateVolume();
-    CronJobGetUndelegateVolume();
-    CronJobGetDelegateTxVolume();
-    CronJobGetUndelegateTxVolume();
+  // Get daily deploy volume chart
+  cronJobGetDeployVolume();
+  cronJobGetDeployTxs();
 
-    // Get exchange volume
-    CronJobGetExchangeVolume();
+  // Get daily transfer volume chart
+  cronJobGetTransferVolume();
+  cronJobGetTransferTxs();
+
+  // Get daily staking volume chart
+  cronJobGetStakingVolume();
+  cronJobGetUnstakingVolume();
+  cronJobGetStakingTxVolume();
+  cronJobGetUnstakingTxVolume();
+
+  // Get exchange volume
+  cronJobGetExchangeVolume();
+
+  // Get auction info
+  cronJobGetTotalBid();
+  cronJobGetActiveBid();
+  cronJobGetTotalValidator();
+  cronJobGetTotalDelegator();
 }
 
-async function CronJobGetStats() {
-    await GetStatsCache();
-    cron.schedule('3 */3 * * * *', async function() {
-        try{
-            await GetStatsCache();
-            console.log("Update get-stats-cache successfull");
-        }catch (err){
-            console.log(err);
-        }
-    })
+async function cronJobGetStats() {
+  await getStatsCache();
+  cron.schedule(CRONJOB_TIME.EVERY_3_MINUTES_ON_3RD_SECOND, async function () {
+    try {
+      await getStatsCache();
+      console.log("Update get-stats-cache successfull");
+    } catch (err) {
+      console.log(err);
+    }
+  });
 }
 
-async function CronJobGetTotalReward() {
-    cron.schedule('3 */10 * * * *', async function() {
-        try{
-            await GetTotalRewardCache();
-        }catch (err) {
-            console.log(err);
-        }
-    })
+async function cronJobGetTotalReward() {
+  cron.schedule(CRONJOB_TIME.EVERY_10_MINUTES_ON_3RD_SECOND, async function () {
+    try {
+      await getTotalRewardCache();
+    } catch (err) {
+      console.log(err);
+    }
+  });
 }
 
-async function CronJobGetEconomics() {
-    await GetEconomicsCache();
-    cron.schedule('4 */2 * * * *', async function() {
-        try{
-            await GetEconomicsCache();
-            console.log("Update get-economics-cache successfull");
-        }catch (err){
-            console.log(err);
-        }
-    })
+async function cronJobGetEconomics() {
+  await getEconomicsCache();
+  cron.schedule(CRONJOB_TIME.EVERY_2_MINUTES_ON_4TH_SECOND, async function () {
+    try {
+      await getEconomicsCache();
+      console.log("Update get-economics-cache successfull");
+    } catch (err) {
+      console.log(err);
+    }
+  });
 }
 
-async function CronJobGetDailyVolume() {
-    cron.schedule('5 10 * * * *', async function() {
-        try{
-            await GetVolumeCache(60);
-            console.log("Update get-volume-cache successfull");
-        }catch (err){
-            console.log(err);
-        }
-    })
+async function cronJobGetDeployVolume() {
+  cron.schedule(
+    CRONJOB_TIME.EVERY_1_HOUR_ON_10TH_MINUTE_9TH_SECOND,
+    async function () {
+      try {
+        await getBlockchainDataCache("deploy");
+        console.log("Update get-deploy-volume-cache successfull");
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  );
 }
 
-async function CronJobGetDelegateVolume() {
-    cron.schedule('6 11 * * * *', async function() {
-        try{
-            await GetStakingVolumeCache("delegate", 60);
-            console.log("Update get-delegate-volume-cache successfull");
-        }catch (err){
-            console.log(err);
-        }
-    })
+async function cronJobGetDeployTxs() {
+  cron.schedule(
+    CRONJOB_TIME.EVERY_1_HOUR_ON_10TH_MINUTE_9TH_SECOND,
+    async function () {
+      try {
+        await getBlockchainDataCache("deploy_tx");
+        console.log("Update get-deploy-tx-cache successfull");
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  );
 }
 
-async function CronJobGetUndelegateVolume() {
-    cron.schedule('7 11 * * * *', async function() {
-        try{
-            await GetStakingVolumeCache("undelegate", 60);
-            console.log("Update get-undelegate-volume-cache successfull");
-        }catch (err){
-            console.log(err);
-        }
-    })
+async function cronJobGetTransferVolume() {
+  cron.schedule(
+    CRONJOB_TIME.EVERY_1_HOUR_ON_10TH_MINUTE_5TH_SECOND,
+    async function () {
+      try {
+        await getBlockchainDataCache("transfer");
+        console.log("Update get-transfer-volume-cache successfull");
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  );
 }
 
-async function CronJobGetDelegateTxVolume() {
-    cron.schedule('6 11 * * * *', async function() {
-        try{
-            await GetStakingTxVolumeCache("delegate", 60);
-            console.log("Update get-delegate-tx-volume-cache successfull");
-        }catch (err){
-            console.log(err);
-        }
-    })
+async function cronJobGetTransferTxs() {
+  cron.schedule(
+    CRONJOB_TIME.EVERY_1_HOUR_ON_10TH_MINUTE_5TH_SECOND,
+    async function () {
+      try {
+        await getBlockchainDataCache("transfer_tx");
+        console.log("Update get-transfer-tx-cache successfull");
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  );
 }
 
-async function CronJobGetUndelegateTxVolume() {
-    cron.schedule('7 11 * * * *', async function() {
-        try{
-            await GetStakingTxVolumeCache("undelegate", 60);
-            console.log("Update get-undelegate-tx-volume-cache successfull");
-        }catch (err){
-            console.log(err);
-        }
-    })
+async function cronJobGetStakingVolume() {
+  cron.schedule(
+    CRONJOB_TIME.EVERY_1_HOUR_ON_10TH_MINUTE_6TH_SECOND,
+    async function () {
+      try {
+        await getBlockchainDataCache("staking");
+        console.log("Update get-staking-volume-cache successfull");
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  );
 }
 
-async function CronJobGetExchangeVolume() {
-    cron.schedule('8 10 * * * *', async function() {
-        try{
-            await GetExchangeVolumeCache(10);
-            console.log("Update get-exchange-volume-cache successfull");
-        }catch (err){
-            console.log(err);
-        }
-    })
+async function cronJobGetUnstakingVolume() {
+  cron.schedule(
+    CRONJOB_TIME.EVERY_1_HOUR_ON_10TH_MINUTE_7TH_SECOND,
+    async function () {
+      try {
+        await getBlockchainDataCache("unstaking");
+        console.log("Update get-unstaking-volume-cache successfull");
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  );
 }
 
-module.exports = { start }
+async function cronJobGetStakingTxVolume() {
+  cron.schedule(
+    CRONJOB_TIME.EVERY_1_HOUR_ON_10TH_MINUTE_6TH_SECOND,
+    async function () {
+      try {
+        await getBlockchainDataCache("staking_tx");
+        console.log("Update get-staking-tx-volume-cache successfull");
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  );
+}
+
+async function cronJobGetUnstakingTxVolume() {
+  cron.schedule(
+    CRONJOB_TIME.EVERY_1_HOUR_ON_10TH_MINUTE_7TH_SECOND,
+    async function () {
+      try {
+        await getBlockchainDataCache("unstaking_tx");
+        console.log("Update get-unstaking-tx-volume-cache successfull");
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  );
+}
+
+async function cronJobGetExchangeVolume() {
+  cron.schedule(
+    CRONJOB_TIME.EVERY_1_HOUR_ON_15TH_MINUTE_8TH_SECOND,
+    async function () {
+      try {
+        await GetExchangeVolumeCache(10);
+        console.log("Update get-exchange-volume-cache successfull");
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  );
+}
+
+async function cronJobGetTotalBid() {
+  cron.schedule(
+    CRONJOB_TIME.EVERY_1_HOUR_ON_20TH_MINUTE_15TH_SECOND,
+    async function () {
+      try {
+        await getBlockchainDataCache("bid");
+        console.log("Update get-total-bid-cache successfull");
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  );
+}
+
+async function cronJobGetActiveBid() {
+  cron.schedule(
+    CRONJOB_TIME.EVERY_1_HOUR_ON_20TH_MINUTE_15TH_SECOND,
+    async function () {
+      try {
+        await getBlockchainDataCache("active_bid");
+        console.log("Update get-total-active-bid-cache successfull");
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  );
+}
+
+async function cronJobGetTotalValidator() {
+  cron.schedule(
+    CRONJOB_TIME.EVERY_1_HOUR_ON_20TH_MINUTE_15TH_SECOND,
+    async function () {
+      try {
+        await getBlockchainDataCache("validator");
+        console.log("Update get-total-validator-cache successfull");
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  );
+}
+
+async function cronJobGetTotalDelegator() {
+  cron.schedule(
+    CRONJOB_TIME.EVERY_1_HOUR_ON_20TH_MINUTE_15TH_SECOND,
+    async function () {
+      try {
+        await getBlockchainDataCache("delegator");
+        console.log("Update get-total-delegator-cache successfull");
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  );
+}
+
+module.exports = { start };

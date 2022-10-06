@@ -1,19 +1,23 @@
-const cron = require('node-cron');
-const { GetValidatorsCache } = require('../controllers/state_controller');
+const cron = require("node-cron");
+const { getValidatorsCache } = require("../controllers/state_controller");
+const { CRONJOB_TIME } = require("../utils/constant");
 
 async function start() {
-    // Get 10 validators
-    CronJobGetValidators();
+  // Get 10 validators
+  cronJobGetValidators();
 }
 
-async function CronJobGetValidators() {
-    cron.schedule('15 */10 * * * *', async function() {
-        try{
-            await GetValidatorsCache(10);
-        } catch(err) {
-            console.log(err)
-        }
-    })
+async function cronJobGetValidators() {
+  cron.schedule(
+    CRONJOB_TIME.EVERY_10_MINUTES_ON_25TH_SECOND,
+    async function () {
+      try {
+        await getValidatorsCache(5);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  );
 }
 
-module.exports = { start }
+module.exports = { start };

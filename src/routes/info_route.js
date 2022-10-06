@@ -1,109 +1,98 @@
-const router = require('express').Router();
-const info_controller = require('../controllers/info_controller');
+const router = require("express").Router();
+const info_controller = require("../controllers/info_controller");
 
-router.route("/get-deploy/:hex").get(info_controller.GetDeploy);
-router.route("/get-deploy-info/:hex").get(info_controller.GetDeployInfo)
-router.route("/get-list-deploys").get(info_controller.GetListDeploys);
-router.route("/get-type/:param").get(info_controller.GetType);
-router.route("/get-circulating-supply/").get(info_controller.GetCirculatingSupply);
-router.route("/get-supply/").get(info_controller.GetSupply);
+router.route("/get-deploy/:hex").get(info_controller.getDeploy);
+router.route("/get-deploy-info/:hex").get(info_controller.getDeployInfo);
+router.route("/get-list-deploys").get(info_controller.getListDeploys);
+router.route("/get-type/:param").get(info_controller.getType);
+router
+  .route("/get-circulating-supply/")
+  .get(info_controller.getCirculatingSupply);
+router.route("/get-supply/").get(info_controller.getSupply);
 
-
-// cache for daily transfer volume
-const verifyGetTransferVolume = (req, res, next) => {
-    try {
-        const count = req.params.count;
-        if (info_controller.transfer_volume_cache.has(`transfer-volume-${count}`)) {
-            return res.status(200).json(info_controller.transfer_volume_cache.get(`transfer-volume-${count}`));
-        }
-        return next();
-    } catch (err) {
-        throw new Error(err);
+// cache for get blockchain data
+const verifyBlockchainData = (req, res, next) => {
+  try {
+    const type = req.query.type;
+    if (info_controller.blockchain_data_cache.has(`${type}`)) {
+      return res
+        .status(200)
+        .json(info_controller.blockchain_data_cache.get(`${type}`));
     }
+    return next();
+  } catch (err) {
+    throw new Error(err);
+  }
 };
-router.route("/get-transfer-volume/:count").get(verifyGetTransferVolume, info_controller.GetTransferVolume);
+router
+  .route("/get-blockchain-data")
+  .get(verifyBlockchainData, info_controller.getBlockchainData);
 
 // cache for daily volume
 const verifyGetVolume = (req, res, next) => {
-    try {
-        const count = req.params.count;
-        if (info_controller.get_volume_cache.has(`get-volume-${count}`)) {
-            return res.status(200).json(info_controller.get_volume_cache.get(`get-volume-${count}`));
-        }
-        return next();
-    } catch (err) {
-        throw new Error(err);
+  try {
+    const count = req.params.count;
+    if (info_controller.get_volume_cache.has(`get-volume-${count}`)) {
+      return res
+        .status(200)
+        .json(info_controller.get_volume_cache.get(`get-volume-${count}`));
     }
+    return next();
+  } catch (err) {
+    throw new Error(err);
+  }
 };
-router.route("/get-volume/:count").get(verifyGetVolume, info_controller.GetVolume);
-
-const verifyGetStakingVolume = (req, res, next) => {
-    try {
-        const count = req.query.count;
-        const type = req.query.type;
-        if (info_controller.get_staking_volume_cache.has(`${type}-${count}`)) {
-            return res.status(200).json(info_controller.get_staking_volume_cache.get(`${type}-${count}`));
-        }
-        return next();
-    } catch (err) {
-        throw new Error(err);
-    }
-};
-router.route("/get-staking-volume").get(verifyGetStakingVolume, info_controller.GetStakingVolume);
-
-const verifyGetStakingTxVolume = (req, res, next) => {
-    try {
-        const count = req.query.count;
-        const type = req.query.type;
-        if (info_controller.get_staking_tx_volume_cache.has(`${type}-${count}`)) {
-            return res.status(200).json(info_controller.get_staking_tx_volume_cache.get(`${type}-${count}`));
-        }
-        return next();
-    } catch (err) {
-        throw new Error(err);
-    }
-};
-router.route("/get-staking-tx-volume").get(verifyGetStakingTxVolume, info_controller.GetStakingTxVolume);
+router
+  .route("/get-volume/:count")
+  .get(verifyGetVolume, info_controller.getVolume);
 
 //cache for get stats
 const verifyGetStats = (req, res, next) => {
-    try{
-        if(info_controller.get_stats_cache.has("get-stats")) {
-            return res.status(200).json(info_controller.get_stats_cache.get("get-stats"));
-        }
-    }catch (err){
-        throw new Error(err);
+  try {
+    if (info_controller.get_stats_cache.has("get-stats")) {
+      return res
+        .status(200)
+        .json(info_controller.get_stats_cache.get("get-stats"));
     }
-}
-router.route("/get-stats").get(verifyGetStats, info_controller.GetStats);
+    return next();
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+router.route("/get-stats").get(verifyGetStats, info_controller.getStats);
 
 // cache for economics
 const verifyEconomics = (req, res, next) => {
-    try {
-        if (info_controller.economics_cache.has("economics")) {
-            return res.status(200).json(info_controller.economics_cache.get("economics"));
-        }
-        return next();
-    } catch (err) {
-        throw new Error(err);
+  try {
+    if (info_controller.economics_cache.has("economics")) {
+      return res
+        .status(200)
+        .json(info_controller.economics_cache.get("economics"));
     }
+    return next();
+  } catch (err) {
+    throw new Error(err);
+  }
 };
-router.route("/economics").get(verifyEconomics, info_controller.GetEconomics);
+router.route("/economics").get(verifyEconomics, info_controller.getEconomics);
 
-router.route("/get-dex-traffic").get(info_controller.GetDexTraffic);
+router.route("/get-dex-traffic").get(info_controller.getDexTraffic);
 
 const verifyExchangeVolume = (req, res, next) => {
-    try {
-        const count = req.query.count;
-        if (info_controller.exchange_volume_cache.has(count)) {
-            return res.status(200).json(info_controller.exchange_volume_cache.get(count));
-        }
-        return next();
-    } catch (err) {
-        throw new Error(err);
+  try {
+    const count = req.query.count;
+    if (info_controller.exchange_volume_cache.has(count)) {
+      return res
+        .status(200)
+        .json(info_controller.exchange_volume_cache.get(count));
     }
+    return next();
+  } catch (err) {
+    throw new Error(err);
+  }
 };
-router.route("/exchange-volume").get(verifyExchangeVolume, info_controller.GetExchangeVolume);
-
+router
+  .route("/exchange-volume")
+  .get(verifyExchangeVolume, info_controller.getExchangeVolume);
 
 module.exports = router;
