@@ -8,6 +8,7 @@ const validator_pool = mysql.createPool({
   password: process.env.PASSWORD,
   database: process.env.VALIDATOR_DB_NAME,
   debug: false,
+  charset: "utf8mb4",
 });
 
 const pool = mysql.createPool({

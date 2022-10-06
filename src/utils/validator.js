@@ -215,8 +215,7 @@ const getCurrentEraValidators = async (url) => {
       if (validator_info != null) {
         result.validators[i].name = validator_info[0].name;
         if (validator_info[0].icon) {
-          result.validators[i].icon =
-            process.env.ICON_IMAGE_URL + validator_info[0].icon;
+          result.validators[i].icon = validator_info[0].icon;
         }
       }
     } catch {}
@@ -267,8 +266,7 @@ const getNextEraValidators = async (url) => {
       if (validator_info != null) {
         result.validators[i].name = validator_info[0].name;
         if (validator_info[0].icon) {
-          result.validators[i].icon =
-            process.env.ICON_IMAGE_URL + validator_info[0].icon;
+          result.validators[i].icon = validator_info[0].icon;
         }
       }
     } catch {}
@@ -304,8 +302,7 @@ const getBids = async () => {
       if (validator_info != null) {
         auction_info[i].name = validator_info[0].name;
         if (validator_info[0].icon) {
-          auction_info[i].icon =
-            process.env.ICON_IMAGE_URL + validator_info[0].icon;
+          auction_info[i].icon = validator_info[0].icon;
         }
       }
     } catch {}
@@ -460,8 +457,7 @@ async function getValidatorInformation(address) {
   information.name = validator.name;
   information.email = validator.email;
   if (validator.icon) {
-    information.icon =
-      process.env.ICON_IMAGE_URL + validator.icon + "?raw=true";
+    information.icon = validator.icon;
   }
   information.website = validator.website;
 
