@@ -34,7 +34,7 @@ async function getHolder(account) {
   });
 }
 
-async function GetNumberOfAccountFromDate(date) {
+async function getNumberOfAccountFromDate(date) {
   return new Promise((resolve, reject) => {
     var sql = `SELECT COUNT(*) AS number_of_holders FROM account WHERE DATE(active_date) < '${date}'`;
     pool.query(sql, function (err, result) {
@@ -100,7 +100,7 @@ module.exports = {
   getHolder,
   GetRichAccounts,
   getTotalNumberOfAccount,
-  GetNumberOfAccountFromDate,
+  getNumberOfAccountFromDate,
   GetAccounts,
   getPublicKeyByAccountHash,
 };

@@ -154,7 +154,7 @@ const getValidators = async (number_of_validator) => {
     //APY
 
     // calculate APY
-    const apy = await GetAPY();
+    const apy = await getAPY();
     result.APY = apy;
 
     // calculate total_stake
@@ -336,7 +336,7 @@ const getRangeBids = async (start, count) => {
   return result;
 };
 
-const GetAPY = async (total_stake) => {
+const getAPY = async (total_stake) => {
   const latest_era = await GetLatestEra();
   const latest_total_reward = (await GetTotalRewardByEra(latest_era.era_id))
     .total_reward;
@@ -485,7 +485,7 @@ module.exports = {
   getCurrentEraValidators,
   getBids,
   getValidatorData,
-  GetAPY,
+  getAPY,
   GetTotalStake,
   getValidatorInformation,
   getNextEraValidators,

@@ -10,7 +10,7 @@ const pool = mysql.createPool({
   debug: false,
 });
 
-async function GetTotalRewardByPublicKey(public_key) {
+async function getTotalRewardByPublicKey(public_key) {
   return new Promise((resolve, reject) => {
     var sql = `SELECT CAST(SUM(CAST(era.amount AS UNSIGNED INTEGER)) as CHAR) as total_reward FROM era WHERE validator = '${public_key}' OR delegator = '${public_key}'`;
     pool.query(sql, function (err, result) {
@@ -86,7 +86,7 @@ async function getDelegatorReward(public_key) {
   });
 }
 
-async function GetTotalRewardByEra(era_id) {
+async function getTotalRewardByEra(era_id) {
   return new Promise((resolve, reject) => {
     var sql = `SELECT CAST(SUM(CAST(era.amount AS UNSIGNED INTEGER)) as CHAR) as total_reward FROM era WHERE era = '${era_id}'`;
     pool.query(sql, function (err, result) {
@@ -199,7 +199,7 @@ async function GetTotalDelegator(era) {
   });
 }
 
-async function GetTotalReward() {
+async function getTotalReward() {
   return new Promise((resolve, reject) => {
     var sql = `SELECT CAST(SUM(CAST(era.amount AS UNSIGNED INTEGER)) as CHAR) as total_reward FROM era`;
     pool.query(sql, function (err, result) {
@@ -264,12 +264,12 @@ async function getLatestTimestampByPublicKey(public_key) {
 }
 
 module.exports = {
-  GetTotalRewardByPublicKey,
-  GetTotalRewardByEra,
+  getTotalRewardByPublicKey,
+  getTotalRewardByEra,
   getLatestEra,
   GetPublicKeyTotalRewardByDate,
   GetTotalDelegator,
-  GetTotalReward,
+  getTotalReward,
   getValidatorReward,
   getPublicKeyRewardByDate,
   getPublicKeyRewardByEra,

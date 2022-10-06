@@ -34,7 +34,7 @@ async function getDeployUpdateTime() {
   });
 }
 
-async function GetEraUpdateTime() {
+async function getEraUpdateTime() {
   return new Promise((resolve, reject) => {
     var sql = `SELECT era FROM timestamp`;
     pool.query(sql, function (err, result) {
@@ -45,7 +45,7 @@ async function GetEraUpdateTime() {
     });
   });
 }
-async function GetAccountUpdateTime() {
+async function getAccountUpdateTime() {
   return new Promise((resolve, reject) => {
     var sql = `SELECT account FROM timestamp`;
     pool.query(sql, function (err, result) {
@@ -72,7 +72,7 @@ async function getValidatorUpdateTime() {
 module.exports = {
   getBlockUpdateTime,
   getDeployUpdateTime,
-  GetEraUpdateTime,
-  GetAccountUpdateTime,
+  getEraUpdateTime,
+  getAccountUpdateTime,
   getValidatorUpdateTime,
 };

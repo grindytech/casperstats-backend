@@ -167,7 +167,7 @@ async function UpdateLinks(public_key, links) {
   });
 }
 
-async function GetCurrentEraValidator() {
+async function getCurrentEraValidator() {
   return new Promise((resolve, reject) => {
     var sql = `SELECT public_key_hex, total_stake_current_era as total_stake, delegation_rate, number_of_delegators FROM validator WHERE current_era_flag = true`;
     pool.query(sql, function (err, result) {
@@ -179,7 +179,7 @@ async function GetCurrentEraValidator() {
   });
 }
 
-async function GetNextEraValidator() {
+async function getNextEraValidator() {
   return new Promise((resolve, reject) => {
     var sql = `SELECT public_key_hex, total_stake_next_era as total_stake, delegation_rate, number_of_delegators FROM validator WHERE next_era_flag = 1`;
     pool.query(sql, function (err, result) {
@@ -191,7 +191,7 @@ async function GetNextEraValidator() {
   });
 }
 
-async function GetTotalActiveValidator() {
+async function getTotalActiveValidator() {
   return new Promise((resolve, reject) => {
     var sql = `SELECT COUNT(*) as total_validator FROM validator WHERE current_era_flag=1`;
     pool.query(sql, function (err, result) {
@@ -203,7 +203,7 @@ async function GetTotalActiveValidator() {
   });
 }
 
-async function GetTotalActiveBids() {
+async function getTotalActiveBids() {
   return new Promise((resolve, reject) => {
     var sql = `SELECT COUNT(*) as total_bids FROM validator WHERE inactive=0`;
     pool.query(sql, function (err, result) {
@@ -215,7 +215,7 @@ async function GetTotalActiveBids() {
   });
 }
 
-async function GetAllValidator() {
+async function getAllValidator() {
   return new Promise((resolve, reject) => {
     var sql = `SELECT public_key_hex, self_stake, total_stake_current_era, total_stake_next_era , inactive, delegation_rate, number_of_delegators FROM validator`;
     pool.query(sql, function (err, result) {
@@ -227,7 +227,7 @@ async function GetAllValidator() {
   });
 }
 
-async function GetRangeValidator(start, count) {
+async function getRangeValidator(start, count) {
   return new Promise((resolve, reject) => {
     var sql = `SELECT public_key_hex, self_stake, total_stake_next_era as total_bid, inactive, delegation_rate, number_of_delegators FROM validator ORDER BY (CONVERT(total_stake_next_era, UNSIGNED)) DESC limit ${start}, ${count}`;
     pool.query(sql, function (err, result) {
@@ -239,7 +239,7 @@ async function GetRangeValidator(start, count) {
   });
 }
 
-async function GetTotalValidator() {
+async function getTotalValidator() {
   return new Promise((resolve, reject) => {
     var sql = `SELECT COUNT(*) as total_validator FROM validator`;
     pool.query(sql, function (err, result) {
@@ -251,7 +251,7 @@ async function GetTotalValidator() {
   });
 }
 
-async function GetTotalStakeCurrentEra() {
+async function getTotalStakeCurrentEra() {
   return new Promise((resolve, reject) => {
     var sql = `SELECT SUM(total_stake_current_era) as total_stake_current FROM validator WHERE current_era_flag = 1`;
     pool.query(sql, function (err, result) {
@@ -263,7 +263,7 @@ async function GetTotalStakeCurrentEra() {
   });
 }
 
-async function GetTotalStakeNextEra() {
+async function getTotalStakeNextEra() {
   return new Promise((resolve, reject) => {
     var sql = `SELECT SUM(total_stake_next_era) as total_stake_next FROM validator WHERE next_era_flag = 1`;
     pool.query(sql, function (err, result) {
@@ -287,14 +287,14 @@ module.exports = {
   UpdateName,
   UpdateLinks,
   UpdateWebsite,
-  GetCurrentEraValidator,
-  GetTotalStakeCurrentEra,
-  GetTotalStakeNextEra,
-  GetAllValidator,
-  GetTotalValidator,
-  GetTotalActiveValidator,
-  GetNextEraValidator,
-  GetRangeValidator,
+  getCurrentEraValidator,
+  getTotalStakeCurrentEra,
+  getTotalStakeNextEra,
+  getAllValidator,
+  getTotalValidator,
+  getTotalActiveValidator,
+  getNextEraValidator,
+  getRangeValidator,
   getValidatorInfo,
-  GetTotalActiveBids,
+  getTotalActiveBids,
 };

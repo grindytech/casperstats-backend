@@ -1,43 +1,43 @@
 const {
-  GetDeploy,
-  GetType,
-  GetTransfersVolume,
-  GetDeployFromRPC,
+  getDeploy,
+  getType,
+  getTransfersVolume,
+  getDeployFromRPC,
 } = require("../utils/chain");
 
 const { ELEMENT_TYPE } = require("../utils/constant");
-const { Execute, GetNetWorkRPC } = require("../utils/common");
+const { execute, getNetWorkRPC } = require("../utils/common");
 require("dotenv").config();
 
 const {
-  GetTotalNumberOfAccount,
-  GetNumberOfAccountFromDate,
+  getTotalNumberOfAccount,
+  getNumberOfAccountFromDate,
 } = require("../models/account");
 const {
-  GetNumberOfTransfersByDate,
-  GetVolumeByDate,
+  getNumberOfTransfersByDate,
+  getVolumeByDate,
 } = require("../models/transfer");
 const CoinGecko = require("coingecko-api");
-const { GetAPY } = require("../utils/validator");
+const { getAPY } = require("../utils/validator");
 const {
-  GetDexAddressesTraffic,
-  GetExchangeVolumeByDate,
+  getDexAddressesTraffic,
+  getExchangeVolumeByDate,
 } = require("../utils/account");
-const { GetTotalReward } = require("../models/era");
-const CoinGeckoClient = new CoinGecko();
+const { getTotalReward } = require("../models/era");
+const coinGeckoClient = new CoinGecko();
 
 const NodeCache = require("node-cache");
-const { GetBlockHeight } = require("../models/block_model");
+const { getBlockHeight } = require("../models/block_model");
 const {
-  GetTotalStakeCurrentEra,
-  GetTotalActiveValidator,
-  GetTotalValidator,
-  GetCurrentEraValidator,
-  GetTotalActiveBids,
+  getTotalStakeCurrentEra,
+  getTotalActiveValidator,
+  getTotalValidator,
+  getCurrentEraValidator,
+  getTotalActiveBids,
 } = require("../models/validator");
-const { GetTotalDelegator } = require("../models/delegator");
-const { GetStats } = require("../models/stats");
-const { GetEraUpdateTime } = require("../models/timestamp");
+const { getTotalDelegator } = require("../models/delegator");
+const { getStats } = require("../models/stats");
+const { getEraUpdateTime } = require("../models/timestamp");
 const { getBlockchainDataByKey } = require("../models/blockchain");
 
 const get_stats_cache = new NodeCache({
@@ -66,14 +66,14 @@ let total_reward_timestamp;
 async function getTotalRewardCache() {
   let total_reward;
   try {
-    let timestamp = await GetEraUpdateTime();
+    let timestamp = await getEraUpdateTime();
     if (get_total_reward.has(`total-reward-'${timestamp}'`)) {
       total_reward_timestamp = timestamp;
       return (total_reward = get_total_reward.get(
         `total-reward-'${timestamp}'`
       ));
     }
-    total_reward = (await GetTotalReward()).total_reward;
+    total_reward = (await getTotalReward()).total_reward;
     get_total_reward.set(`total-reward-'${timestamp}'`, total_reward);
     get_total_reward.del(`total-reward-'${total_reward_timestamp}'`);
     total_reward_timestamp = timestamp;
@@ -88,27 +88,27 @@ async function getTotalRewardCache() {
 async function getEconomicsCache() {
   let economics = {};
   try {
-    const block_height = await GetBlockHeight();
+    const block_height = await getBlockHeight();
     economics.block_height = block_height;
-    const supply = await GetStats();
+    const supply = await getStats();
     if (supply) {
       economics.total_supply = supply.total_supply;
       economics.circulating_supply = supply.circulating_supply;
     }
 
-    let total_stake = await GetTotalStakeCurrentEra();
+    let total_stake = await getTotalStakeCurrentEra();
 
     // calculate APY
-    const apy = await GetAPY(total_stake);
+    const apy = await getAPY(total_stake);
     economics.APY = apy;
 
     // calculate total_stake
 
     economics.total_stake = total_stake.toString();
-    economics.total_active_validators = await GetTotalActiveValidator();
-    economics.total_bid_validators = await GetTotalValidator();
-    economics.total_active_bids = await GetTotalActiveBids();
-    economics.total_delegators = await GetTotalDelegator();
+    economics.total_active_validators = await getTotalActiveValidator();
+    economics.total_bid_validators = await getTotalValidator();
+    economics.total_active_bids = await getTotalActiveBids();
+    economics.total_delegators = await getTotalDelegator();
 
     // total reward
     let total_reward;
@@ -155,8 +155,8 @@ async function getStatsCache() {
         yesterday = yesterday.toISOString();
       }
 
-      const holders = (await GetTotalNumberOfAccount()).number_of_holders;
-      const last_holders = (await GetNumberOfAccountFromDate(yesterday))
+      const holders = (await getTotalNumberOfAccount()).number_of_holders;
+      const last_holders = (await getNumberOfAccountFromDate(yesterday))
         .number_of_holders;
       stats.holders = holders;
       stats.holders_change =
@@ -165,14 +165,14 @@ async function getStatsCache() {
 
     // validator
     {
-      const era_validators = await GetCurrentEraValidator();
+      const era_validators = await getCurrentEraValidator();
       const current_validators = era_validators.length;
       stats.validators = current_validators;
     }
 
     // circulating + total supply
     {
-      const supply = await GetStats();
+      const supply = await getStats();
       if (supply) {
         stats.circulating = supply.circulating_supply;
         stats.total_supply = supply.total_supply;
@@ -191,7 +191,7 @@ async function getStatsCache() {
       //     developer_data: false,
       //     localization: false,
       // }
-      // let data = await CoinGeckoClient.coins.fetch('casper-network', params);
+      // let data = await coinGeckoClient.coins.fetch('casper-network', params);
       // stats.price = data.data.market_data.current_price.usd;
       // stats.price_change = data.data.market_data.price_change_percentage_24h;
       // stats.marketcap = data.data.market_data.market_cap.usd;
@@ -204,7 +204,7 @@ async function getStatsCache() {
       //     days: 1,
       //     vs_currency: 'usd',
       // }
-      // let data = await CoinGeckoClient.coins.fetchMarketChart('casper-network', params);
+      // let data = await coinGeckoClient.coins.fetchMarketChart('casper-network', params);
 
       // const length = data.data.total_volumes.length;
       // const current_transaction =  data.data.total_volumes[0][1];
@@ -228,10 +228,10 @@ async function getStatsCache() {
         before_yesterday = before_yesterday.toISOString();
       }
 
-      let today_transfers = (await GetNumberOfTransfersByDate(yesterday, now))
+      let today_transfers = (await getNumberOfTransfersByDate(yesterday, now))
         .number_of_transfers;
       let yesterday_transfers = (
-        await GetNumberOfTransfersByDate(before_yesterday, yesterday)
+        await getNumberOfTransfersByDate(before_yesterday, yesterday)
       ).number_of_transfers;
 
       stats.transactions = today_transfers;
@@ -244,7 +244,7 @@ async function getStatsCache() {
     // transfers
     {
       const count = 60;
-      const data = await GetTransfersVolume(count);
+      const data = await getTransfersVolume(count);
       stats.transfers = data;
     }
 
@@ -265,7 +265,7 @@ async function GetVolumeCache(count) {
       let the_date = new Date();
       the_date.setDate(datetime.getDate() - i);
       the_date = the_date.toISOString().slice(0, 10);
-      let data = await GetVolumeByDate(the_date, the_date);
+      let data = await getVolumeByDate(the_date, the_date);
       data = data[0];
 
       const paser_data = [
@@ -323,7 +323,7 @@ async function GetExchangeVolumeCache(count) {
       the_date.setDate(datetime.getDate() - i);
       the_date = the_date.toISOString().slice(0, 10);
 
-      const traffic_data = await GetExchangeVolumeByDate(the_date, the_date);
+      const traffic_data = await getExchangeVolumeByDate(the_date, the_date);
       result.push(traffic_data);
     }
     exchange_volume_cache.set(count, result);
@@ -347,10 +347,10 @@ module.exports = {
   getTotalRewardCache,
   getBlockchainDataCache,
 
-  GetDeploy: async function (req, res) {
+  getDeploy: async function (req, res) {
     let hex = req.params.hex; // Hex-encoded deploy hash
-    const url = await GetNetWorkRPC();
-    GetDeployFromRPC(url, hex)
+    const url = await getNetWorkRPC();
+    getDeployFromRPC(url, hex)
       .then((value) => {
         res.status(200).json(value);
       })
@@ -360,9 +360,9 @@ module.exports = {
       });
   },
 
-  GetDeployInfo: async function (req, res) {
+  getDeployInfo: async function (req, res) {
     let hex = req.params.hex; // Hex-encoded deploy hash
-    GetDeploy(hex)
+    getDeploy(hex)
       .then((value) => {
         res.status(200).json(value);
       })
@@ -372,10 +372,10 @@ module.exports = {
       });
   },
 
-  GetListDeploys: async function (req, res) {
+  getListDeploys: async function (req, res) {
     let id = req.query.id; // JSON-RPC identifier, applied to the request and returned in the response. If not provided, a random integer will be assigned
     let b = req.query.b; // Hex-encoded block hash or height of the block. If not given, the last block added to the chain as known at the given node will be used
-    const rpc_url = await GetNetWorkRPC();
+    const rpc_url = await getNetWorkRPC();
     let command = `${process.env.CASPER_CLIENT} list-deploys --node-address ${rpc_url}`;
 
     if (id) {
@@ -386,7 +386,7 @@ module.exports = {
       command = command + ` -b ${b}`;
     }
 
-    Execute(command)
+    execute(command)
       .then((value) => {
         res.status(200);
         res.json(value);
@@ -396,10 +396,10 @@ module.exports = {
       });
   },
 
-  GetType: async function (req, res) {
+  getType: async function (req, res) {
     const param = req.params.param;
     try {
-      const type = await GetType(param);
+      const type = await getType(param);
       res.status(200);
       res.json(type);
     } catch (err) {
@@ -410,16 +410,16 @@ module.exports = {
     }
   },
 
-  GetCirculatingSupply: async function (req, res) {
+  getCirculatingSupply: async function (req, res) {
     // CasperLabs APIs
     res.status(200).json("comming soon");
   },
 
-  GetSupply: async function (req, res) {
+  getSupply: async function (req, res) {
     res.status(200).json("comming soon");
   },
 
-  GetBlockchainData: async function (req, res) {
+  getBlockchainData: async function (req, res) {
     try {
       const type = req.query.type;
       const result = await getBlockchainDataCache(type);
@@ -429,7 +429,7 @@ module.exports = {
     }
   },
 
-  GetVolume: async function (req, res) {
+  getVolume: async function (req, res) {
     try {
       const count = req.params.count;
       const result = await GetVolumeCache(count);
@@ -439,7 +439,7 @@ module.exports = {
     }
   },
 
-  GetStats: async function (req, res) {
+  getStats: async function (req, res) {
     try {
       let stats = await getStatsCache();
       res.status(200);
@@ -449,7 +449,7 @@ module.exports = {
     }
   },
 
-  GetEconomics: async function (req, res) {
+  getEconomics: async function (req, res) {
     try {
       let economics = await getEconomicsCache();
       res.status(200).json(economics);
@@ -458,7 +458,7 @@ module.exports = {
     }
   },
 
-  GetDexTraffic: async function (req, res) {
+  getDexTraffic: async function (req, res) {
     // get all known address
     try {
       let now = new Date();
@@ -468,8 +468,8 @@ module.exports = {
         yesterday = yesterday.toISOString();
         now = now.toISOString();
       }
-      let inflow = await GetDexAddressesTraffic("in", yesterday, now);
-      let outflow = await GetDexAddressesTraffic("out", yesterday, now);
+      let inflow = await getDexAddressesTraffic("in", yesterday, now);
+      let outflow = await getDexAddressesTraffic("out", yesterday, now);
 
       res.status(200).json({
         inflow,
@@ -483,7 +483,7 @@ module.exports = {
     }
   },
 
-  GetExchangeVolume: async function (req, res) {
+  getExchangeVolume: async function (req, res) {
     // get all known address
     const count = req.query.count;
     try {

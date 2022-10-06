@@ -1,14 +1,14 @@
 const router = require("express").Router();
 const info_controller = require("../controllers/info_controller");
 
-router.route("/get-deploy/:hex").get(info_controller.GetDeploy);
-router.route("/get-deploy-info/:hex").get(info_controller.GetDeployInfo);
-router.route("/get-list-deploys").get(info_controller.GetListDeploys);
-router.route("/get-type/:param").get(info_controller.GetType);
+router.route("/get-deploy/:hex").get(info_controller.getDeploy);
+router.route("/get-deploy-info/:hex").get(info_controller.getDeployInfo);
+router.route("/get-list-deploys").get(info_controller.getListDeploys);
+router.route("/get-type/:param").get(info_controller.getType);
 router
   .route("/get-circulating-supply/")
-  .get(info_controller.GetCirculatingSupply);
-router.route("/get-supply/").get(info_controller.GetSupply);
+  .get(info_controller.getCirculatingSupply);
+router.route("/get-supply/").get(info_controller.getSupply);
 
 // cache for get blockchain data
 const verifyBlockchainData = (req, res, next) => {
@@ -26,7 +26,7 @@ const verifyBlockchainData = (req, res, next) => {
 };
 router
   .route("/get-blockchain-data")
-  .get(verifyBlockchainData, info_controller.GetBlockchainData);
+  .get(verifyBlockchainData, info_controller.getBlockchainData);
 
 // cache for daily volume
 const verifyGetVolume = (req, res, next) => {
@@ -44,7 +44,7 @@ const verifyGetVolume = (req, res, next) => {
 };
 router
   .route("/get-volume/:count")
-  .get(verifyGetVolume, info_controller.GetVolume);
+  .get(verifyGetVolume, info_controller.getVolume);
 
 //cache for get stats
 const verifyGetStats = (req, res, next) => {
@@ -59,7 +59,7 @@ const verifyGetStats = (req, res, next) => {
     throw new Error(err);
   }
 };
-router.route("/get-stats").get(verifyGetStats, info_controller.GetStats);
+router.route("/get-stats").get(verifyGetStats, info_controller.getStats);
 
 // cache for economics
 const verifyEconomics = (req, res, next) => {
@@ -74,9 +74,9 @@ const verifyEconomics = (req, res, next) => {
     throw new Error(err);
   }
 };
-router.route("/economics").get(verifyEconomics, info_controller.GetEconomics);
+router.route("/economics").get(verifyEconomics, info_controller.getEconomics);
 
-router.route("/get-dex-traffic").get(info_controller.GetDexTraffic);
+router.route("/get-dex-traffic").get(info_controller.getDexTraffic);
 
 const verifyExchangeVolume = (req, res, next) => {
   try {
@@ -93,6 +93,6 @@ const verifyExchangeVolume = (req, res, next) => {
 };
 router
   .route("/exchange-volume")
-  .get(verifyExchangeVolume, info_controller.GetExchangeVolume);
+  .get(verifyExchangeVolume, info_controller.getExchangeVolume);
 
 module.exports = router;

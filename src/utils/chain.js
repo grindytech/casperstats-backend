@@ -336,7 +336,7 @@ async function IsPublicKeyHex(param) {
   return false;
 }
 
-const GetType = async (param) => {
+const getType = async (param) => {
   // clean the input
   const imput = param.replace(/\s+/g, "");
   const url = await getNetWorkRPC();
@@ -403,7 +403,7 @@ const GetType = async (param) => {
   };
 };
 
-const GetTransfersVolume = async (count) => {
+const getTransfersVolume = async (count) => {
   var datetime = new Date();
   let result = [];
   for (let i = 0; i < count; i++) {
@@ -427,9 +427,9 @@ module.exports = {
   GetTransferDetail,
   getBlock,
   getTransfersInBlock,
-  GetType,
+  getType,
   getDeploysInBlock,
-  GetTransfersVolume,
+  getTransfersVolume,
   getDeployByRPC,
   getDeployFromRPC,
 };

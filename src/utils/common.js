@@ -116,7 +116,7 @@ async function GetAccountData(url, address) {
 
   return account;
 }
-const Execute = async (command) => {
+const execute = async (command) => {
   return new Promise((resolve, reject) => {
     exec(command, { maxBuffer: 1024 * 10000 }, (error, stdout, stderr) => {
       if (error) {
@@ -210,7 +210,7 @@ const queryState = async (key, state = "", id = undefined) => {
       command = command + ` --id ${id}`;
     }
 
-    Execute(command)
+    execute(command)
       .then((value) => {
         resolve(value);
       })
@@ -294,7 +294,7 @@ module.exports = {
   getHeight,
   queryState,
   GetLatestStateRootHash,
-  Execute,
+  execute,
   getBalance,
   getAccountHash,
   requestRPC,

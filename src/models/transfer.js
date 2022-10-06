@@ -58,7 +58,7 @@ async function getTotalNumberOfTransfers() {
   });
 }
 
-async function GetNumberOfTransfersByDate(from, to) {
+async function getNumberOfTransfersByDate(from, to) {
   return new Promise((resolve, reject) => {
     var sql = `SELECT COUNT(*) AS number_of_transfers FROM transfer WHERE DATE(timestamp) BETWEEN DATE('${from}') AND DATE('${to}')`;
     pool.query(sql, function (err, result) {
@@ -74,7 +74,7 @@ async function GetNumberOfTransfersByDate(from, to) {
   });
 }
 
-async function GetVolumeByDate(from, to) {
+async function getVolumeByDate(from, to) {
   return new Promise((resolve, reject) => {
     var sql = `SELECT CAST(SUM(CAST(transfer.value AS UNSIGNED INTEGER)) as CHAR) as volume FROM transfer WHERE DATE(timestamp) BETWEEN DATE('${from}') AND DATE('${to}')`;
     pool.query(sql, function (err, result) {
@@ -121,8 +121,8 @@ async function GetOutflowOfAddressByDate(account_hash, from, to) {
 module.exports = {
   getTransfersByAccountHash,
   getTotalNumberOfTransfers,
-  GetNumberOfTransfersByDate,
-  GetVolumeByDate,
+  getNumberOfTransfersByDate,
+  getVolumeByDate,
   getTransfers,
   GetInflowOfAddressByDate,
   GetOutflowOfAddressByDate,

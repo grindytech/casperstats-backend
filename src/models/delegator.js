@@ -10,7 +10,7 @@ const delegator_pool = mysql.createPool({
   debug: false,
 });
 
-async function GetDelegatorsOfValidator(address) {
+async function getDelegatorsOfValidator(address) {
   return new Promise((resolve, reject) => {
     var sql = `SELECT * FROM delegator WHERE delegatee = '${address}'`;
     delegator_pool.query(sql, function (err, result) {
@@ -22,7 +22,7 @@ async function GetDelegatorsOfValidator(address) {
   });
 }
 
-async function GetTotalDelegator() {
+async function getTotalDelegator() {
   return new Promise((resolve, reject) => {
     var sql = `SELECT COUNT(distinct public_key) as total_delegator FROM delegator`;
     delegator_pool.query(sql, function (err, result) {
@@ -46,7 +46,7 @@ async function getRangeDelegator(validator, start, count) {
   });
 }
 
-async function GetAllDelegator() {
+async function getAllDelegator() {
   return new Promise((resolve, reject) => {
     var sql = `SELECT * FROM delegator`;
     delegator_pool.query(sql, function (err, result) {
@@ -71,9 +71,9 @@ async function getTotalStakeAsDelegator(public_key) {
 }
 
 module.exports = {
-  GetDelegatorsOfValidator,
-  GetTotalDelegator,
+  getDelegatorsOfValidator,
+  getTotalDelegator,
   getRangeDelegator,
-  GetAllDelegator,
+  getAllDelegator,
   getTotalStakeAsDelegator,
 };

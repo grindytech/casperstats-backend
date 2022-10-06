@@ -167,7 +167,7 @@ async function getUnstakingAmount(url, public_key) {
   return total;
 }
 
-async function GetDexAddressesTraffic(type, from, to) {
+async function getDexAddressesTraffic(type, from, to) {
   let get_traffic;
   if (type == "in") {
     get_traffic = GetInflowOfAddressByDate;
@@ -213,7 +213,7 @@ async function GetDexAddressesTraffic(type, from, to) {
   };
 }
 
-async function GetExchangeVolumeByDate(date) {
+async function getExchangeVolumeByDate(date) {
   let accounts = await GetAllKnownAddress();
   let in_total = 0;
   let out_total = 0;
@@ -259,9 +259,9 @@ module.exports = {
   getAccountData,
   getRichest,
   getUnstakingAmount,
-  GetDexAddressesTraffic,
+  getDexAddressesTraffic,
   getAccountName,
-  GetExchangeVolumeByDate,
+  getExchangeVolumeByDate,
   withoutTime,
   getRichestCache,
 };
