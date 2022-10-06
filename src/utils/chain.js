@@ -3,20 +3,20 @@ dotenv.config();
 const { RpcApiName, ELEMENT_TYPE } = require("./constant");
 const account_fn = require("./account");
 const {
-  GetHeight,
+  getHeight,
   requestRPC,
   getAccountHash,
-  Execute,
+  execute,
   getNetWorkRPC,
 } = require("./common");
 const request = require("request");
 const {
-  GetNumberOfTransfersByDate,
+  getNumberOfTransfersByDate,
   getTransfersByDeployHash,
 } = require("../models/transfer");
 const { getDeployByDeployHash } = require("../models/deploy");
 const { getBlockHeightByHash } = require("../models/block_model");
-const { GetAllValidator } = require("../models/validator");
+const { getAllValidator } = require("../models/validator");
 
 const getDeployhashes = async (url, block) => {
   return new Promise((resolve, reject) => {
@@ -37,7 +37,7 @@ const getDeployhashes = async (url, block) => {
   });
 };
 
-const GetTotalDeployCost = async (execution_results) => {
+const getTotalDeployCost = async (execution_results) => {
   let total_cost = 0;
   for (let i = 0; i < execution_results.length; i++) {
     let cost = 0;
@@ -136,7 +136,7 @@ const getDeployFromRPC = async (url, hex) => {
     } else {
       first_block_height = await getBlockHeightByBlock(url, first_block_hash);
     }
-    let total_cost = await GetTotalDeployCost(result.execution_results);
+    let total_cost = await getTotalDeployCost(result.execution_results);
 
     result.deploy.header["block_hash"] = first_block_hash;
     result.deploy.header["block_height"] = first_block_height;
@@ -148,7 +148,7 @@ const getDeployFromRPC = async (url, hex) => {
   return result;
 };
 
-const GetTransfersFromDeploy = async (deploy_hash) => {
+const getTransfersFromDeploy = async (deploy_hash) => {
   return new Promise((resolve, reject) => {
     QueryState(deploy_hash)
       .then((value) => {
@@ -161,7 +161,7 @@ const GetTransfersFromDeploy = async (deploy_hash) => {
   });
 };
 
-const GetTransferDetail = async (transfer_hex) => {
+const getTransferDetail = async (transfer_hex) => {
   return new Promise((resolve, reject) => {
     QueryState(transfer_hex)
       .then((value) => {
@@ -211,7 +211,7 @@ const getDeploysInBlock = async (url, block) => {
       command = command + ` -b ${block}`;
     }
 
-    Execute(command)
+    execute(command)
       .then((value) => {
         resolve(value);
       })
@@ -224,7 +224,7 @@ const getDeploysInBlock = async (url, block) => {
 const getDeployByRPC = async (url, hex) => {
   return new Promise((resolve, reject) => {
     let command = `${process.env.CASPER_CLIENT} get-deploy --node-address ${url} ${hex}`;
-    Execute(command)
+    execute(command)
       .then((value) => {
         resolve(value);
       })
@@ -254,9 +254,9 @@ const getTransfersInBlock = async (url, block) => {
   });
 };
 
-async function IsBlockHeight(url, param) {
+async function isBlockHeight(url, param) {
   if (isNaN(param) == false) {
-    const height = await GetHeight(url);
+    const height = await getHeight(url);
     if (param < 0 || param > height) {
       return false;
     }
@@ -265,7 +265,7 @@ async function IsBlockHeight(url, param) {
   return false;
 }
 
-async function IsBlockHash(url, param) {
+async function isBlockHash(url, param) {
   if (param.length == 64) {
     //block hash
     // check block hash
@@ -279,7 +279,7 @@ async function IsBlockHash(url, param) {
   return false;
 }
 
-async function IsDeployHash(url, param) {
+async function isDeployHash(url, param) {
   if (param.length == 64) {
     try {
       const value = await getDeployFromRPC(url, param);
@@ -291,7 +291,7 @@ async function IsDeployHash(url, param) {
   return false;
 }
 
-async function IsTransferHash(url, param) {
+async function isTransferHash(url, param) {
   if (param.length == 64) {
     try {
       let deploy_info = await getDeployFromRPC(url, param);
@@ -303,11 +303,11 @@ async function IsTransferHash(url, param) {
   return false;
 }
 
-async function IsValidatorAddress(url, param) {
+async function isValidatorAddress(url, param) {
   try {
-    const is_pk = await IsPublicKeyHex(param);
+    const is_pk = await isPublicKeyHex(param);
     if (is_pk) {
-      const auction_info = await GetAllValidator();
+      const auction_info = await getAllValidator();
       let element = auction_info.find((el) => el.public_key_hex == param);
       if (element) {
         return true;
@@ -317,7 +317,7 @@ async function IsValidatorAddress(url, param) {
   return false;
 }
 
-async function IsAccountHash(param) {
+async function isAccountHash(param) {
   try {
     if (param.includes("account-hash-")) {
       return true;
@@ -328,7 +328,7 @@ async function IsAccountHash(param) {
   return false;
 }
 
-async function IsPublicKeyHex(param) {
+async function isPublicKeyHex(param) {
   try {
     await getAccountHash(param);
     return true;
@@ -341,7 +341,7 @@ const getType = async (param) => {
   const imput = param.replace(/\s+/g, "");
   const url = await getNetWorkRPC();
 
-  const is_blockheight = await IsBlockHeight(url, imput);
+  const is_blockheight = await isBlockHeight(url, imput);
   if (is_blockheight) {
     return {
       value: imput,
@@ -349,7 +349,7 @@ const getType = async (param) => {
     };
   }
 
-  const is_block_hash = await IsBlockHash(url, imput);
+  const is_block_hash = await isBlockHash(url, imput);
   if (is_block_hash) {
     return {
       value: imput,
@@ -357,7 +357,7 @@ const getType = async (param) => {
     };
   }
 
-  const is_deploy_hash = await IsDeployHash(url, imput);
+  const is_deploy_hash = await isDeployHash(url, imput);
   if (is_deploy_hash) {
     return {
       value: imput,
@@ -365,7 +365,7 @@ const getType = async (param) => {
     };
   }
 
-  const is_transfer_hash = await IsTransferHash(url, imput);
+  const is_transfer_hash = await isTransferHash(url, imput);
   if (is_transfer_hash) {
     return {
       value: imput,
@@ -373,7 +373,7 @@ const getType = async (param) => {
     };
   }
 
-  const is_validator_address = await IsValidatorAddress(url, imput);
+  const is_validator_address = await isValidatorAddress(url, imput);
   if (is_validator_address) {
     return {
       value: imput,
@@ -381,7 +381,7 @@ const getType = async (param) => {
     };
   }
 
-  const is_account_hash = await IsAccountHash(imput);
+  const is_account_hash = await isAccountHash(imput);
   if (is_account_hash) {
     return {
       value: imput,
@@ -389,7 +389,7 @@ const getType = async (param) => {
     };
   }
 
-  const is_pk_hex = await IsPublicKeyHex(imput);
+  const is_pk_hex = await isPublicKeyHex(imput);
   if (is_pk_hex) {
     return {
       value: imput,
@@ -410,7 +410,7 @@ const getTransfersVolume = async (count) => {
     let the_date = new Date();
     the_date.setDate(datetime.getDate() - i);
     the_date = the_date.toISOString().slice(0, 10);
-    let data = await GetNumberOfTransfersByDate(the_date, the_date);
+    let data = await getNumberOfTransfersByDate(the_date, the_date);
     const paser_data = [
       Math.floor(new Date(the_date).getTime()),
       data.number_of_transfers,
@@ -423,8 +423,8 @@ const getTransfersVolume = async (count) => {
 module.exports = {
   getDeployhashes,
   getDeploy,
-  GetTransfersFromDeploy,
-  GetTransferDetail,
+  getTransfersFromDeploy,
+  getTransferDetail,
   getBlock,
   getTransfersInBlock,
   getType,

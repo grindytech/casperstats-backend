@@ -9,7 +9,7 @@ router.route("/get-balance-state/").get(state_controller.getBalanceState);
 router.route("/query-state/:key").get(state_controller.queryState);
 
 // Auction and staking
-router.route("/get-auction-info").get(state_controller.GetAuctionInfo);
+router.route("/get-auction-info").get(state_controller.getAuctionInfo);
 router
   .route("/get-current-era-validators")
   .get(state_controller.getCurrentEraValidators);
@@ -36,7 +36,7 @@ const verifyGetValidator = (req, res, next) => {
 };
 router
   .route("/get-validator/:address")
-  .get(verifyGetValidator, state_controller.GetValidator);
+  .get(verifyGetValidator, state_controller.getValidator);
 //cache for get-range-delegator
 const verifyGetRangeDelegator = (req, res, next) => {
   try {
@@ -94,6 +94,6 @@ const verifyGetRangeEraRewards = (req, res, next) => {
 router
   .route("/get-range-era-rewards")
   .get(verifyGetRangeEraRewards, state_controller.getRangeEraRewards);
-router.route("/get-fee/:type").get(state_controller.GetLatestTransaction);
+router.route("/get-fee/:type").get(state_controller.getLatestTransaction);
 
 module.exports = router;

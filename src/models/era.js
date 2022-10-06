@@ -167,7 +167,7 @@ async function getPublicKeyRewardByEra(public_key, era) {
   });
 }
 
-async function GetPublicKeyTotalRewardByDate(account, from, to) {
+async function getPublicKeyTotalRewardByDate(account, from, to) {
   return new Promise((resolve, reject) => {
     var sql = `SELECT CAST(SUM(CAST(era.amount AS UNSIGNED INTEGER)) as CHAR) as total_reward FROM era WHERE (validator = '${account}' OR delegator = '${account}') AND timestamp BETWEEN '${from}' AND '${to}'`;
     pool.query(sql, function (err, result) {
@@ -183,7 +183,7 @@ async function GetPublicKeyTotalRewardByDate(account, from, to) {
   });
 }
 
-async function GetTotalDelegator(era) {
+async function getTotalDelegator(era) {
   return new Promise((resolve, reject) => {
     var sql = `SELECT COUNT(DISTINCT validator, delegator) as total_delegators from era WHERE era = ${era}`;
     pool.query(sql, function (err, result) {
@@ -231,7 +231,7 @@ async function getTimestampByEra(era) {
   });
 }
 
-async function GetEraValidatorOfPublicKey(public_key, era) {
+async function getEraValidatorOfPublicKey(public_key, era) {
   return new Promise((resolve, reject) => {
     var sql = `SELECT validator FROM era WHERE ((validator = '${public_key}' AND delegator = "") OR delegator = '${public_key}') AND era = ${era}`;
     pool.query(sql, function (err, result) {
@@ -267,15 +267,15 @@ module.exports = {
   getTotalRewardByPublicKey,
   getTotalRewardByEra,
   getLatestEra,
-  GetPublicKeyTotalRewardByDate,
-  GetTotalDelegator,
+  getPublicKeyTotalRewardByDate,
+  getTotalDelegator,
   getTotalReward,
   getValidatorReward,
   getPublicKeyRewardByDate,
   getPublicKeyRewardByEra,
   getTimestampByEra,
   getLatestEraByDate,
-  GetEraValidatorOfPublicKey,
+  getEraValidatorOfPublicKey,
   getLatestTimestampByPublicKey,
   getRangeEraRewards,
   getDelegatorReward,

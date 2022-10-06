@@ -19,7 +19,7 @@ const pool = mysql.createPool({
   debug: false,
 });
 
-async function CreateValidatorInfoTable() {
+async function createValidatorInfoTable() {
   return new Promise((resolve, reject) => {
     var sql = `CREATE TABLE IF NOT EXISTS validator (public_key VARCHAR(68) NOT NULL PRIMARY KEY, name VARCHAR(50), email VARCHAR(50), icon TEXT, website VARCHAR(200), links VARCHAR(500), details VARCHAR(1000))`;
     validator_pool.query(sql, function (err, result) {
@@ -29,7 +29,7 @@ async function CreateValidatorInfoTable() {
   });
 }
 
-async function InsertValidatorInfo(
+async function insertValidatorInfo(
   public_key,
   name,
   email,
@@ -49,7 +49,7 @@ async function InsertValidatorInfo(
   });
 }
 
-async function DeleteValidatorInfo(public_key) {
+async function deleteValidatorInfo(public_key) {
   return new Promise((resolve, reject) => {
     var sql = `DELETE FROM validator WHERE public_key = '${public_key}'`;
     validator_pool.query(sql, function (err, result) {
@@ -97,7 +97,7 @@ async function getValidatorInfoByName(name) {
   });
 }
 
-async function DropValidatorInfo() {
+async function dropValidatorInfo() {
   return new Promise((resolve, reject) => {
     var sql = "DROP TABLE validator_";
     validator_pool.query(sql, function (err, result) {
@@ -119,7 +119,7 @@ async function getValidatorsInfoWithNameAndPublicKey() {
   });
 }
 
-async function UpdateName(public_key, name) {
+async function updateName(public_key, name) {
   return new Promise((resolve, reject) => {
     var sql = `UPDATE validator SET name = '${name}' WHERE public_key = '${public_key}'`;
     validator_pool.query(sql, function (err, result) {
@@ -131,7 +131,7 @@ async function UpdateName(public_key, name) {
   });
 }
 
-async function UpdateEmail(public_key, email) {
+async function updateEmail(public_key, email) {
   return new Promise((resolve, reject) => {
     var sql = `UPDATE validator SET email = '${email}' WHERE public_key = '${public_key}'`;
     validator_pool.query(sql, function (err, result) {
@@ -143,7 +143,7 @@ async function UpdateEmail(public_key, email) {
   });
 }
 
-async function UpdateWebsite(public_key, website) {
+async function updateWebsite(public_key, website) {
   return new Promise((resolve, reject) => {
     var sql = `UPDATE validator SET website = '${website}' WHERE public_key = '${public_key}'`;
     validator_pool.query(sql, function (err, result) {
@@ -155,7 +155,7 @@ async function UpdateWebsite(public_key, website) {
   });
 }
 
-async function UpdateLinks(public_key, links) {
+async function updateLinks(public_key, links) {
   return new Promise((resolve, reject) => {
     var sql = `UPDATE validator SET links = '${links}' WHERE public_key = '${public_key}'`;
     validator_pool.query(sql, function (err, result) {
@@ -276,17 +276,17 @@ async function getTotalStakeNextEra() {
 }
 
 module.exports = {
-  CreateValidatorInfoTable,
-  InsertValidatorInfo,
+  createValidatorInfoTable,
+  insertValidatorInfo,
   getValidator,
-  DropValidatorInfo,
-  DeleteValidatorInfo,
+  dropValidatorInfo,
+  deleteValidatorInfo,
   getValidatorInfoByName,
   getValidatorsInfoWithNameAndPublicKey,
-  UpdateEmail,
-  UpdateName,
-  UpdateLinks,
-  UpdateWebsite,
+  updateEmail,
+  updateName,
+  updateLinks,
+  updateWebsite,
   getCurrentEraValidator,
   getTotalStakeCurrentEra,
   getTotalStakeNextEra,

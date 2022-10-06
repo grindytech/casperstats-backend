@@ -4,19 +4,19 @@ const { RpcApiName } = require("./constant");
 const common = require("./common");
 const { GetAccounts } = require("../models/account");
 const math = require("mathjs");
-const { GetAllDeployOfPublicKeyByType } = require("../models/deploy");
-const { GetDeployByRPC } = require("./chain");
-const { GetEraByBlockHash } = require("../models/block_model");
-const { GetAllKnownAddress } = require("../models/address");
+const { getAllDeployOfPublicKeyByType } = require("../models/deploy");
+const { getDeployByRPC } = require("./chain");
+const { getEraByBlockHash } = require("../models/block_model");
+const { getAllKnownAddress } = require("../models/address");
 const {
-  GetInflowOfAddressByDate,
-  GetOutflowOfAddressByDate,
+  getInflowOfAddressByDate,
+  getOutflowOfAddressByDate,
 } = require("../models/transfer");
-const { GetAddress } = require("../models/address");
-const { GetValidatorInformation } = require("./validator");
-const { GetAllValidator } = require("../models/validator");
-const { GetAllDelegator } = require("../models/delegator");
-const { GetLatestEra } = require("../models/era_id");
+const { getAddress } = require("../models/address");
+const { getValidatorInformation } = require("./validator");
+const { getAllValidator } = require("../models/validator");
+const { getAllDelegator } = require("../models/delegator");
+const { getLatestEra } = require("../models/era_id");
 const NodeCache = require("node-cache");
 const get_all_accounts_cache = new NodeCache({
   stdTTL: process.env.CACHE_GET_RICH_ACCOUNTS || 3600,
@@ -33,7 +33,7 @@ async function getAccountData(address) {
   // try to get account hash if it's publickey otherwise it's an account hash
   else
     try {
-      account_hash = await common.GetAccountHash(address);
+      account_hash = await common.getAccountHash(address);
       account_hash = "account-hash-" + account_hash.replace(/\n/g, "");
       public_key = address;
     } catch (err) {
@@ -56,7 +56,7 @@ async function getRichestCache() {
     let stakers = []; // stake order
     {
       // get all staking accounts
-      const auction_info = await GetAllValidator();
+      const auction_info = await getAllValidator();
 
       for (let i = 0; i < auction_info.length; i++) {
         stakers.push({
@@ -65,7 +65,7 @@ async function getRichestCache() {
         });
       }
 
-      const delegators = await GetAllDelegator();
+      const delegators = await getAllDelegator();
       for (let j = 0; j < delegators.length; j++) {
         stakers.push({
           public_key_hex: delegators[j].public_key,
@@ -128,7 +128,7 @@ async function getRichest(start, count) {
     let data = get_all_accounts_cache.get(`richest account`);
     result = data.slice(Number(start), Number(start) + Number(count));
   } else {
-    //const url = await common.GetNetWorkRPC();
+    //const url = await common.getNetWorkRPC();
 
     result = await getRichestCache();
     result = result.slice(Number(start), Number(start) + Number(count));
@@ -137,10 +137,10 @@ async function getRichest(start, count) {
   // {
   //     for (let i = 0; i < result.length; i++) {
   //         if (result[i].account_hash == undefined) {
-  //             result[i].account_hash = await common.GetAccountHash(result[i].public_key_hex);
+  //             result[i].account_hash = await common.getAccountHash(result[i].public_key_hex);
 
   //             result[i].active_date = "";
-  //             result[i].transferrable = (await common.GetBalanceByAccountHash(url, "account-hash-" + result[i].account_hash)).balance_value;
+  //             result[i].transferrable = (await common.getBalanceByAccountHash(url, "account-hash-" + result[i].account_hash)).balance_value;
   //             result[i].balance = (Number(result[i].staked_amount) + Number(result[i].transferrable)).toString();
   //         }
   //     }
@@ -149,14 +149,14 @@ async function getRichest(start, count) {
 }
 
 async function getUnstakingAmount(url, public_key) {
-  const deploys = await GetAllDeployOfPublicKeyByType(public_key, "undelegate");
-  const current_era = await GetLatestEra();
+  const deploys = await getAllDeployOfPublicKeyByType(public_key, "undelegate");
+  const current_era = await getLatestEra();
   let total = 0;
   for (let i = 0; i < deploys.length; i++) {
     if (deploys[i].status == "success") {
-      const era_of_creation = await GetEraByBlockHash(deploys[i].hash);
+      const era_of_creation = await getEraByBlockHash(deploys[i].hash);
       if (Number(era_of_creation) + 8 <= Number(current_era)) break;
-      const deploy_data = await GetDeployByRPC(url, deploys[i].deploy_hash);
+      const deploy_data = await getDeployByRPC(url, deploys[i].deploy_hash);
       const args = deploy_data.result.deploy.session.StoredContractByHash.args;
       const amount = args.find((value) => {
         return value[0] == "amount";
@@ -170,11 +170,11 @@ async function getUnstakingAmount(url, public_key) {
 async function getDexAddressesTraffic(type, from, to) {
   let get_traffic;
   if (type == "in") {
-    get_traffic = GetInflowOfAddressByDate;
+    get_traffic = getInflowOfAddressByDate;
   } else {
-    get_traffic = GetOutflowOfAddressByDate;
+    get_traffic = getOutflowOfAddressByDate;
   }
-  let accounts = await GetAllKnownAddress();
+  let accounts = await getAllKnownAddress();
   let traffic_value = {};
   let total = 0;
   for (let i = 0; i < accounts.length; i++) {
@@ -214,17 +214,17 @@ async function getDexAddressesTraffic(type, from, to) {
 }
 
 async function getExchangeVolumeByDate(date) {
-  let accounts = await GetAllKnownAddress();
+  let accounts = await getAllKnownAddress();
   let in_total = 0;
   let out_total = 0;
   for (let i = 0; i < accounts.length; i++) {
-    const in_amount = await GetInflowOfAddressByDate(
+    const in_amount = await getInflowOfAddressByDate(
       accounts[i].account_hash,
       date,
       date
     );
     in_total += Number(in_amount);
-    const out_amount = await GetOutflowOfAddressByDate(
+    const out_amount = await getOutflowOfAddressByDate(
       accounts[i].account_hash,
       date,
       date
@@ -238,11 +238,11 @@ async function getExchangeVolumeByDate(date) {
 }
 
 async function getAccountName(account) {
-  let address_name = await GetAddress(account);
+  let address_name = await getAddress(account);
   if (address_name && address_name.length > 0) {
     return address_name[0].name;
   }
-  let validator_name = await GetValidatorInformation(account);
+  let validator_name = await getValidatorInformation(account);
   if (validator_name) {
     return validator_name.name;
   }

@@ -213,7 +213,7 @@ module.exports = {
       });
   },
 
-  GetAuctionInfo: async function (req, res) {
+  getAuctionInfo: async function (req, res) {
     const block = Number(req.query.block);
     const url = await getNetWorkRPC();
     requestRPC(url, RpcApiName.get_auction_info, [{ Height: block }])
@@ -312,7 +312,7 @@ module.exports = {
     }
   },
 
-  GetValidator: async function (req, res) {
+  getValidator: async function (req, res) {
     try {
       const address = req.params.address;
       const url = await getNetWorkRPC();
@@ -388,7 +388,7 @@ module.exports = {
     }
   },
 
-  GetLatestTransaction: async function (req, res) {
+  getLatestTransaction: async function (req, res) {
     const type = req.params.type;
     try {
       let cost = (await getLatestDeployCostByType(type)).cost;

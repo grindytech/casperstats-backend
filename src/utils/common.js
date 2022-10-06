@@ -69,7 +69,7 @@ async function getAccountHash(address) {
 }
 
 const getBalance = async (url, address) => {
-  let s = await GetLatestStateRootHash(url); // get latest root hash
+  let s = await getLatestStateRootHash(url); // get latest root hash
   try {
     let URef = await queryState(address, s); // URef for address
     let main_purse = URef.result.stored_value.Account.main_purse;
@@ -88,7 +88,7 @@ const getBalance = async (url, address) => {
 };
 
 const getBalanceByAccountHash = async (url, account_hash) => {
-  let s = await GetLatestStateRootHash(url); //Hex-encoded hash of the state root
+  let s = await getLatestStateRootHash(url); //Hex-encoded hash of the state root
 
   const state = await queryState(account_hash, s);
   const main_purse = state.result.stored_value.Account.main_purse;
@@ -109,7 +109,7 @@ const getBalanceByState = async (url, account_hash, s) => {
   return result.result.balance_value;
 };
 
-async function GetAccountData(url, address) {
+async function getAccountData(url, address) {
   const account = {};
   account["balance"] = await getBalance(url, address);
   account["account_hash"] = await getAccountHash(address);
@@ -170,7 +170,7 @@ const requestRPC = async (url, method, params, id = undefined) => {
   });
 };
 
-const GetLatestStateRootHash = async (url) => {
+const getLatestStateRootHash = async (url) => {
   return new Promise((resolve, reject) => {
     requestRPC(url, RpcApiName.get_state_root_hash, [])
       .then((value) => {
@@ -200,7 +200,7 @@ const queryState = async (key, state = "", id = undefined) => {
   const rpc_url = await getNetWorkRPC();
 
   if (state == "") {
-    state = await GetLatestStateRootHash(rpc_url);
+    state = await getLatestStateRootHash(rpc_url);
   }
 
   return new Promise((resolve, reject) => {
@@ -290,10 +290,10 @@ const auth = (user, password) => {
 };
 
 module.exports = {
-  GetAccountData,
+  getAccountData,
   getHeight,
   queryState,
-  GetLatestStateRootHash,
+  getLatestStateRootHash,
   execute,
   getBalance,
   getAccountHash,

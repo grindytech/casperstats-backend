@@ -22,7 +22,7 @@ async function getDeploysByPublicKey(public_key, start, count) {
   });
 }
 
-async function GetAllDeployByPublicKey(public_key) {
+async function getAllDeployByPublicKey(public_key) {
   return new Promise((resolve, reject) => {
     var sql = `SELECT * FROM deploy WHERE public_key = '${public_key}' ORDER BY timestamp DESC`;
     pool.query(sql, function (err, result) {
@@ -58,7 +58,7 @@ async function getDeployOfPublicKeyByType(public_key, type, start, count) {
   });
 }
 
-async function GetAllDeployOfPublicKeyByType(public_key, type) {
+async function getAllDeployOfPublicKeyByType(public_key, type) {
   return new Promise((resolve, reject) => {
     var sql = `SELECT * FROM deploy WHERE public_key = '${public_key}' AND type = '${type}' ORDER BY timestamp DESC`;
     pool.query(sql, function (err, result) {
@@ -86,7 +86,7 @@ async function countDeployByType(public_key, type) {
   });
 }
 
-async function GetDeployByDate(type, from, to) {
+async function getDeployByDate(type, from, to) {
   return new Promise((resolve, reject) => {
     var sql = `SELECT * FROM deploy WHERE type = '${type}' AND (DATE(timestamp) BETWEEN DATE('${from}') AND DATE('${to}'))`;
     pool.query(sql, function (err, result) {
@@ -126,7 +126,7 @@ async function getLatestDeployCostByType(type) {
   });
 }
 
-async function GetLatestDeployByType() {
+async function getLatestDeployByType() {
   return new Promise((resolve, reject) => {
     var sql = `SELECT cost FROM deploy WHERE type = '${type}' AND status = 'success' ORDER BY timestamp DESC LIMIT 1`;
     pool.query(sql, function (err, result) {
@@ -144,13 +144,13 @@ async function GetLatestDeployByType() {
 
 module.exports = {
   getDeploysByPublicKey,
-  GetAllDeployByPublicKey,
+  getAllDeployByPublicKey,
   getAllDeployByHash,
   getDeployOfPublicKeyByType,
   countDeployByType,
-  GetAllDeployOfPublicKeyByType,
-  GetDeployByDate,
+  getAllDeployOfPublicKeyByType,
+  getDeployByDate,
   getLatestDeployCostByType,
-  GetLatestDeployByType,
+  getLatestDeployByType,
   getDeployByDeployHash,
 };

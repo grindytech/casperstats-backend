@@ -34,7 +34,7 @@ async function getDateByEra(era) {
   });
 }
 
-async function GetLatestEra() {
+async function getLatestEra() {
   return new Promise((resolve, reject) => {
     var sql = `SELECT MAX(era) as latest_era FROM era_id`;
     pool.query(sql, function (err, result) {
@@ -49,5 +49,5 @@ async function GetLatestEra() {
 module.exports = {
   gerEraIdByDate,
   getDateByEra,
-  GetLatestEra,
+  getLatestEra,
 };
