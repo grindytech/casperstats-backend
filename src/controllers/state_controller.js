@@ -5,7 +5,7 @@ const {
   getBalanceByAccountHash,
   getBalanceByState,
   getNetWorkRPC,
-} = require("../utils/common");
+} = require("../service/common");
 const {
   getValidators,
   getCurrentEraValidators,
@@ -14,8 +14,8 @@ const {
   getValidatorData,
   getValidatorInformation,
   getRangeBids,
-} = require("../utils/validator");
-const { RpcApiName } = require("../utils/constant");
+} = require("../service/validator");
+const { RpcApiName } = require("../service/constant");
 require("dotenv").config();
 
 const NodeCache = require("node-cache");

@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const validator_controller = require("../controllers/validator_controller");
-const { auth } = require("../utils/common");
+const { auth } = require("../service/common");
 
 function authentication_required(req, res, next) {
   if (

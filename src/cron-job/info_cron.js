@@ -6,7 +6,7 @@ const {
   getTotalRewardCache,
   getBlockchainDataCache,
 } = require("../controllers/info_controller");
-const { CRONJOB_TIME } = require("../utils/constant");
+const { CRONJOB_TIME } = require("../service/constant");
 
 async function start() {
   // Get Stats

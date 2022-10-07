@@ -17,10 +17,10 @@ const {
   getBlock,
   getTransfersInBlock,
   getDeploysInBlock,
-} = require("../utils/chain");
-const common = require("../utils/common");
-const { requestRPC, getNetWorkRPC } = require("../utils/common");
-const { RpcApiName } = require("../utils/constant");
+} = require("../service/chain");
+const common = require("../service/common");
+const { requestRPC, getNetWorkRPC } = require("../service/common");
+const { RpcApiName } = require("../service/constant");
 const request = require("request");
 
 const NodeCache = require("node-cache");

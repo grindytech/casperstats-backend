@@ -3,10 +3,10 @@ const {
   getType,
   getTransfersVolume,
   getDeployFromRPC,
-} = require("../utils/chain");
+} = require("../service/chain");
 
-const { ELEMENT_TYPE } = require("../utils/constant");
-const { execute, getNetWorkRPC } = require("../utils/common");
+const { ELEMENT_TYPE } = require("../service/constant");
+const { execute, getNetWorkRPC } = require("../service/common");
 require("dotenv").config();
 
 const {
@@ -18,11 +18,11 @@ const {
   getVolumeByDate,
 } = require("../models/transfer");
 const CoinGecko = require("coingecko-api");
-const { getAPY } = require("../utils/validator");
+const { getAPY } = require("../service/validator");
 const {
   getDexAddressesTraffic,
   getExchangeVolumeByDate,
-} = require("../utils/account");
+} = require("../service/account");
 const { getTotalReward } = require("../models/era");
 const coinGeckoClient = new CoinGecko();
 

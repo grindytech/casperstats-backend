@@ -1,7 +1,7 @@
 require("dotenv").config();
 const path = require("path");
 const fs = require("fs");
-const { getNetWorkRPC } = require("../utils/common");
+const { getNetWorkRPC } = require("../service/common");
 
 const { CasperClient, CasperServiceByJsonRPC } = require("casper-client-sdk");
 
