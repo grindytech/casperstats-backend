@@ -1,11 +1,11 @@
-const { RpcApiName } = require("../utils/constant");
+const { RpcApiName } = require("../service/constant");
 const {
   getAccountData,
   getRichest,
   getUnstakingAmount,
   getAccountName,
   withoutTime,
-} = require("../utils/account");
+} = require("../service/account");
 const math = require("mathjs");
 require("dotenv").config();
 const {
@@ -27,7 +27,7 @@ const {
   requestRPC,
   getNetWorkRPC,
   getBalanceByAccountHash,
-} = require("../utils/common");
+} = require("../service/common");
 const {
   getValidatorReward,
   getDelegatorReward,
@@ -37,8 +37,8 @@ const {
   getLatestTimestampByPublicKey,
 } = require("../models/era");
 const { gerEraIdByDate } = require("../models/era_id");
-const { getValidatorInformation } = require("../utils/validator");
-const { getDeployByRPC } = require("../utils/chain");
+const { getValidatorInformation } = require("../service/validator");
+const { getDeployByRPC } = require("../service/chain");
 const { getValidator } = require("../models/validator");
 const { getTotalStakeAsDelegator } = require("../models/delegator");
 

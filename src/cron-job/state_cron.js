@@ -4,7 +4,7 @@ const {
   getCurrentEraValidatorsCache,
   getNextEraValidatorsCache,
 } = require("../controllers/state_controller");
-const { CRONJOB_TIME } = require("../utils/constant");
+const { CRONJOB_TIME } = require("../service/constant");
 
 async function start() {
   // Get validator

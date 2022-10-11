@@ -6,7 +6,7 @@ const {
   getTotalRewardCache,
   getBlockchainDataCache,
 } = require("../controllers/info_controller");
-const { CRONJOB_TIME } = require("../utils/constant");
+const { CRONJOB_TIME } = require("../service/constant");
 
 async function start() {
   // Get Stats
@@ -40,6 +40,9 @@ async function start() {
   cronJobGetActiveBid();
   cronJobGetTotalValidator();
   cronJobGetTotalDelegator();
+
+  // Get daily total rewards chart
+  cronJobGetDailyTotalReward();
 }
 
 async function cronJobGetStats() {
@@ -251,6 +254,20 @@ async function cronJobGetTotalDelegator() {
       try {
         await getBlockchainDataCache("delegator");
         console.log("Update get-total-delegator-cache successfull");
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  );
+}
+
+async function cronJobGetDailyTotalReward() {
+  cron.schedule(
+    CRONJOB_TIME.EVERY_1_HOUR_ON_20TH_MINUTE_17TH_SECOND,
+    async function () {
+      try {
+        await getBlockchainDataCache("reward");
+        console.log("Update get-daily-total-rewards-cache successfull");
       } catch (err) {
         console.log(err);
       }

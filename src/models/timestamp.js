@@ -1,5 +1,5 @@
 const mysql = require("mysql");
-const { db_config } = require("../utils/common");
+const { db_config } = require("../service/common");
 
 const pool = mysql.createPool({
   connectionLimit: 100, //important

@@ -1,5 +1,5 @@
 const validator_db = require("../models/validator");
-const { getValidatorInformation } = require("../utils/validator");
+const { getValidatorInformation } = require("../service/validator");
 require("dotenv").config();
 
 module.exports = {

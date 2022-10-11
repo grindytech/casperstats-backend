@@ -1,7 +1,7 @@
 const cron = require("node-cron");
 const { getRangeRichestCache } = require("../controllers/account_controller");
-const { getRichestCache } = require("../utils/account");
-const { CRONJOB_TIME } = require("../utils/constant");
+const { getRichestCache } = require("../service/account");
+const { CRONJOB_TIME } = require("../service/constant");
 
 async function start() {
   // Get richest list

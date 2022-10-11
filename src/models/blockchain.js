@@ -1,5 +1,5 @@
 const Sequelize = require("sequelize");
-const { sequelize } = require("../utils/common");
+const { sequelize } = require("../service/common");
 
 const Blockchain = sequelize.define(
   "blockchain",
