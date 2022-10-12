@@ -4,6 +4,7 @@ const state_cron = require("./state_cron");
 const block_cron = require("./block_cron");
 const transfer_cron = require("./transfer_cron");
 const validator_cron = require("./validator_cron");
+const highcharts_cron = require("./highchart_cron");
 
 async function start() {
   // block_cron
@@ -23,5 +24,8 @@ async function start() {
 
   // validator_cron
   validator_cron.start();
+
+  // hightcharts_cron
+  highcharts_cron.start();
 }
 module.exports = { start };
