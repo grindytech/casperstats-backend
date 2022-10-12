@@ -3,6 +3,7 @@ const cors = require("cors");
 const routes = require("./routes");
 const bodyParser = require("body-parser");
 const cron = require("./cron-job");
+const highcharts = require("./highcharts");
 
 require("dotenv").config();
 
@@ -44,7 +45,7 @@ app.use(express.json());
 app.use(routes);
 
 cron.start();
-
+highcharts.generateChartsIntoImage("staking");
 app.listen(PORT, HOST, () => {
   console.log(`Server is running on port: ${PORT} ${HOST}`);
 });
