@@ -1,5 +1,6 @@
 const chartExporter = require("highcharts-export-server");
 const { stakingChart } = require("./staking_chart");
+const { transferChart } = require("./transfer_chart");
 require("dotenv").config();
 
 async function generateChartsIntoImage(type) {
@@ -7,6 +8,9 @@ async function generateChartsIntoImage(type) {
 
   if (type === "staking") {
     charOption = await stakingChart();
+  }
+  if (type === "transfer") {
+    charOption = await transferChart();
   }
 
   // Initialize the exporter
