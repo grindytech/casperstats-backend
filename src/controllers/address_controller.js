@@ -3,23 +3,21 @@ const { getAccountHash } = require("../service/common");
 require("dotenv").config();
 
 module.exports = {
-  GetAddress: async function (req, res) {
+  getAddress: async function (req, res) {
     const address = req.params.address;
-    address_db
-      .GetAddress(address)
-      .then((value) => {
-        if (value.length == 1) {
-          res.status(200).json(value[0]);
-        } else {
-          res.status(200).json({});
-        }
-      })
-      .catch((err) => {
-        res.status(500).json({ error: "Can not get address" });
-      });
+    try {
+      const value = await address_db.getAddress(address);
+      if (value.length == 1) {
+        res.status(200).json(value[0]);
+      } else {
+        res.status(200).json({});
+      }
+    } catch (err) {
+      res.status(500).json({ error: "Can not get address" });
+    }
   },
 
-  AddAddress: async function (req, res) {
+  addAddress: async function (req, res) {
     const public_key = req.body.public_key;
     const name = req.body.name;
     let account_hash = req.body.account_hash;
@@ -28,54 +26,47 @@ module.exports = {
       account_hash = await getAccountHash(public_key);
     }
 
-    address_db
-      .InsertAddress(public_key, account_hash, name)
-      .then((value) => {
-        res.status(200).json(value);
-      })
-      .catch((err) => {
-        console.log(err);
-        res.status(500).send({ error: "Can not insert new address" });
-      });
+    try {
+      await address_db.insertAddress(public_key, account_hash, name);
+      res.status(200).json({ message: "Insert address successfully" });
+    } catch (err) {
+      console.log(err);
+      res.status(500).send({ error: "Can not insert new address" });
+    }
   },
 
-  UpdateAddress: async function (req, res) {
+  updateAddress: async function (req, res) {
     const public_key = req.body.public_key;
   },
 
-  DeleteAddress: async function (req, res) {
+  deleteAddress: async function (req, res) {
     const address = req.params.address;
-    address_db
-      .DeleteAddress(address)
-      .then((value) => {
-        res.status(200).json(value);
-      })
-      .catch((err) => {
-        res.status(500).send("Can not delete account");
-      });
+    try {
+      await address_db.deleteAddress(address);
+      res.status(200).json({ message: "Delete account successfully" });
+    } catch (err) {
+      console.log(err);
+      res.status(500).send("Can not delete account");
+    }
   },
 
-  Init: async function (req, res) {
-    address_db
-      .CreateAddressTable()
-      .then((value) => {
-        res.status(200).json(value);
-      })
-      .catch((err) => {
-        console.log(err);
-        res.status(500).send("Can not create address table");
-      });
+  init: async function (req, res) {
+    try {
+      await address_db.createAddressTable();
+      res.status(200).json({ message: "Create address table successfully" });
+    } catch (err) {
+      console.log(err);
+      res.status(500).send("Can not create address table");
+    }
   },
 
-  Drop: async function (req, res) {
-    address_db
-      .DropAddress()
-      .then((value) => {
-        res.status(200).json(value);
-      })
-      .catch((err) => {
-        console.log(err);
-        res.status(500).send("Can not drop address table");
-      });
+  drop: async function (req, res) {
+    try {
+      await address_db.dropAddress();
+      res.status(200).json({ message: "Drop address table successfully" });
+    } catch (err) {
+      console.log(err);
+      res.status(500).send("Can not drop address table");
+    }
   },
 };

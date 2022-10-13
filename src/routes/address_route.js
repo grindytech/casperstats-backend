@@ -32,17 +32,17 @@ function authentication_required(req, res, next) {
   }
 }
 
-router.route("/get/:address").get(address_controller.GetAddress);
+router.route("/get/:address").get(address_controller.getAddress);
 router
   .route("/update")
-  .post(authentication_required, address_controller.UpdateAddress);
+  .post(authentication_required, address_controller.updateAddress);
 router
   .route("/add")
-  .post(authentication_required, address_controller.AddAddress);
+  .post(authentication_required, address_controller.addAddress);
 router
   .route("/delete/:address")
-  .get(authentication_required, address_controller.DeleteAddress);
-router.route("/init").get(authentication_required, address_controller.Init);
-router.route("/drop").get(authentication_required, address_controller.Drop);
+  .get(authentication_required, address_controller.deleteAddress);
+router.route("/init").get(authentication_required, address_controller.init);
+router.route("/drop").get(authentication_required, address_controller.drop);
 
 module.exports = router;
