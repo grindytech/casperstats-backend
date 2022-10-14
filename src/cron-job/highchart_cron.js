@@ -9,6 +9,9 @@ async function start() {
   // Generate daily transfers chart
   cronJobTransferChart();
 
+  // Generate daliy deploys chart
+  cronJobDeployChart();
+
   // Generate daily prices chart
   cronJobPriceChart();
 }
@@ -28,6 +31,17 @@ async function cronJobTransferChart() {
     CRONJOB_TIME.EVERY_1_HOUR_ON_10TH_MINUTE_6TH_SECOND,
     async function () {
       await highcharts.generateChartsIntoImage("transfer");
+      console.log("generate daily transfer chart successfully");
+    }
+  );
+}
+
+async function cronJobDeployChart() {
+  await highcharts.generateChartsIntoImage("deploy");
+  cron.schedule(
+    CRONJOB_TIME.EVERY_1_HOUR_ON_10TH_MINUTE_9TH_SECOND,
+    async function () {
+      await highcharts.generateChartsIntoImage("deploy");
       console.log("generate daily transfer chart successfully");
     }
   );

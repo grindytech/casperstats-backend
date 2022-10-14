@@ -11,7 +11,6 @@ async function priceChart() {
     series: [
       {
         data: data.reverse(),
-        name: "CSPR to USD",
       },
     ],
     legend: {

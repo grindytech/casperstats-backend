@@ -1,9 +1,9 @@
 const { getBlockchainDataCache } = require("../controllers/info_controller");
 
-async function transferChart() {
+async function deployChart() {
   // Get data daily transfer volume and number of transfers
-  let transfer = await getBlockchainDataCache("transfer");
-  let transfer_tx = await getBlockchainDataCache("transfer_tx");
+  let deploy = await getBlockchainDataCache("deploy");
+  let deploy_tx = await getBlockchainDataCache("deploy_tx");
 
   let chartOption = {
     chart: {
@@ -20,11 +20,11 @@ async function transferChart() {
     colors: ["#B6B6B4"],
     series: [
       {
-        data: transfer_tx.reverse(),
+        data: deploy_tx.reverse(),
       },
       {
         type: "column",
-        data: transfer.reverse(),
+        data: deploy.reverse(),
         yAxis: 1,
       },
     ],
@@ -34,7 +34,7 @@ async function transferChart() {
     yAxis: [
       {
         title: {
-          text: "Number of transfers",
+          text: "Number of deploys",
         },
         labels: {
           align: "center",
@@ -61,4 +61,4 @@ async function transferChart() {
   return chartOption;
 }
 
-module.exports = { transferChart };
+module.exports = { deployChart };
