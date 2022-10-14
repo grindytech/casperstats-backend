@@ -57,8 +57,8 @@ async function stakingChart() {
         labels: {
           align: "center",
         },
-        top: "90%",
-        height: "10%",
+        top: "85%",
+        height: "15%",
         offset: 0,
       },
     ],
