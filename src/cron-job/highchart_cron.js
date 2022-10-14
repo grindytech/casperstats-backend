@@ -14,6 +14,12 @@ async function start() {
 
   // Generate daily prices chart
   cronJobPriceChart();
+
+  // Generate daily total volumes chart
+  cronJobTotalVolumeChart();
+
+  // Generate daily market caps chart
+  cronJobMarketCapChart();
 }
 
 async function cronJobStakingChart() {
@@ -37,12 +43,11 @@ async function cronJobTransferChart() {
 }
 
 async function cronJobDeployChart() {
-  await highcharts.generateChartsIntoImage("deploy");
   cron.schedule(
     CRONJOB_TIME.EVERY_1_HOUR_ON_10TH_MINUTE_9TH_SECOND,
     async function () {
       await highcharts.generateChartsIntoImage("deploy");
-      console.log("generate daily transfer chart successfully");
+      console.log("generate daily deploys chart successfully");
     }
   );
 }
@@ -52,7 +57,27 @@ async function cronJobPriceChart() {
     CRONJOB_TIME.EVERY_1_HOUR_ON_10TH_MINUTE_7TH_SECOND,
     async function () {
       await highcharts.generateChartsIntoImage("price");
-      console.log("generate daily transfer chart successfully");
+      console.log("generate daily prices chart successfully");
+    }
+  );
+}
+
+async function cronJobTotalVolumeChart() {
+  cron.schedule(
+    CRONJOB_TIME.EVERY_1_HOUR_ON_10TH_MINUTE_8TH_SECOND,
+    async function () {
+      await highcharts.generateChartsIntoImage("total_volume");
+      console.log("generate daily total volume chart successfully");
+    }
+  );
+}
+
+async function cronJobMarketCapChart() {
+  cron.schedule(
+    CRONJOB_TIME.EVERY_1_HOUR_ON_15TH_MINUTE_10TH_SECOND,
+    async function () {
+      await highcharts.generateChartsIntoImage("market_cap");
+      console.log("generate daily market caps chart successfully");
     }
   );
 }

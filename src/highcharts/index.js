@@ -1,7 +1,9 @@
 const chartExporter = require("highcharts-export-server");
 const { deployChart } = require("./deploy_chart");
+const { marketCapChart } = require("./marketCap_chart");
 const { priceChart } = require("./price_chart");
 const { stakingChart } = require("./staking_chart");
+const { totalVolumeChart } = require("./totalVolume_chart");
 const { transferChart } = require("./transfer_chart");
 require("dotenv").config();
 
@@ -19,6 +21,12 @@ async function generateChartsIntoImage(type) {
   }
   if (type === "price") {
     charOption = await priceChart();
+  }
+  if (type === "total_volume") {
+    charOption = await totalVolumeChart();
+  }
+  if (type === "market_cap") {
+    charOption = await marketCapChart();
   }
 
   // Initialize the exporter
