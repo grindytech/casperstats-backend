@@ -26,6 +26,9 @@ async function start() {
 
   // Generate daily delegator chart
   cronJobDelegatorChart();
+
+  // Generate daily supply growth chart
+  cronJobSupplyGrowthChart();
 }
 
 async function cronJobStakingChart() {
@@ -100,7 +103,17 @@ async function cronJobDelegatorChart() {
     CRONJOB_TIME.AT_0_OCLOCK_IN_THE_7TH_SECOND_EVERYDAY,
     async function () {
       await highcharts.generateChartsIntoImage(TYPE_CHART.delegator);
-      console.log("generate daily validators chart successfully");
+      console.log("generate daily delegators chart successfully");
+    }
+  );
+}
+
+async function cronJobSupplyGrowthChart() {
+  cron.schedule(
+    CRONJOB_TIME.AT_0_OCLOCK_IN_THE_8TH_SECOND_EVERYDAY,
+    async function () {
+      await highcharts.generateChartsIntoImage(TYPE_CHART.total_supply);
+      console.log("generate daily supply growth chart successfully");
     }
   );
 }

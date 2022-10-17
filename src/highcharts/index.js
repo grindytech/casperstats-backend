@@ -5,50 +5,47 @@ const { deployChart } = require("./deploy_chart");
 const { marketCapChart } = require("./marketCap_chart");
 const { priceChart } = require("./price_chart");
 const { stakingChart } = require("./staking_chart");
+const { totalSupplyChart } = require("./supplyGrowth_chart");
 const { totalVolumeChart } = require("./totalVolume_chart");
 const { transferChart } = require("./transfer_chart");
 const { validatorChart } = require("./validator_chart");
 require("dotenv").config();
 
-async function generateChartsIntoImage(type) {
-  let charOption;
+// Get type of charts
+const CHARTS = {};
+CHARTS[TYPE_CHART.staking] = stakingChart;
+CHARTS[TYPE_CHART.transfer] = transferChart;
+CHARTS[TYPE_CHART.deploy] = deployChart;
+CHARTS[TYPE_CHART.price] = priceChart;
+CHARTS[TYPE_CHART.total_volume] = totalVolumeChart;
+CHARTS[TYPE_CHART.market_cap] = marketCapChart;
+CHARTS[TYPE_CHART.validator] = validatorChart;
+CHARTS[TYPE_CHART.delegator] = delegatorChart;
+CHARTS[TYPE_CHART.total_supply] = totalSupplyChart;
+async function getTypeChart(type) {
+  let result = {};
+  result = await CHARTS[type]();
+  return result;
+}
 
-  if (type === TYPE_CHART.staking) {
-    charOption = await stakingChart();
-  }
-  if (type === TYPE_CHART.transfer) {
-    charOption = await transferChart();
-  }
-  if (type === TYPE_CHART.deploy) {
-    charOption = await deployChart();
-  }
-  if (type === TYPE_CHART.price) {
-    charOption = await priceChart();
-  }
-  if (type === TYPE_CHART.total_volume) {
-    charOption = await totalVolumeChart();
-  }
-  if (type === TYPE_CHART.market_cap) {
-    charOption = await marketCapChart();
-  }
-  if (type === TYPE_CHART.validator) {
-    charOption = await validatorChart();
-  }
-  if (type === TYPE_CHART.delegator) {
-    charOption = await delegatorChart();
-  }
+async function generateChartsIntoImage(type) {
+  let charOption = await getTypeChart(type);
+  console.log(JSON.stringify(charOption.series));
 
   // Initialize the exporter
   chartExporter.initPool();
 
   // Export chart using these options
-  chartExporter.export(
+  await chartExporter.export(
     {
       type: "svg",
       options: charOption,
-      outfile: process.env.CHART_ASSETS_URL + `${type}.svg`,
+      outfile: `${type}.svg`,
     },
     (err, res) => {
+      if (err) {
+        console.log(err);
+      }
       console.log(
         `The chart has been succesfully generated at ${res.filename}!`
       );

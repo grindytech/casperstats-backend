@@ -36,6 +36,7 @@ const TYPE_CHART = {
   active_bid: "active_bid",
   validator: "validator",
   delegator: "delegator",
+  total_supply: "total_supply",
 };
 
 const CRONJOB_TIME = {
@@ -64,6 +65,7 @@ const CRONJOB_TIME = {
   AT_0_OCLOCK_IN_THE_5TH_SECOND_EVERYDAY: "5 0 0 * * *",
   AT_0_OCLOCK_IN_THE_6TH_SECOND_EVERYDAY: "6 0 0 * * *",
   AT_0_OCLOCK_IN_THE_7TH_SECOND_EVERYDAY: "7 0 0 * * *",
+  AT_0_OCLOCK_IN_THE_8TH_SECOND_EVERYDAY: "8 0 0 * * *",
 };
 
 module.exports = { RpcApiName, ELEMENT_TYPE, CRONJOB_TIME, TYPE_CHART };
