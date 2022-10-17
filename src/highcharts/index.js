@@ -5,6 +5,7 @@ const { priceChart } = require("./price_chart");
 const { stakingChart } = require("./staking_chart");
 const { totalVolumeChart } = require("./totalVolume_chart");
 const { transferChart } = require("./transfer_chart");
+const { validatorChart } = require("./validator_chart");
 require("dotenv").config();
 
 async function generateChartsIntoImage(type) {
@@ -27,6 +28,9 @@ async function generateChartsIntoImage(type) {
   }
   if (type === "market_cap") {
     charOption = await marketCapChart();
+  }
+  if (type === "validator") {
+    charOption = await validatorChart();
   }
 
   // Initialize the exporter

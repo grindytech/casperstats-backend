@@ -20,6 +20,9 @@ async function start() {
 
   // Generate daily market caps chart
   cronJobMarketCapChart();
+
+  // Generate daily auction info chart
+  cronJobValidatorChart();
 }
 
 async function cronJobStakingChart() {
@@ -78,6 +81,16 @@ async function cronJobMarketCapChart() {
     async function () {
       await highcharts.generateChartsIntoImage("market_cap");
       console.log("generate daily market caps chart successfully");
+    }
+  );
+}
+
+async function cronJobValidatorChart() {
+  cron.schedule(
+    CRONJOB_TIME.EVERY_1_HOUR_ON_15TH_MINUTE_8TH_SECOND,
+    async function () {
+      await highcharts.generateChartsIntoImage("validator");
+      console.log("generate daily validators chart successfully");
     }
   );
 }
