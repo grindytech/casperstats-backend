@@ -1,8 +1,9 @@
 const { getBlockchainDataCache } = require("../controllers/info_controller");
+const { TYPE_CHART } = require("../service/constant");
 
 async function marketCapChart() {
   // Get daily data of prices
-  const data = await getBlockchainDataCache("market_cap");
+  const data = await getBlockchainDataCache(TYPE_CHART.market_cap);
 
   let chartOption = {
     title: {

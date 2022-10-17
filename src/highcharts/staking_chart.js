@@ -1,11 +1,12 @@
 const { getBlockchainDataCache } = require("../controllers/info_controller");
+const { TYPE_CHART } = require("../service/constant");
 
 async function stakingChart() {
   // Get transfer volume
-  let staking = await getBlockchainDataCache("staking");
-  let staking_tx = await getBlockchainDataCache("staking_tx");
-  let unstaking = await getBlockchainDataCache("unstaking");
-  let unstaking_tx = await getBlockchainDataCache("unstaking_tx");
+  let staking = await getBlockchainDataCache(TYPE_CHART.staking);
+  let staking_tx = await getBlockchainDataCache(TYPE_CHART.staking_tx);
+  let unstaking = await getBlockchainDataCache(TYPE_CHART.unstaking);
+  let unstaking_tx = await getBlockchainDataCache(TYPE_CHART.unstaking_tx);
 
   let chartOption = {
     chart: {

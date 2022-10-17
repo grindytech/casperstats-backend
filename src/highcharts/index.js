@@ -1,4 +1,6 @@
 const chartExporter = require("highcharts-export-server");
+const { TYPE_CHART } = require("../service/constant");
+const { delegatorChart } = require("./delegator_chart");
 const { deployChart } = require("./deploy_chart");
 const { marketCapChart } = require("./marketCap_chart");
 const { priceChart } = require("./price_chart");
@@ -11,26 +13,29 @@ require("dotenv").config();
 async function generateChartsIntoImage(type) {
   let charOption;
 
-  if (type === "staking") {
+  if (type === TYPE_CHART.staking) {
     charOption = await stakingChart();
   }
-  if (type === "transfer") {
+  if (type === TYPE_CHART.transfer) {
     charOption = await transferChart();
   }
-  if (type === "deploy") {
+  if (type === TYPE_CHART.deploy) {
     charOption = await deployChart();
   }
-  if (type === "price") {
+  if (type === TYPE_CHART.price) {
     charOption = await priceChart();
   }
-  if (type === "total_volume") {
+  if (type === TYPE_CHART.total_volume) {
     charOption = await totalVolumeChart();
   }
-  if (type === "market_cap") {
+  if (type === TYPE_CHART.market_cap) {
     charOption = await marketCapChart();
   }
-  if (type === "validator") {
+  if (type === TYPE_CHART.validator) {
     charOption = await validatorChart();
+  }
+  if (type === TYPE_CHART.delegator) {
+    charOption = await delegatorChart();
   }
 
   // Initialize the exporter

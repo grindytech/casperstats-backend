@@ -1,22 +1,16 @@
 const { getBlockchainDataCache } = require("../controllers/info_controller");
 const { TYPE_CHART } = require("../service/constant");
 
-async function totalVolumeChart() {
-  // Get daily data of prices
-  const data = await getBlockchainDataCache(TYPE_CHART.total_volume);
+async function delegatorChart() {
+  // Get data of auction info
+  let delegators = await getBlockchainDataCache(TYPE_CHART.delegator);
 
   let chartOption = {
-    title: {
-      text: "",
-    },
-    series: [
-      {
-        type: "area",
-        data: data.reverse(),
-      },
-    ],
     legend: {
       enabled: false,
+    },
+    title: {
+      text: "",
     },
     colors: ["#B6B6B4"],
     plotOptions: {
@@ -35,12 +29,21 @@ async function totalVolumeChart() {
         },
       },
     },
+    series: [
+      {
+        type: "area",
+        data: delegators.reverse(),
+      },
+    ],
     xAxis: {
       type: "datetime",
     },
     yAxis: {
       title: {
-        text: "Total volumes",
+        text: "Number of delegators",
+      },
+      labels: {
+        align: "center",
       },
     },
   };
@@ -48,4 +51,4 @@ async function totalVolumeChart() {
   return chartOption;
 }
 
-module.exports = { totalVolumeChart };
+module.exports = { delegatorChart };

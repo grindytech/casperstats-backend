@@ -1,10 +1,11 @@
 const { getBlockchainDataCache } = require("../controllers/info_controller");
+const { TYPE_CHART } = require("../service/constant");
 
 async function validatorChart() {
   // Get data of auction info
-  let bids = await getBlockchainDataCache("bid");
-  let active_bids = await getBlockchainDataCache("active_bid");
-  let validators = await getBlockchainDataCache("validator");
+  let bids = await getBlockchainDataCache(TYPE_CHART.bid);
+  let active_bids = await getBlockchainDataCache(TYPE_CHART.active_bid);
+  let validators = await getBlockchainDataCache(TYPE_CHART.validator);
 
   let chartOption = {
     legend: {
@@ -43,6 +44,14 @@ async function validatorChart() {
     ],
     xAxis: {
       type: "datetime",
+    },
+    yAxis: {
+      title: {
+        text: "",
+      },
+      labels: {
+        align: "center",
+      },
     },
   };
 

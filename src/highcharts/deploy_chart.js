@@ -1,9 +1,10 @@
 const { getBlockchainDataCache } = require("../controllers/info_controller");
+const { TYPE_CHART } = require("../service/constant");
 
 async function deployChart() {
   // Get data daily transfer volume and number of transfers
-  let deploy = await getBlockchainDataCache("deploy");
-  let deploy_tx = await getBlockchainDataCache("deploy_tx");
+  let deploy = await getBlockchainDataCache(TYPE_CHART.deploy);
+  let deploy_tx = await getBlockchainDataCache(TYPE_CHART.deploy_tx);
 
   let chartOption = {
     chart: {
