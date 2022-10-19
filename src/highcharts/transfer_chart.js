@@ -1,40 +1,13 @@
 const { getBlockchainDataCache } = require("../controllers/info_controller");
+const { chart_config } = require("../service/common");
 const { TYPE_CHART } = require("../service/constant");
 
 async function transferChart() {
   // Get data daily transfer volume and number of transfers
-  let transfer = await getBlockchainDataCache(TYPE_CHART.transfer);
-  let transfer_tx = await getBlockchainDataCache(TYPE_CHART.transfer_tx);
+  const transfer = await getBlockchainDataCache(TYPE_CHART.transfer);
+  const transfer_tx = await getBlockchainDataCache(TYPE_CHART.transfer_tx);
 
-  let chartOption = {
-    chart: {
-      numberFormatter(v) {
-        return numeral(v).format("0.[00] a");
-      },
-    },
-    legend: {
-      enabled: false,
-    },
-    title: {
-      text: "",
-    },
-    colors: ["#B6B6B4"],
-    plotOptions: {
-      area: {
-        fillColor: {
-          linearGradient: {
-            x1: 0,
-            y1: 0,
-            x2: 0,
-            y2: 1.3,
-          },
-          stops: [
-            [0, "rgba(0, 0, 0, 0.2)"],
-            [1, "rgba(255,255,255,0)"],
-          ],
-        },
-      },
-    },
+  const option = {
     series: [
       {
         type: "area",
@@ -46,9 +19,6 @@ async function transferChart() {
         yAxis: 1,
       },
     ],
-    xAxis: {
-      type: "datetime",
-    },
     yAxis: [
       {
         title: {
@@ -75,6 +45,8 @@ async function transferChart() {
       },
     ],
   };
+
+  const chartOption = chart_config(option);
 
   return chartOption;
 }

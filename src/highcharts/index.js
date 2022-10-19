@@ -30,7 +30,6 @@ async function getTypeChart(type) {
 
 async function generateChartsIntoImage(type) {
   let charOption = await getTypeChart(type);
-  console.log(JSON.stringify(charOption.series));
 
   // Initialize the exporter
   chartExporter.initPool();
@@ -40,7 +39,7 @@ async function generateChartsIntoImage(type) {
     {
       type: "svg",
       options: charOption,
-      outfile: `${type}.svg`,
+      outfile: process.env.CHART_ASSETS_URL + `${type}.svg`,
     },
     (err, res) => {
       if (err) {

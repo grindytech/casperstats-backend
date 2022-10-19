@@ -1,36 +1,14 @@
 const { getBlockchainDataCache } = require("../controllers/info_controller");
+const { chart_config } = require("../service/common");
 const { TYPE_CHART } = require("../service/constant");
 
 async function validatorChart() {
   // Get data of auction info
-  let bids = await getBlockchainDataCache(TYPE_CHART.bid);
-  let active_bids = await getBlockchainDataCache(TYPE_CHART.active_bid);
-  let validators = await getBlockchainDataCache(TYPE_CHART.validator);
+  const bids = await getBlockchainDataCache(TYPE_CHART.bid);
+  const active_bids = await getBlockchainDataCache(TYPE_CHART.active_bid);
+  const validators = await getBlockchainDataCache(TYPE_CHART.validator);
 
-  let chartOption = {
-    legend: {
-      enabled: false,
-    },
-    title: {
-      text: "",
-    },
-    colors: ["#B6B6B4"],
-    plotOptions: {
-      area: {
-        fillColor: {
-          linearGradient: {
-            x1: 0,
-            y1: 0,
-            x2: 0,
-            y2: 1.3,
-          },
-          stops: [
-            [0, "rgba(0, 0, 0, 0.2)"],
-            [1, "rgba(255,255,255,0)"],
-          ],
-        },
-      },
-    },
+  const option = {
     series: [
       {
         data: bids.reverse(),
@@ -42,9 +20,6 @@ async function validatorChart() {
         data: validators.reverse(),
       },
     ],
-    xAxis: {
-      type: "datetime",
-    },
     yAxis: {
       title: {
         text: "",
@@ -54,6 +29,8 @@ async function validatorChart() {
       },
     },
   };
+
+  const chartOption = chart_config(option);
 
   return chartOption;
 }

@@ -1,26 +1,15 @@
 const { getBlockchainDataCache } = require("../controllers/info_controller");
+const { chart_config } = require("../service/common");
 const { TYPE_CHART } = require("../service/constant");
 
 async function stakingChart() {
   // Get transfer volume
-  let staking = await getBlockchainDataCache(TYPE_CHART.staking);
-  let staking_tx = await getBlockchainDataCache(TYPE_CHART.staking_tx);
-  let unstaking = await getBlockchainDataCache(TYPE_CHART.unstaking);
-  let unstaking_tx = await getBlockchainDataCache(TYPE_CHART.unstaking_tx);
+  const staking = await getBlockchainDataCache(TYPE_CHART.staking);
+  const staking_tx = await getBlockchainDataCache(TYPE_CHART.staking_tx);
+  const unstaking = await getBlockchainDataCache(TYPE_CHART.unstaking);
+  const unstaking_tx = await getBlockchainDataCache(TYPE_CHART.unstaking_tx);
 
-  let chartOption = {
-    chart: {
-      numberFormatter(v) {
-        return numeral(v).format("0.[00] a");
-      },
-    },
-    legend: {
-      enabled: false,
-    },
-    title: {
-      text: "",
-    },
-    colors: ["#B6B6B4"],
+  const option = {
     series: [
       {
         data: staking_tx.reverse(),
@@ -39,9 +28,6 @@ async function stakingChart() {
         yAxis: 1,
       },
     ],
-    xAxis: {
-      type: "datetime",
-    },
     yAxis: [
       {
         title: false,
@@ -64,6 +50,8 @@ async function stakingChart() {
       },
     ],
   };
+
+  const chartOption = chart_config(option);
 
   return chartOption;
 }
