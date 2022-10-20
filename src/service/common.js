@@ -45,6 +45,61 @@ const sequelize = new Sequelize(
   }
 );
 
+const common_option = (option) => {
+  return {
+    series: [
+      {
+        type: "area",
+        data: option.data.reverse(),
+      },
+    ],
+    yAxis: {
+      title: {
+        text: option.title,
+      },
+    },
+  };
+};
+
+const chart_config = (option) => {
+  return {
+    chart: {
+      numberFormatter(v) {
+        return numeral(v).format("0.[00] a");
+      },
+    },
+    legend: {
+      enabled: false,
+    },
+    title: {
+      text: "",
+    },
+    colors: ["#B6B6B4"],
+    plotOptions: {
+      area: {
+        fillColor: {
+          linearGradient: {
+            x1: 0,
+            y1: 0,
+            x2: 0,
+            y2: 1.3,
+          },
+          stops: [
+            [0, "rgba(0, 0, 0, 0.2)"],
+            [1, "rgba(255,255,255,0)"],
+          ],
+        },
+        threshold: null,
+      },
+    },
+    series: option.series,
+    xAxis: {
+      type: "datetime",
+    },
+    yAxis: option.yAxis,
+  };
+};
+
 async function getAccountHash(address) {
   return new Promise((resolve, reject) => {
     let command = `${process.env.CASPER_CLIENT} account-address`;
@@ -305,4 +360,6 @@ module.exports = {
   auth,
   getEra,
   sequelize,
+  chart_config,
+  common_option,
 };

@@ -20,6 +20,25 @@ const ELEMENT_TYPE = {
   UNKNOWN: "UNKNOWN",
 };
 
+const TYPE_CHART = {
+  staking: "staking",
+  staking_tx: "staking_tx",
+  unstaking: "unstaking",
+  unstaking_tx: "unstaking_tx",
+  transfer: "transfer",
+  transfer_tx: "transfer_tx",
+  deploy: "deploy",
+  deploy_tx: "deploy_tx",
+  price: "price",
+  total_volume: "total_volume",
+  market_cap: "market_cap",
+  bid: "bid",
+  active_bid: "active_bid",
+  validator: "validator",
+  delegator: "delegator",
+  total_supply: "total_supply",
+};
+
 const CRONJOB_TIME = {
   EVERY_4_SECONDS: "*/4 * * * * *",
   EVERY_20_SECONDS: "*/20 * * * * *",
@@ -35,8 +54,18 @@ const CRONJOB_TIME = {
   EVERY_1_HOUR_ON_10TH_MINUTE_6TH_SECOND: "6 10 * * * *",
   EVERY_1_HOUR_ON_10TH_MINUTE_7TH_SECOND: "7 10 * * * *",
   EVERY_1_HOUR_ON_15TH_MINUTE_8TH_SECOND: "8 15 * * * *",
+  EVERY_1_HOUR_ON_15TH_MINUTE_10TH_SECOND: "10 15 * * * *",
   EVERY_1_HOUR_ON_20TH_MINUTE_15TH_SECOND: "15 20 * * * *",
   EVERY_1_HOUR_ON_20TH_MINUTE_17TH_SECOND: "17 20 * * * *",
+  AT_0_OCLOCK_EVERYDAY: "0 0 0 * * *",
+  AT_0_OCLOCK_IN_THE_1ST_SECOND_EVERYDAY: "1 0 0 * * *",
+  AT_0_OCLOCK_IN_THE_2ND_SECOND_EVERYDAY: "2 0 0 * * *",
+  AT_0_OCLOCK_IN_THE_3RD_SECOND_EVERYDAY: "3 0 0 * * *",
+  AT_0_OCLOCK_IN_THE_4TH_SECOND_EVERYDAY: "4 0 0 * * *",
+  AT_0_OCLOCK_IN_THE_5TH_SECOND_EVERYDAY: "5 0 0 * * *",
+  AT_0_OCLOCK_IN_THE_6TH_SECOND_EVERYDAY: "6 0 0 * * *",
+  AT_0_OCLOCK_IN_THE_7TH_SECOND_EVERYDAY: "7 0 0 * * *",
+  AT_0_OCLOCK_IN_THE_8TH_SECOND_EVERYDAY: "8 0 0 * * *",
 };
 
-module.exports = { RpcApiName, ELEMENT_TYPE, CRONJOB_TIME };
+module.exports = { RpcApiName, ELEMENT_TYPE, CRONJOB_TIME, TYPE_CHART };

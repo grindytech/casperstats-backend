@@ -9,24 +9,7 @@ router
   .route("/get-circulating-supply/")
   .get(info_controller.getCirculatingSupply);
 router.route("/get-supply/").get(info_controller.getSupply);
-
-// cache for get blockchain data
-const verifyBlockchainData = (req, res, next) => {
-  try {
-    const type = req.query.type;
-    if (info_controller.blockchain_data_cache.has(`${type}`)) {
-      return res
-        .status(200)
-        .json(info_controller.blockchain_data_cache.get(`${type}`));
-    }
-    return next();
-  } catch (err) {
-    throw new Error(err);
-  }
-};
-router
-  .route("/get-blockchain-data")
-  .get(verifyBlockchainData, info_controller.getBlockchainData);
+router.route("/get-blockchain-data").get(info_controller.getBlockchainData);
 
 // cache for daily volume
 const verifyGetVolume = (req, res, next) => {

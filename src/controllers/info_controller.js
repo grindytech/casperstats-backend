@@ -285,6 +285,12 @@ async function GetVolumeCache(count) {
 
 async function getBlockchainDataCache(type) {
   let blockchain_data = [];
+
+  // Check if cache already has value of given type, then return value
+  if (blockchain_data_cache.has(`${type}`)) {
+    return (blockchain_data = blockchain_data_cache.get(`${type}`));
+  }
+
   const result = await getBlockchainDataByKey(type);
 
   // Return error if type is invalid
