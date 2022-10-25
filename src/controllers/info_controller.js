@@ -502,4 +502,20 @@ module.exports = {
       });
     }
   },
+
+  getHighCharts: async function (req, res) {
+    const result = {
+      delegator: process.env.ASSETS + "delegator.svg",
+      deploy: process.env.ASSETS + "deploy.svg",
+      market_cap: process.env.ASSETS + "market_cap.svg",
+      price: process.env.ASSETS + "price.svg",
+      staking: process.env.ASSETS + "staking.svg",
+      total_supply: process.env.ASSETS + "total_supply.svg",
+      total_volume: process.env.ASSETS + "total_volume.svg",
+      transfer: process.env.ASSETS + "transfer.svg",
+      validator: process.env.ASSETS + "validator.svg",
+    };
+
+    res.status(200).json(result);
+  },
 };

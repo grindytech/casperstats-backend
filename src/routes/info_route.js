@@ -78,4 +78,6 @@ router
   .route("/exchange-volume")
   .get(verifyExchangeVolume, info_controller.getExchangeVolume);
 
+router.route("/get-all-highcharts").get(info_controller.getHighCharts);
+
 module.exports = router;
