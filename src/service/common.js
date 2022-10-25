@@ -64,6 +64,7 @@ const common_option = (option) => {
 const chart_config = (option) => {
   return {
     chart: {
+      backgroundColor: "none",
       numberFormatter(v) {
         return numeral(v).format("0.[00] a");
       },
