@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/cryptoviet/casperstats-backend#readme",
   "dependencies": {
-    "axios": "^0.21.4",
+    "axios": "^1.1.3",
     "casper-client-sdk": "^1.4.2",
     "child_process": "^1.0.2",
     "coingecko-api": "^1.0.10",
@@ -37,7 +37,6 @@
     "node-cache": "^5.1.2",
     "node-cron": "^3.0.2",
     "nodemon": "^2.0.7",
-    "request": "^2.88.2",
     "sequelize": "^6.23.2"
   },
   "devDependencies": {

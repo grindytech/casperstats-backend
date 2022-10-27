@@ -9,7 +9,6 @@ const {
   execute,
   getNetWorkRPC,
 } = require("./common");
-const request = require("request");
 const {
   getNumberOfTransfersByDate,
   getTransfersByDeployHash,

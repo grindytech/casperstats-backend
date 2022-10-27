@@ -21,7 +21,6 @@ const {
 const common = require("../service/common");
 const { requestRPC, getNetWorkRPC } = require("../service/common");
 const { RpcApiName } = require("../service/constant");
-const request = require("request");
 
 const NodeCache = require("node-cache");
 const {
