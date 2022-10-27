@@ -1,9 +1,9 @@
 const dotenv = require("dotenv");
 dotenv.config();
 const { RpcApiName } = require("./constant");
-const request = require("request");
 const { exec } = require("child_process");
 const { Sequelize } = require("sequelize");
+const axios = require("axios");
 
 var db_config = {
   host: process.env.HOST,
@@ -189,53 +189,38 @@ const execute = async (command) => {
 };
 
 const requestRPC = async (url, method, params, id = undefined) => {
-  return new Promise((resolve, reject) => {
+  try {
     let body = "";
-    if (id == undefined) {
+    if (id === undefined) {
       let unique = new Date().getTime();
-      body = JSON.stringify({
-        jsonrpc: "2.0",
-        id: unique,
-        method: method,
-        params: params,
-      });
-    } else {
-      body = JSON.stringify({
-        jsonrpc: "2.0",
-        id: id,
-        method: method,
-        params: params,
-      });
+      id = unique;
     }
-    let options = {
-      url: url,
-      method: "post",
-      headers: {
-        "content-type": "application/json",
-      },
-      body,
+
+    body = {
+      jsonrpc: "2.0",
+      id: id,
+      method: method,
+      params: params,
     };
-    console.log("Option: ", options);
-    request(options, (error, response, body) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(JSON.parse(body));
-      }
-    });
-  });
+
+    const response = await axios.post(url, body);
+    return response.data;
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 const getLatestStateRootHash = async (url) => {
-  return new Promise((resolve, reject) => {
-    requestRPC(url, RpcApiName.get_state_root_hash, [])
-      .then((value) => {
-        resolve(value.result.state_root_hash);
-      })
-      .catch((err) => {
-        reject(err);
-      });
-  });
+  try {
+    const state_root_hash = await requestRPC(
+      url,
+      RpcApiName.get_state_root_hash,
+      []
+    );
+    return state_root_hash.result.state_root_hash;
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 /**
@@ -253,27 +238,24 @@ const getLatestStateRootHash = async (url) => {
  * @return {object}.
  */
 const queryState = async (key, state = "", id = undefined) => {
-  const rpc_url = await getNetWorkRPC();
+  try {
+    const rpc_url = await getNetWorkRPC();
 
-  if (state == "") {
-    state = await getLatestStateRootHash(rpc_url);
-  }
+    if (state == "") {
+      state = await getLatestStateRootHash(rpc_url);
+    }
 
-  return new Promise((resolve, reject) => {
     let command = `${process.env.CASPER_CLIENT} query-state --node-address ${rpc_url} -k ${key} -s ${state}`;
-    console.log("command: ", command);
+    //console.log("command: ", command);
     if (id != undefined) {
       command = command + ` --id ${id}`;
     }
 
-    execute(command)
-      .then((value) => {
-        resolve(value);
-      })
-      .catch((err) => {
-        reject(err);
-      });
-  });
+    const result = await execute(command);
+    return result;
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 const getHeight = async (url) => {
@@ -292,30 +274,19 @@ const getEra = async (url) => {
 };
 
 async function GetNetworkStatus(URL) {
-  return new Promise((resolve, reject) => {
-    const body = JSON.stringify({
+  try {
+    const body = {
       jsonrpc: "2.0",
       id: 1,
       method: RpcApiName.get_status,
       params: [],
-    });
-    let options = {
-      url: URL,
-      method: "post",
-      headers: {
-        "content-type": "application/json",
-      },
-      body,
     };
 
-    request(options, (error, response, body) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(body);
-      }
-    });
-  });
+    const response = await axios.post(URL, body);
+    return response.data;
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 /**
@@ -332,7 +303,6 @@ async function getNetWorkRPC() {
   for (let i = 0; i < URLs.length; i++) {
     try {
       let status = await GetNetworkStatus(URLs[i]);
-      status = JSON.parse(status);
       if (status.result.last_added_block_info != undefined) {
         return URLs[i];
       }

@@ -34,6 +34,7 @@ async function getAccountData(address) {
   else
     try {
       account_hash = await common.getAccountHash(address);
+      console.log("account hash: " + account_hash);
       account_hash = "account-hash-" + account_hash.replace(/\n/g, "");
       public_key = address;
     } catch (err) {
