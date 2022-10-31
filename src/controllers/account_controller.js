@@ -259,13 +259,20 @@ module.exports = {
     const start = req.query.start;
     const count = req.query.count;
 
-    let account_hash = account;
+    let account_hash;
 
     // Get account_hash if possible
     try {
-      const hash = await getAccountHash(account);
-      account_hash = hash;
-    } catch (err) {}
+      if (account.includes("account-hash")) {
+        account_hash = account.replace("account-hash-", "");
+      } else {
+        account_hash = await getAccountHash(account);
+        account_hash = account_hash.replace("account-hash-", "");
+      }
+    } catch (err) {
+      console.log(err);
+      account_hash = account;
+    }
 
     getTransfersByAccountHash(account_hash, start, count)
       .then((value) => {
@@ -297,7 +304,11 @@ module.exports = {
     let public_key_hex = "";
     {
       try {
-        const get_holder = await getHolder(account);
+        let account_hash = account;
+        if (account.includes("account-hash-")) {
+          account_hash = account.replace("account-hash-", "");
+        }
+        const get_holder = await getHolder(account_hash);
         const holder = get_holder[0];
         public_key_hex = holder.public_key_hex;
       } catch (err) {
@@ -416,7 +427,12 @@ module.exports = {
 
     let public_key = account;
     {
-      const public_key_hex = await getPublicKeyByAccountHash(account);
+      let account_hash = account;
+      if (account.includes("account-hash-")) {
+        account_hash = account.replace("account-hash-", "");
+      }
+
+      const public_key_hex = await getPublicKeyByAccountHash(account_hash);
       if (public_key_hex != null) {
         public_key = public_key_hex.public_key_hex;
       }
@@ -456,7 +472,11 @@ module.exports = {
 
     let public_key = account;
     {
-      const public_key_hex = await getPublicKeyByAccountHash(account);
+      let account_hash = account;
+      if (account.includes("account-hash-")) {
+        account_hash = account.replace("account-hash-", "");
+      }
+      const public_key_hex = await getPublicKeyByAccountHash(account_hash);
       if (public_key_hex != null) {
         public_key = public_key_hex.public_key_hex;
       }
@@ -518,7 +538,11 @@ module.exports = {
     try {
       let public_key = account;
       {
-        const public_key_hex = await getPublicKeyByAccountHash(account);
+        let account_hash = account;
+        if (account.includes("account-hash-")) {
+          account_hash = account.replace("account-hash-", "");
+        }
+        const public_key_hex = await getPublicKeyByAccountHash(account_hash);
         if (public_key_hex != null) {
           public_key = public_key_hex.public_key_hex;
         }
@@ -605,7 +629,11 @@ module.exports = {
     try {
       let public_key = account;
       {
-        const public_key_hex = await getPublicKeyByAccountHash(account);
+        let account_hash = account;
+        if (account.includes("account-hash-")) {
+          account_hash = account.replace("account-hash-", "");
+        }
+        const public_key_hex = await getPublicKeyByAccountHash(account_hash);
         if (public_key_hex != null) {
           public_key = public_key_hex.public_key_hex;
         }
