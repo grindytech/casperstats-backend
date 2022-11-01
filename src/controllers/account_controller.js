@@ -75,7 +75,6 @@ module.exports = {
           account_hash = account.replace("account-hash-", "");
         } else {
           account_hash = await getAccountHash(account);
-          account_hash = account_hash.replace("account-hash-", "");
         }
       } catch (err) {
         account_hash = account;
@@ -267,7 +266,6 @@ module.exports = {
         account_hash = account.replace("account-hash-", "");
       } else {
         account_hash = await getAccountHash(account);
-        account_hash = account_hash.replace("account-hash-", "");
       }
     } catch (err) {
       console.log(err);
