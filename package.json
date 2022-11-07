@@ -31,6 +31,7 @@
     "express": "^4.17.1",
     "fs": "^0.0.1-security",
     "highcharts-export-server": "^2.1.0",
+    "joi": "^17.7.0",
     "mathjs": "^9.3.2",
     "mysql": "^2.18.1",
     "mysql2": "^2.3.3",

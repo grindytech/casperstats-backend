@@ -1,5 +1,4 @@
 const router = require("express").Router();
-const path = require("path");
 
 const account_route = require("./account_route");
 const chain_route = require("./chain_route");
