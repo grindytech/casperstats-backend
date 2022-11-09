@@ -39,6 +39,12 @@ const TYPE_CHART = {
   total_supply: "total_supply",
 };
 
+const PROPERTY_TYPE = {
+  body: "body",
+  query: "query",
+  params: "params",
+};
+
 const CRONJOB_TIME = {
   EVERY_4_SECONDS: "*/4 * * * * *",
   EVERY_20_SECONDS: "*/20 * * * * *",
@@ -68,4 +74,10 @@ const CRONJOB_TIME = {
   AT_0_OCLOCK_IN_THE_8TH_SECOND_EVERYDAY: "8 0 0 * * *",
 };
 
-module.exports = { RpcApiName, ELEMENT_TYPE, CRONJOB_TIME, TYPE_CHART };
+module.exports = {
+  RpcApiName,
+  ELEMENT_TYPE,
+  CRONJOB_TIME,
+  TYPE_CHART,
+  PROPERTY_TYPE,
+};
