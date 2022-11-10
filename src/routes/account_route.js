@@ -14,13 +14,13 @@ router
 router
   .route("/get-transfers")
   .get(
-    validateInput(schemas.rangeWithAccount, PROPERTY_TYPE.query),
+    validateInput(schemas.startToCountWithAccount, PROPERTY_TYPE.query),
     account_controller.getAccountTransfers
   );
 router
   .route("/get-deploys/")
   .get(
-    validateInput(schemas.rangeWithAccount, PROPERTY_TYPE.query),
+    validateInput(schemas.startToCountWithAccount, PROPERTY_TYPE.query),
     account_controller.getAccountDeploys
   );
 router.route("/get-balance/:public_key").get(account_controller.getBalance);
@@ -55,7 +55,7 @@ const verifyRichAccount = (req, res, next) => {
 router
   .route("/get-rich-accounts/")
   .get(
-    validateInput(schemas.range, PROPERTY_TYPE.query),
+    validateInput(schemas.startToCount, PROPERTY_TYPE.query),
     verifyRichAccount,
     account_controller.getRichAccounts
   );
@@ -63,7 +63,7 @@ router.route("/count-holders/").get(account_controller.countHolders);
 router
   .route("/get-rewards")
   .get(
-    validateInput(schemas.rangeWithAccount, PROPERTY_TYPE.query),
+    validateInput(schemas.startToCountWithAccount, PROPERTY_TYPE.query),
     account_controller.getRewardV2
   );
 router.route("/get-era-reward").get(account_controller.getEraReward);
@@ -71,13 +71,13 @@ router.route("/get-era-reward").get(account_controller.getEraReward);
 router
   .route("/undelegate/")
   .get(
-    validateInput(schemas.rangeWithAccount, PROPERTY_TYPE.query),
+    validateInput(schemas.startToCountWithAccount, PROPERTY_TYPE.query),
     account_controller.getUndelegate
   );
 router
   .route("/delegate/")
   .get(
-    validateInput(schemas.rangeWithAccount, PROPERTY_TYPE.query),
+    validateInput(schemas.startToCountWithAccount, PROPERTY_TYPE.query),
     account_controller.getDelegate
   );
 router.route("/get-bids/").get(account_controller.getBids);

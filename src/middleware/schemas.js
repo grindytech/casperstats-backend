@@ -11,11 +11,11 @@ const schemas = {
   account: Joi.object().keys({
     account: account,
   }),
-  range: Joi.object().keys({
+  startToCount: Joi.object().keys({
     start: start,
     count: count,
   }),
-  rangeWithAccount: Joi.object().keys({
+  startToCountWithAccount: Joi.object().keys({
     account: account,
     start: start,
     count: count,
