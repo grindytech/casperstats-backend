@@ -76,7 +76,7 @@ async function get_deploy_type(deploy_data) {
       }
 
       const action = args.find((value) => {
-        return value[0] == "action";
+        return value[0] === "action";
       })[1].parsed;
 
       return action;
@@ -268,7 +268,7 @@ const getTransfersInBlock = async (url, block) => {
 };
 
 async function isBlockHeight(url, param) {
-  if (isNaN(param) == false) {
+  if (isNaN(param) === false) {
     const height = await getHeight(url);
     if (param < 0 || param > height) {
       return false;
@@ -279,13 +279,13 @@ async function isBlockHeight(url, param) {
 }
 
 async function isBlockHash(url, param) {
-  if (param.length == 64) {
+  if (param.length === 64) {
     //block hash
     // check block hash
     let params = [{ Hash: param }];
     try {
       const block_data = await requestRPC(url, RpcApiName.get_block, params);
-      if (block_data.error == undefined || block_data.error == null)
+      if (block_data.error === undefined || block_data.error === null)
         return true;
     } catch (err) {}
   }
@@ -293,7 +293,7 @@ async function isBlockHash(url, param) {
 }
 
 async function isDeployHash(url, param) {
-  if (param.length == 64) {
+  if (param.length === 64) {
     try {
       const value = await getDeployFromRPC(url, param);
       if (value != null) {
@@ -305,10 +305,10 @@ async function isDeployHash(url, param) {
 }
 
 async function isTransferHash(url, param) {
-  if (param.length == 64) {
+  if (param.length === 64) {
     try {
       let deploy_info = await getDeployFromRPC(url, param);
-      if (deploy_info.deploy.header.type == "transfer") {
+      if (deploy_info.deploy.header.type === "transfer") {
         return true;
       }
     } catch (err) {}
@@ -321,7 +321,9 @@ async function isValidatorAddress(url, param) {
     const is_pk = await isPublicKeyHex(param);
     if (is_pk) {
       const auction_info = await getAllValidator();
-      let element = auction_info.find((el) => el.public_key_hex == param);
+      let element = auction_info.find(
+        (element) => element.public_key_hex === param
+      );
       if (element) {
         return true;
       }
@@ -334,7 +336,7 @@ async function isAccountHash(param) {
   try {
     if (param.includes("account-hash-")) {
       return true;
-    } else if (param.length == 64) {
+    } else if (param.length === 64) {
       return true;
     }
   } catch (err) {}
