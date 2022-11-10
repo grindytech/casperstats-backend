@@ -67,6 +67,20 @@ async function get_deploy_type(deploy_data) {
         return entry_point;
       }
     } catch (err) {}
+    try {
+      let args;
+      if (deploy_data.deploy.session.StoredContractByHash) {
+        args = session.StoredContractByHash.args;
+      } else if (deploy_data.deploy.session.ModuleBytes) {
+        args = deploy_data.deploy.session.ModuleBytes.args;
+      }
+
+      const action = args.find((value) => {
+        return value[0] == "action";
+      })[1].parsed;
+
+      return action;
+    } catch (err) {}
   }
   return type;
 }
