@@ -71,12 +71,7 @@ module.exports = {
 
       let account_hash;
       try {
-        if (account.includes("account-hash-")) {
-          account_hash = account.replace("account-hash-", "");
-        } else {
-          account_hash = await getAccountHash(account);
-          account_hash = account_hash.replace("account-hash-", "");
-        }
+        account_hash = await getAccountHash(account);
       } catch (err) {
         account_hash = account;
       }
@@ -169,7 +164,7 @@ module.exports = {
         total_validator_reward = 0;
       }
 
-      // // Total delegator reward
+      // Total delegator reward
       let total_delegator_reward = 0;
       try {
         if (account_data.public_key_hex) {
@@ -263,12 +258,7 @@ module.exports = {
 
     // Get account_hash if possible
     try {
-      if (account.includes("account-hash")) {
-        account_hash = account.replace("account-hash-", "");
-      } else {
-        account_hash = await getAccountHash(account);
-        account_hash = account_hash.replace("account-hash-", "");
-      }
+      account_hash = await getAccountHash(account);
     } catch (err) {
       console.log(err);
       account_hash = account;
@@ -305,9 +295,6 @@ module.exports = {
     {
       try {
         let account_hash = account;
-        if (account.includes("account-hash-")) {
-          account_hash = account.replace("account-hash-", "");
-        }
         const get_holder = await getHolder(account_hash);
         const holder = get_holder[0];
         public_key_hex = holder.public_key_hex;
@@ -473,9 +460,6 @@ module.exports = {
     let public_key = account;
     {
       let account_hash = account;
-      if (account.includes("account-hash-")) {
-        account_hash = account.replace("account-hash-", "");
-      }
       const public_key_hex = await getPublicKeyByAccountHash(account_hash);
       if (public_key_hex != null) {
         public_key = public_key_hex.public_key_hex;
@@ -539,9 +523,6 @@ module.exports = {
       let public_key = account;
       {
         let account_hash = account;
-        if (account.includes("account-hash-")) {
-          account_hash = account.replace("account-hash-", "");
-        }
         const public_key_hex = await getPublicKeyByAccountHash(account_hash);
         if (public_key_hex != null) {
           public_key = public_key_hex.public_key_hex;
@@ -630,9 +611,6 @@ module.exports = {
       let public_key = account;
       {
         let account_hash = account;
-        if (account.includes("account-hash-")) {
-          account_hash = account.replace("account-hash-", "");
-        }
         const public_key_hex = await getPublicKeyByAccountHash(account_hash);
         if (public_key_hex != null) {
           public_key = public_key_hex.public_key_hex;
