@@ -5,14 +5,47 @@ const { exec } = require("child_process");
 const { Sequelize } = require("sequelize");
 const axios = require("axios");
 
-var db_config = {
+const db_config = {
   host: process.env.HOST,
   user: process.env.DB_USER,
   password: process.env.PASSWORD,
   database: process.env.DATABASE_NAME,
 };
 
-var db_config_sequelize = {
+const casper_config_sequelize = {
+  host: process.env.HOST,
+  user: process.env.DB_USER,
+  password: process.env.PASSWORD,
+  database: process.env.DATABASE_NAME,
+  dialect: "mysql",
+  pool: {
+    max: 100,
+    min: 0,
+    acquire: 30000,
+    idle: 10000,
+  },
+};
+
+const casper_sequelize = new Sequelize(
+  casper_config_sequelize.database,
+  casper_config_sequelize.user,
+  casper_config_sequelize.password,
+  {
+    host: casper_config_sequelize.host,
+    dialect: casper_config_sequelize.dialect,
+    pool: {
+      max: casper_config_sequelize.pool.max,
+      min: casper_config_sequelize.pool.min,
+      acquire: casper_config_sequelize.pool.acquire,
+      idle: casper_config_sequelize.pool.idle,
+    },
+    define: {
+      freezeTableName: true,
+    },
+  }
+);
+
+const db_config_sequelize = {
   host: process.env.HOST,
   user: process.env.DB_USER,
   password: process.env.PASSWORD,
@@ -363,4 +396,5 @@ module.exports = {
   common_option,
   pagination,
   checkNextAndPreviousPage,
+  casper_sequelize,
 };

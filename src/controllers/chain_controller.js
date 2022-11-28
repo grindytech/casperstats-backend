@@ -251,8 +251,8 @@ module.exports = {
       data.size = size;
 
       // Get total pages
-      let totalPages = Number(height) / size;
-      data.pages = Number(Math.ceil(totalPages));
+      let totalPages = Math.ceil(Number(height) / size);
+      data.pages = Number(totalPages);
 
       // check if current page has next page and previous page
       const check = common.checkNextAndPreviousPage(page, totalPages);
@@ -338,8 +338,8 @@ module.exports = {
 
   getBlocksByProposer: async function (req, res) {
     const validator = req.query.validator;
-    const start = req.query.start;
-    const count = req.query.count;
+    const start = Number(req.query.start);
+    const count = Number(req.query.count);
 
     try {
       //const url = await getNetWorkRPC();
