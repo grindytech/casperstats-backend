@@ -1,5 +1,8 @@
 const router = require("express").Router();
 const chain_controller = require("../controllers/chain_controller");
+const validateInput = require("../middleware");
+const schemas = require("../middleware/schemas");
+const { PROPERTY_TYPE } = require("../service/constant");
 
 const verifyBlock = (req, res, next) => {
   try {
@@ -13,10 +16,19 @@ const verifyBlock = (req, res, next) => {
   }
 };
 
-router.route("/get-block/:block").get(verifyBlock, chain_controller.getBlock);
+router
+  .route("/get-block/:block")
+  .get(
+    validateInput(schemas.block, PROPERTY_TYPE.params),
+    verifyBlock,
+    chain_controller.getBlock
+  );
 router
   .route("/get-latest-blocks/:number")
-  .get(chain_controller.getLatestBlocks);
+  .get(
+    validateInput(schemas.number, PROPERTY_TYPE.params),
+    chain_controller.getLatestBlocks
+  );
 
 const verifyBlockTransfers = (req, res, next) => {
   try {
@@ -33,11 +45,23 @@ const verifyBlockTransfers = (req, res, next) => {
 };
 router
   .route("/get-block-transfers/:block")
-  .get(verifyBlockTransfers, chain_controller.getBlockTx);
+  .get(
+    validateInput(schemas.block, PROPERTY_TYPE.params),
+    verifyBlockTransfers,
+    chain_controller.getBlockTx
+  );
 router
   .route("/get-state-root-hash/:block")
-  .get(chain_controller.GetStateRootHash);
-router.route("/get-range-block").get(chain_controller.getRangeBlock);
+  .get(
+    validateInput(schemas.block, PROPERTY_TYPE.params),
+    chain_controller.GetStateRootHash
+  );
+router
+  .route("/get-range-block")
+  .get(
+    validateInput(schemas.startToEnd, PROPERTY_TYPE.query),
+    chain_controller.getRangeBlock
+  );
 
 const verifyBlockDeploys = (req, res, next) => {
   try {
@@ -54,14 +78,28 @@ const verifyBlockDeploys = (req, res, next) => {
 };
 router
   .route("/get-block-deploy/:block")
-  .get(verifyBlockDeploys, chain_controller.getBlockDeployTx);
+  .get(
+    validateInput(schemas.block, PROPERTY_TYPE.params),
+    verifyBlockDeploys,
+    chain_controller.getBlockDeployTx
+  );
 
 // router for transaction
 router.route("/count-transfers").get(chain_controller.countTransfers);
-router.route("/get-latest-txs/").get(chain_controller.getLatestTx);
+router
+  .route("/get-latest-txs/")
+  .get(
+    validateInput(schemas.startToCount, PROPERTY_TYPE.query),
+    chain_controller.getLatestTx
+  );
 
 // blocks
-router.route("/get-proposer-blocks").get(chain_controller.getBlocksByProposer);
+router
+  .route("/get-proposer-blocks")
+  .get(
+    validateInput(schemas.startToCountWithValidator, PROPERTY_TYPE.query),
+    chain_controller.getBlocksByProposer
+  );
 
 // status
 router.route("/status/").get(chain_controller.getStatus);

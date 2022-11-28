@@ -1,10 +1,18 @@
 const router = require("express").Router();
 const state_controller = require("../controllers/state_controller");
+const validateInput = require("../middleware");
+const schemas = require("../middleware/schemas");
+const { PROPERTY_TYPE } = require("../service/constant");
 
 router
   .route("/get-balance-v2/:account_hash")
   .get(state_controller.getBalanceAccountHash);
-router.route("/get-balance/:address").get(state_controller.getBalanceAddress);
+router
+  .route("/get-balance/:account")
+  .get(
+    validateInput(schemas.account, PROPERTY_TYPE.params),
+    state_controller.getBalanceAddress
+  );
 router.route("/get-balance-state/").get(state_controller.getBalanceState);
 router.route("/query-state/:key").get(state_controller.queryState);
 
@@ -17,17 +25,27 @@ router
   .route("/get-next-era-validators")
   .get(state_controller.getNextEraValidators);
 router.route("/get-bids").get(state_controller.getBids);
-router.route("/get-range-bids").get(state_controller.getRangeBids);
+router
+  .route("/get-range-bids")
+  .get(
+    validateInput(schemas.startToCount, PROPERTY_TYPE.query),
+    state_controller.getRangeBids
+  );
 
-router.route("/get-validators/:number").get(state_controller.getValidators);
+router
+  .route("/get-validators/:number")
+  .get(
+    validateInput(schemas.number, PROPERTY_TYPE.params),
+    state_controller.getValidators
+  );
 // cache for get-validator
 const verifyGetValidator = (req, res, next) => {
   try {
-    const address = req.params.address;
-    if (state_controller.get_validator_cache.has(address)) {
+    const account = req.params.account;
+    if (state_controller.get_validator_cache.has(account)) {
       return res
         .status(200)
-        .json(state_controller.get_validator_cache.get(address));
+        .json(state_controller.get_validator_cache.get(account));
     }
     return next();
   } catch (err) {
@@ -35,8 +53,12 @@ const verifyGetValidator = (req, res, next) => {
   }
 };
 router
-  .route("/get-validator/:address")
-  .get(verifyGetValidator, state_controller.getValidator);
+  .route("/get-validator/:account")
+  .get(
+    validateInput(schemas.account, PROPERTY_TYPE.params),
+    verifyGetValidator,
+    state_controller.getValidator
+  );
 //cache for get-range-delegator
 const verifyGetRangeDelegator = (req, res, next) => {
   try {
@@ -64,7 +86,11 @@ const verifyGetRangeDelegator = (req, res, next) => {
 };
 router
   .route("/get-range-delegator")
-  .get(verifyGetRangeDelegator, state_controller.getRangeDelegator);
+  .get(
+    validateInput(schemas.startToCountWithValidator, PROPERTY_TYPE.query),
+    verifyGetRangeDelegator,
+    state_controller.getRangeDelegator
+  );
 
 //cache for get-range-era-rewards
 const verifyGetRangeEraRewards = (req, res, next) => {
@@ -93,7 +119,11 @@ const verifyGetRangeEraRewards = (req, res, next) => {
 };
 router
   .route("/get-range-era-rewards")
-  .get(verifyGetRangeEraRewards, state_controller.getRangeEraRewards);
+  .get(
+    validateInput(schemas.startToCountWithValidator, PROPERTY_TYPE.query),
+    verifyGetRangeEraRewards,
+    state_controller.getRangeEraRewards
+  );
 router.route("/get-fee/:type").get(state_controller.getLatestTransaction);
 
 module.exports = router;

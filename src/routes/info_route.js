@@ -1,15 +1,33 @@
 const router = require("express").Router();
 const info_controller = require("../controllers/info_controller");
+const validateInput = require("../middleware");
+const schemas = require("../middleware/schemas");
+const { PROPERTY_TYPE } = require("../service/constant");
 
-router.route("/get-deploy/:hex").get(info_controller.getDeploy);
-router.route("/get-deploy-info/:hex").get(info_controller.getDeployInfo);
+router
+  .route("/get-deploy/:hex")
+  .get(
+    validateInput(schemas.hex, PROPERTY_TYPE.params),
+    info_controller.getDeploy
+  );
+router
+  .route("/get-deploy-info/:hex")
+  .get(
+    validateInput(schemas.hex, PROPERTY_TYPE.params),
+    info_controller.getDeployInfo
+  );
 router.route("/get-list-deploys").get(info_controller.getListDeploys);
 router.route("/get-type/:param").get(info_controller.getType);
 router
   .route("/get-circulating-supply/")
   .get(info_controller.getCirculatingSupply);
 router.route("/get-supply/").get(info_controller.getSupply);
-router.route("/get-blockchain-data").get(info_controller.getBlockchainData);
+router
+  .route("/get-blockchain-data")
+  .get(
+    validateInput(schemas.blockchain_data_type, PROPERTY_TYPE.query),
+    info_controller.getBlockchainData
+  );
 
 // cache for daily volume
 const verifyGetVolume = (req, res, next) => {

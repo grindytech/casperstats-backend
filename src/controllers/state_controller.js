@@ -181,10 +181,10 @@ module.exports = {
   },
 
   getBalanceAddress: async function (req, res) {
-    let address = req.params.address;
+    let account = req.params.account;
     try {
       const url = await getNetWorkRPC();
-      const balance = await getBalance(url, address);
+      const balance = await getBalance(url, account);
       res.status(200);
       res.json(balance);
     } catch (err) {
@@ -314,17 +314,17 @@ module.exports = {
 
   getValidator: async function (req, res) {
     try {
-      const address = req.params.address;
+      const account = req.params.account;
       const url = await getNetWorkRPC();
-      let data = await getValidatorData(url, address);
+      let data = await getValidatorData(url, account);
 
       // add additonal information
       try {
-        data.information = await getValidatorInformation(address);
+        data.information = await getValidatorInformation(account);
       } catch (err) {
         data.information = null;
       }
-      get_validator_cache.set(address, data);
+      get_validator_cache.set(account, data);
       res.status(200);
       res.json(data);
     } catch (err) {
