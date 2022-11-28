@@ -315,6 +315,34 @@ const auth = (user, password) => {
   return user == process.env.API_USER && password == process.env.API_PASSWORD;
 };
 
+// API pagination
+const pagination = {
+  currentPage: 1,
+  hasNext: false,
+  hasPrevious: false,
+  items: [],
+  pages: 1,
+  size: 0,
+  total: 0,
+};
+
+const checkNextAndPreviousPage = (page, totalPages) => {
+  let hasNext = false;
+  let hasPrevious = false;
+  // check if current page has next page and previous page
+  if (page === totalPages) {
+    hasNext = false;
+  }
+  if (page < totalPages) {
+    hasNext = true;
+  }
+  if (page > 1 && page <= totalPages) {
+    hasPrevious = true;
+  }
+
+  return { hasNext: hasNext, hasPrevious: hasPrevious };
+};
+
 module.exports = {
   getAccountData,
   getHeight,
@@ -333,4 +361,6 @@ module.exports = {
   sequelize,
   chart_config,
   common_option,
+  pagination,
+  checkNextAndPreviousPage,
 };

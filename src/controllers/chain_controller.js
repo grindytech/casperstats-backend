@@ -240,22 +240,30 @@ module.exports = {
   },
 
   getRangeBlock: async function (req, res) {
-    let start = Number(req.query.start);
-    let end = Number(req.query.end);
+    let page = Number(req.query.page);
+    let size = Number(req.query.size);
 
     try {
       let height = await getBlockHeight();
-      let data = {
-        current_height: 0,
-        result: [],
-      };
-      data.current_height = height;
-      let block_data = await getRangeBlock(start, end);
-      // for (let i = end; i >= start; i--) {
-      //   let block_data = await getBlockByHeight(i);
-      //   data.result.push(block_data);
-      // }
-      data.result = block_data;
+      const data = common.pagination;
+      data.currentPage = page;
+      data.total = height;
+      data.size = size;
+
+      // Get total pages
+      let totalPages = Number(height) / size;
+      data.pages = Number(Math.ceil(totalPages));
+
+      // check if current page has next page and previous page
+      const check = common.checkNextAndPreviousPage(page, totalPages);
+      data.hasNext = check.hasNext;
+      data.hasPrevious = check.hasPrevious;
+
+      // get range blocks
+      let start = Number(size * (page - 1));
+      let block_data = await getRangeBlock(start, size);
+      data.items = block_data;
+
       res.status(200);
       res.json(data);
     } catch (err) {

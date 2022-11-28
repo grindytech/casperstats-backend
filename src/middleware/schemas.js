@@ -2,15 +2,26 @@ const Joi = require("joi");
 
 // The account-hash is a 32-byte hash of the public key
 // Casper networks are compatible with both Ed25519 and secp256k1 public key cryptography.
-const account = Joi.string().alphanum().min(64).max(68).required();
+const account = Joi.alternatives()
+  .try(
+    Joi.string().alphanum().length(64),
+    Joi.string().alphanum().length(66),
+    Joi.string().alphanum().length(68)
+  )
+  .required();
 
 const start = Joi.number().min(0).required();
 const count_or_end = Joi.number().min(1).required();
 
-const block = Joi.number().min(0).required();
+const block = Joi.alternatives()
+  .try(Joi.number().min(0), Joi.string().alphanum().length(64))
+  .required();
 const number = Joi.number().min(1).max(30).required();
 
 const hex = Joi.string().alphanum().length(64).required();
+
+const page = Joi.number().min(1).required();
+const size = Joi.number().valid(10, 20, 30).required();
 
 // type to get blockchain data
 const blockchain_data_type = Joi.string().valid(
@@ -65,6 +76,10 @@ const schemas = {
   }),
   blockchain_data_type: Joi.object().keys({
     type: blockchain_data_type,
+  }),
+  pagination: Joi.object().keys({
+    page: page,
+    size: size,
   }),
 };
 

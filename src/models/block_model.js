@@ -70,9 +70,9 @@ async function getLatestBlock(count) {
   });
 }
 
-async function getRangeBlock(start, end) {
+async function getRangeBlock(start, size) {
   return new Promise((resolve, reject) => {
-    var sql = `SELECT * FROM block WHERE height BETWEEN ${start} AND ${end} ORDER BY height DESC`;
+    var sql = `SELECT * FROM block ORDER BY height DESC LIMIT ${start}, ${size}`;
     pool.query(sql, function (err, result) {
       if (err) {
         reject(err);

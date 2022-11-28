@@ -59,7 +59,7 @@ router
 router
   .route("/get-range-block")
   .get(
-    validateInput(schemas.startToEnd, PROPERTY_TYPE.query),
+    validateInput(schemas.pagination, PROPERTY_TYPE.query),
     chain_controller.getRangeBlock
   );
 
