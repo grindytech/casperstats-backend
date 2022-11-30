@@ -81,6 +81,11 @@ const schemas = {
     page: page,
     size: size,
   }),
+  paginationWithAccount: Joi.object().keys({
+    account: account,
+    page: page,
+    size: size,
+  }),
 };
 
 module.exports = schemas;

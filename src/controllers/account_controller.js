@@ -13,7 +13,10 @@ const {
   getTotalNumberOfAccount,
   getPublicKeyByAccountHash,
 } = require("../models/account");
-const { getTransfersByAccountHash } = require("../models/transfer");
+const {
+  getTransfersByAccountHash,
+  getTotalNumberOfTransfersByAccount,
+} = require("../models/transfer");
 const { getTimestampByEraFromSwtichBlock } = require("../models/block_model");
 const { getTimestampByEra } = require("../models/era");
 const {
@@ -27,6 +30,8 @@ const {
   requestRPC,
   getNetWorkRPC,
   getBalanceByAccountHash,
+  pagination,
+  checkNextAndPreviousPage,
 } = require("../service/common");
 const {
   getValidatorReward,
@@ -251,39 +256,66 @@ module.exports = {
 
   getAccountTransfers: async function (req, res) {
     const account = req.query.account;
-    const start = req.query.start;
-    const count = req.query.count;
+    const page = Number(req.query.page);
+    const size = Number(req.query.size);
 
     let account_hash;
+    const data = pagination;
 
-    // Get account_hash if possible
     try {
-      account_hash = await getAccountHash(account);
+      data.currentPage = page;
+      data.size = size;
+
+      // Get account_hash if possible
+      try {
+        account_hash = await getAccountHash(account);
+      } catch (err) {
+        console.log(err);
+        account_hash = account;
+      }
+
+      // get total transfers by account
+      const totalTransfers = await getTotalNumberOfTransfersByAccount(
+        account_hash
+      );
+      data.total = totalTransfers;
+
+      // get total pages
+      const totalPages = Math.ceil(totalTransfers / size);
+      data.pages = totalPages;
+
+      // check if current page has next page and previous page
+      const check = checkNextAndPreviousPage(page, totalPages);
+      data.hasNext = check.hasNext;
+      data.hasPrevious = check.hasPrevious;
+
+      // get range transfers by account
+      let start = Number(size * (page - 1));
+      const transfers = await getTransfersByAccountHash(
+        account_hash,
+        start,
+        size
+      );
+
+      // get type of transfer
+      for (let i = 0; i < transfers.length; i++) {
+        if (transfers[i].to_address === "null") {
+          transfers[i].to_address = null;
+        }
+
+        if (account_hash == transfers[i].from_address) {
+          transfers[i].dataValues.type = "out";
+        } else {
+          transfers[i].dataValues.type = "in";
+        }
+      }
+      data.items = transfers;
+
+      res.json(data);
     } catch (err) {
       console.log(err);
-      account_hash = account;
+      res.status(500).send("Can not get transfer deploys history");
     }
-
-    getTransfersByAccountHash(account_hash, start, count)
-      .then((value) => {
-        // add type in or out
-        for (let i = 0; i < value.length; i++) {
-          if (value[i].to_address === "null") {
-            value[i].to_address = null;
-          }
-
-          if (account_hash == value[i].from_address) {
-            value[i]["type"] = "out";
-          } else {
-            value[i]["type"] = "in";
-          }
-        }
-        res.json(value);
-      })
-      .catch((err) => {
-        console.log(err);
-        res.status(500).send("Can not get transfer deploys history");
-      });
   },
 
   getAccountDeploys: async function (req, res) {

@@ -66,15 +66,26 @@ async function getTransfersByDeployHash(deploy_hash) {
   });
 }
 
-async function getTransfersByAccountHash(account_hash, start, count) {
-  return new Promise((resolve, reject) => {
-    var sql = `SELECT * FROM transfer WHERE (from_address = '${account_hash}' OR to_address = '${account_hash}') ORDER BY timestamp DESC LIMIT ${start}, ${count}`;
-    pool.query(sql, function (err, result) {
-      if (err) {
-        reject(err);
-      }
-      resolve(result);
-    });
+//`SELECT * FROM transfer WHERE (from_address = '${account_hash}' OR to_address = '${account_hash}') ORDER BY timestamp DESC LIMIT ${start}, ${count}`;
+async function getTransfersByAccountHash(account_hash, start, size) {
+  return await Transfer.findAll({
+    where: {
+      [Op.or]: [
+        {
+          from_address: {
+            [Op.eq]: account_hash,
+          },
+        },
+        {
+          to_address: {
+            [Op.eq]: account_hash,
+          },
+        },
+      ],
+    },
+    order: [["timestamp", "DESC"]],
+    offset: start,
+    limit: size,
   });
 }
 
@@ -84,6 +95,29 @@ async function getTotalNumberOfTransfers() {
     attributes: [
       [Sequelize.fn("COUNT", Sequelize.col("*")), "number_of_transfers"],
     ],
+  });
+  return numberOfTransfers[0].dataValues.number_of_transfers;
+}
+
+async function getTotalNumberOfTransfersByAccount(address) {
+  const numberOfTransfers = await Transfer.findAll({
+    attributes: [
+      [Sequelize.fn("COUNT", Sequelize.col("*")), "number_of_transfers"],
+    ],
+    where: {
+      [Op.or]: [
+        {
+          from_address: {
+            [Op.eq]: address,
+          },
+        },
+        {
+          to_address: {
+            [Op.eq]: address,
+          },
+        },
+      ],
+    },
   });
   return numberOfTransfers[0].dataValues.number_of_transfers;
 }
@@ -150,6 +184,7 @@ async function getOutflowOfAddressByDate(account_hash, from, to) {
 
 module.exports = {
   Transfer,
+  getTotalNumberOfTransfersByAccount,
   getTransfersByAccountHash,
   getTotalNumberOfTransfers,
   getNumberOfTransfersByDate,

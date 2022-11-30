@@ -14,7 +14,7 @@ router
 router
   .route("/get-transfers")
   .get(
-    validateInput(schemas.startToCountWithAccount, PROPERTY_TYPE.query),
+    validateInput(schemas.paginationWithAccount, PROPERTY_TYPE.query),
     account_controller.getAccountTransfers
   );
 router
