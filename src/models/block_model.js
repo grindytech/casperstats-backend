@@ -1,133 +1,187 @@
-const mysql = require("mysql");
-const { db_config } = require("../service/common");
+const { casper_sequelize } = require("../service/common");
+const Sequelize = require("sequelize");
 
-const pool = mysql.createPool({
-  connectionLimit: 100, //important
-  host: db_config.host || "localhost",
-  user: db_config.user || "root",
-  password: db_config.password,
-  database: db_config.database,
-  debug: false,
-});
+const Block = casper_sequelize.define(
+  "block",
+  {
+    hash: {
+      type: Sequelize.STRING(64),
+      primaryKey: true,
+      allowNull: false,
+    },
+    height: {
+      type: Sequelize.INTEGER,
+      unique: true,
+    },
+    timestamp: {
+      type: Sequelize.STRING(25),
+    },
+    deploy_hashes: {
+      type: Sequelize.INTEGER,
+    },
+    transfer_hashes: {
+      type: Sequelize.INTEGER,
+    },
+    era: {
+      type: Sequelize.INTEGER,
+    },
+    parent_hash: {
+      type: Sequelize.STRING(64),
+    },
+    state_root_hash: {
+      type: Sequelize.STRING(64),
+    },
+    validator: {
+      type: Sequelize.STRING(68),
+    },
+  },
+  {
+    timestamps: false,
+  }
+);
 
 async function getBlocksByValidator(validator_public_key, start, count) {
-  return new Promise((resolve, reject) => {
-    var sql = `SELECT * FROM block WHERE validator = '${validator_public_key}' ORDER BY height DESC LIMIT ${start}, ${count}`;
-    pool.query(sql, function (err, result) {
-      if (err) {
-        reject(err);
-      }
-      resolve(result);
-    });
+  return await Block.findAll({
+    where: {
+      validator: {
+        [Sequelize.Op.eq]: validator_public_key,
+      },
+    },
+    order: [["height", "DESC"]],
+    offset: start,
+    limit: count,
   });
 }
 
+//`SELECT era , MAX(height) as height FROM block WHERE DATE(timestamp) BETWEEN '${date}' AND '${date}' GROUP BY era ORDER BY height DESC`
 async function GetSwitchBlockByDate(date) {
-  return new Promise((resolve, reject) => {
-    var sql = `SELECT era , MAX(height) as height FROM block WHERE DATE(timestamp) BETWEEN '${date}' AND '${date}' GROUP BY era ORDER BY height DESC`;
-    pool.query(sql, function (err, result) {
-      if (err) {
-        reject(err);
-      }
-      resolve(result);
-    });
+  return await Block.findAll({
+    attributes: [
+      "era",
+      [Sequelize.fn("MAX", Sequelize.col("height")), "height"],
+    ],
+    where: {
+      [Sequelize.fn("DATE", Sequelize.col("timestamp"))]: {
+        [Sequelize.Op.between]: [date, date],
+      },
+    },
+    group: "era",
+    order: [["height", "DESC"]],
   });
 }
 
+// `SELECT * FROM block WHERE height = '${height}'`;
 async function getBlockByHeight(height) {
-  return new Promise((resolve, reject) => {
-    var sql = `SELECT * FROM block WHERE height = '${height}'`;
-    pool.query(sql, function (err, result) {
-      if (err) {
-        reject(err);
-      }
-      resolve(result[0]);
-    });
+  return await Block.findAll({
+    where: {
+      height: {
+        [Sequelize.Op.eq]: height,
+      },
+    },
   });
 }
 
+//`SELECT height FROM block WHERE hash = '${hash}'`;
 async function getBlockHeightByHash(hash) {
-  return new Promise((resolve, reject) => {
-    var sql = `SELECT height FROM block WHERE hash = '${hash}'`;
-    pool.query(sql, function (err, result) {
-      if (err) {
-        reject(err);
-      }
-      resolve(result);
-    });
+  return await Block.findAll({
+    attributes: ["height"],
+    where: {
+      hash: {
+        [Sequelize.Op.eq]: hash,
+      },
+    },
   });
 }
 
+//`SELECT * FROM block ORDER BY height DESC LIMIT 0, ${count}`;
 async function getLatestBlock(count) {
-  return new Promise((resolve, reject) => {
-    var sql = `SELECT * FROM block ORDER BY height DESC LIMIT 0, ${count}`;
-    pool.query(sql, function (err, result) {
-      if (err) {
-        reject(err);
-      }
-      resolve(result);
-    });
+  return await Block.findAll({
+    order: [["height", "DESC"]],
+    offset: 0,
+    limit: count,
   });
 }
 
-async function getRangeBlock(start, end) {
-  return new Promise((resolve, reject) => {
-    var sql = `SELECT * FROM block WHERE height BETWEEN ${start} AND ${end} ORDER BY height DESC`;
-    pool.query(sql, function (err, result) {
-      if (err) {
-        reject(err);
-      }
-      resolve(result);
-    });
+async function getRangeBlock(start, size) {
+  return await Block.findAll({
+    order: [["height", "DESC"]],
+    offset: start,
+    limit: size,
   });
 }
 
+//`SELECT MAX(height) as height FROM block`;
 async function getBlockHeight() {
-  return new Promise((resolve, reject) => {
-    var sql = `SELECT MAX(height) as height FROM block`;
-    pool.query(sql, function (err, result, fields) {
-      if (err) resolve(false);
-      if (result != undefined && result.length > 0) {
-        const height = result[0].height;
-        resolve(height);
-      } else {
-        resolve(-1);
-      }
+  try {
+    const height = await Block.findAll({
+      attributes: [[Sequelize.fn("MAX", Sequelize.col("height")), "height"]],
     });
-  });
+
+    if (height != undefined && height.length > 0) {
+      return height[0].height;
+    } else {
+      return -1;
+    }
+  } catch (err) {
+    return false;
+  }
 }
 
+//`SELECT era FROM block WHERE hash = '${hash}'`;
 async function getEraByBlockHash(hash) {
-  return new Promise((resolve, reject) => {
-    var sql = `SELECT era FROM block WHERE hash = '${hash}'`;
-    pool.query(sql, function (err, result, fields) {
-      if (err) resolve(false);
-      if (result != undefined && result.length > 0) {
-        const era = result[0].era;
-        resolve(era);
-      } else {
-        resolve(-1);
-      }
+  try {
+    const era = await Block.findAll({
+      attributes: ["era"],
+      where: {
+        hash: {
+          [Sequelize.Op.eq]: hash,
+        },
+      },
     });
-  });
+
+    if (era != undefined && era.length > 0) {
+      return era[0].era;
+    } else {
+      return -1;
+    }
+  } catch (err) {
+    return false;
+  }
 }
 
+// `SELECT timestamp FROM block WHERE height = (SELECT MIN(height) AS height FROM block WHERE era = ${era})`;
 async function getTimestampByEraFromSwtichBlock(era) {
-  return new Promise((resolve, reject) => {
-    var sql = `SELECT timestamp FROM block WHERE height = (SELECT MIN(height) AS height FROM block WHERE era = ${era})`;
-    pool.query(sql, function (err, result, fields) {
-      if (err) reject(err);
-      if (result != undefined && result != null && result.length > 0) {
-        const timestamp = result[0].timestamp;
-        resolve(timestamp);
-      } else {
-        resolve(null);
-      }
+  try {
+    const timestamp = await Block.findAll({
+      attributes: ["timestamp"],
+      where: {
+        height: {
+          [Sequelize.Op.eq]: Block.findAll({
+            attributes: [
+              [Sequelize.fn("MIN", Sequelize.col("height")), "height"],
+            ],
+            where: {
+              era: {
+                [Sequelize.Op.eq]: era,
+              },
+            },
+          }),
+        },
+      },
     });
-  });
+
+    if (timestamp != undefined && timestamp != null && timestamp.length > 0) {
+      return timestamp[0].timestamp;
+    } else {
+      return null;
+    }
+  } catch (err) {
+    return false;
+  }
 }
 
 module.exports = {
+  Block,
   getBlocksByValidator,
   GetSwitchBlockByDate,
   getBlockByHeight,

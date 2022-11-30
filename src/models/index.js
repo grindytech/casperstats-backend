@@ -1,7 +1,8 @@
 var mysql = require("mysql");
 require("dotenv").config();
-const { db_config, sequelize } = require("../service/common");
+const { db_config, sequelize, casper_sequelize } = require("../service/common");
 const { Blockchain } = require("./blockchain");
+const { Block } = require("./block_model");
 
 var db = mysql.createConnection({
   host: db_config.host || "localhost",
@@ -9,6 +10,15 @@ var db = mysql.createConnection({
   password: db_config.password,
   database: db_config.database,
 });
+
+casper_sequelize
+  .authenticate()
+  .then(() => {
+    console.log("Connect to casper_chain database successfully.");
+  })
+  .catch((error) => {
+    console.error("Unable to connect to the database: ", error);
+  });
 
 sequelize
   .authenticate()

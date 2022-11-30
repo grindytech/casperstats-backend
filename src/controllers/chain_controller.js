@@ -39,6 +39,9 @@ const get_block_transfers_cache = new NodeCache({
 const get_latest_block_cache = new NodeCache({
   stdTTL: process.env.CACHE_GET_LATEST_BLOCKS || 60,
 });
+const get_range_blocks_cache = new NodeCache({
+  stdTTL: process.env.CACHE_GET_LATEST_BLOCKS || 60,
+});
 const get_latest_tx_cache = new NodeCache({
   stdTTL: process.env.CACHE_GET_LATEST_BLOCKS || 50,
 });
@@ -65,6 +68,45 @@ async function getLatestBlocksCache(num) {
   }
 
   return datas;
+}
+
+async function getRangeBLocksCache(page, size) {
+  const data = common.pagination;
+  try {
+    let timestamp = await getBlockUpdateTime();
+    if (get_range_blocks_cache.has(`'${page}' - '${size}' - '${timestamp}'`)) {
+      block_timestamp = timestamp;
+      return get_range_blocks_cache.get(
+        `'${page}' - '${size}' - '${timestamp}'`
+      );
+    }
+
+    let height = await getBlockHeight();
+    data.currentPage = page;
+    data.total = height;
+    data.size = size;
+
+    // Get total pages
+    let totalPages = Math.ceil(Number(height) / size);
+    data.pages = Number(totalPages);
+
+    // check if current page has next page and previous page
+    const check = common.checkNextAndPreviousPage(page, totalPages);
+    data.hasNext = check.hasNext;
+    data.hasPrevious = check.hasPrevious;
+
+    // get range blocks
+    let start = Number(size * (page - 1));
+    let block_data = await getRangeBlock(start, size);
+    data.items = block_data;
+
+    get_range_blocks_cache.set(`'${page}' - '${size}' - '${timestamp}'`, data);
+    block_timestamp = timestamp;
+  } catch (err) {
+    console.log(err);
+  }
+
+  return data;
 }
 
 async function getLatestTxCache(start, count) {
@@ -101,8 +143,10 @@ module.exports = {
   get_block_transfers_cache,
   get_latest_block_cache,
   get_latest_tx_cache,
+  get_range_blocks_cache,
   getLatestBlocksCache,
   getLatestTxCache,
+  getRangeBLocksCache,
 
   getBlock: async function (req, res) {
     const b = req.params.block; // Hex-encoded block hash or height of the block. If not given, the last block added to the chain as known at the given node will be used
@@ -240,24 +284,25 @@ module.exports = {
   },
 
   getRangeBlock: async function (req, res) {
-    let start = Number(req.query.start);
-    let end = Number(req.query.end);
+    let page = Number(req.query.page);
+    let size = Number(req.query.size);
 
     try {
-      let height = await getBlockHeight();
-      let data = {
-        current_height: 0,
-        result: [],
-      };
-      data.current_height = height;
-      let block_data = await getRangeBlock(start, end);
-      // for (let i = end; i >= start; i--) {
-      //   let block_data = await getBlockByHeight(i);
-      //   data.result.push(block_data);
-      // }
-      data.result = block_data;
+      let datas;
+      if (
+        get_range_blocks_cache.has(
+          `'${page}' - '${size}' - '${block_timestamp}'`
+        )
+      ) {
+        datas = get_range_blocks_cache.get(
+          `'${page}' - '${size}' - '${block_timestamp}'`
+        );
+      } else {
+        datas = await getRangeBLocksCache(page, size);
+      }
+
       res.status(200);
-      res.json(data);
+      res.json(datas);
     } catch (err) {
       console.log(err);
       res.status(500).send("Can not get block by range");
@@ -330,8 +375,8 @@ module.exports = {
 
   getBlocksByProposer: async function (req, res) {
     const validator = req.query.validator;
-    const start = req.query.start;
-    const count = req.query.count;
+    const start = Number(req.query.start);
+    const count = Number(req.query.count);
 
     try {
       //const url = await getNetWorkRPC();
