@@ -7,7 +7,7 @@ const {
 } = require("../models/block_model");
 const {
   getTotalNumberOfTransfers,
-  getTransfers,
+  getRangeTransfers,
   getTransfersByDeployHash,
 } = require("../models/transfer");
 const { getAllDeployByHash } = require("../models/deploy");
@@ -109,26 +109,45 @@ async function getRangeBLocksCache(page, size) {
   return data;
 }
 
-async function getLatestTxCache(start, count) {
-  let result;
+async function getRangeTxCache(page, size) {
+  let result = common.pagination;
 
   try {
     let timestamp = await getDeployUpdateTime();
-    if (get_latest_tx_cache.has(`'${start}'-'${count}'-'${timestamp}'`)) {
+    if (get_latest_tx_cache.has(`'${page}'-'${size}'-'${timestamp}'`)) {
       deploy_timestamp = timestamp;
       return (result = get_latest_tx_cache.get(
-        `'${start}'-'${count}'-'${timestamp}'`
+        `'${page}'-'${size}'-'${timestamp}'`
       ));
     }
-    result = await getTransfers(start, count);
 
-    for (let i = 0; i < result.length; i++) {
-      if (result[i].to_address === "null") {
-        result[i].to_address = null;
+    result.currentPage = page;
+    result.size = size;
+
+    // get total transfers
+    const totalTransfers = await getTotalNumberOfTransfers();
+    result.total = Number(totalTransfers);
+
+    // get total pages
+    let totalPages = Math.ceil(Number(totalTransfers) / size);
+    result.pages = totalPages;
+
+    // check if current page has next page and previous page
+    const check = common.checkNextAndPreviousPage(page, totalPages);
+    result.hasNext = check.hasNext;
+    result.hasPrevious = check.hasPrevious;
+
+    // get range transfers
+    let start = Number(size * (page - 1));
+    let transfersData = await getRangeTransfers(start, size);
+    result.items = transfersData;
+
+    for (let i = 0; i < result.items.length; i++) {
+      if (result.items[i].to_address === "null") {
+        result.items[i].to_address = null;
       }
     }
-    get_latest_tx_cache.set(`'${start}'-'${count}'-'${timestamp}'`, result);
-    get_latest_tx_cache.del(`'${start}'-'${count}'-'${deploy_timestamp}'`);
+    get_latest_tx_cache.set(`'${page}'-'${size}'-'${timestamp}'`, result);
     deploy_timestamp = timestamp;
   } catch (err) {
     console.log(err);
@@ -145,7 +164,7 @@ module.exports = {
   get_latest_tx_cache,
   get_range_blocks_cache,
   getLatestBlocksCache,
-  getLatestTxCache,
+  getRangeTxCache,
   getRangeBLocksCache,
 
   getBlock: async function (req, res) {
@@ -202,7 +221,7 @@ module.exports = {
     if (isNaN(b)) {
       hash = b;
     } else {
-      hash = (await getBlockByHeight(b)).hash;
+      hash = (await getBlockByHeight(parseInt(b))).hash;
     }
     // const url = await getNetWorkRPC();
     // requestRPC(url, RpcApiName.get_block_transfers, params).then(value => {
@@ -265,8 +284,7 @@ module.exports = {
   },
 
   getLatestBlocks: async function (req, res) {
-    let num = req.params.number; // Number of block
-
+    let num = Number(req.params.number); // Number of block
     try {
       let datas;
       if (get_latest_block_cache.has(`'${num}'-'${block_timestamp}'`)) {
@@ -316,7 +334,7 @@ module.exports = {
       if (isNaN(b)) {
         hash = b;
       } else {
-        hash = (await getBlockByHeight(b)).hash;
+        hash = (await getBlockByHeight(parseInt(b))).hash;
       }
       const url = await getNetWorkRPC();
       let deploy_hashes = await getDeployhashes(url, b);
@@ -350,19 +368,19 @@ module.exports = {
       });
   },
 
-  getLatestTx: async function (req, res) {
+  getRangeTx: async function (req, res) {
     try {
-      const start = req.query.start;
-      const count = req.query.count;
+      const page = Number(req.query.page);
+      const size = Number(req.query.size);
       let result;
       if (
-        get_latest_tx_cache.has(`'${start}'-'${count}'-'${deploy_timestamp}'`)
+        get_latest_tx_cache.has(`'${page}'-'${size}'-'${deploy_timestamp}'`)
       ) {
         result = get_latest_tx_cache.get(
-          `'${start}'-'${count}'-'${deploy_timestamp}'`
+          `'${page}'-'${size}'-'${deploy_timestamp}'`
         );
       } else {
-        result = await getLatestTxCache(start, count);
+        result = await getRangeTxCache(page, size);
       }
 
       res.status(200);

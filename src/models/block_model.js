@@ -1,5 +1,6 @@
 const { casper_sequelize } = require("../service/common");
 const Sequelize = require("sequelize");
+const { Op } = Sequelize;
 
 const Block = casper_sequelize.define(
   "block",
@@ -44,7 +45,7 @@ async function getBlocksByValidator(validator_public_key, start, count) {
   return await Block.findAll({
     where: {
       validator: {
-        [Sequelize.Op.eq]: validator_public_key,
+        [Op.eq]: validator_public_key,
       },
     },
     order: [["height", "DESC"]],
@@ -62,7 +63,7 @@ async function GetSwitchBlockByDate(date) {
     ],
     where: {
       [Sequelize.fn("DATE", Sequelize.col("timestamp"))]: {
-        [Sequelize.Op.between]: [date, date],
+        [Op.between]: [date, date],
       },
     },
     group: "era",
@@ -75,7 +76,7 @@ async function getBlockByHeight(height) {
   return await Block.findAll({
     where: {
       height: {
-        [Sequelize.Op.eq]: height,
+        [Op.eq]: height,
       },
     },
   });
@@ -87,7 +88,7 @@ async function getBlockHeightByHash(hash) {
     attributes: ["height"],
     where: {
       hash: {
-        [Sequelize.Op.eq]: hash,
+        [Op.eq]: hash,
       },
     },
   });
@@ -134,7 +135,7 @@ async function getEraByBlockHash(hash) {
       attributes: ["era"],
       where: {
         hash: {
-          [Sequelize.Op.eq]: hash,
+          [Op.eq]: hash,
         },
       },
     });
@@ -156,13 +157,13 @@ async function getTimestampByEraFromSwtichBlock(era) {
       attributes: ["timestamp"],
       where: {
         height: {
-          [Sequelize.Op.eq]: Block.findAll({
+          [Op.eq]: Block.findAll({
             attributes: [
               [Sequelize.fn("MIN", Sequelize.col("height")), "height"],
             ],
             where: {
               era: {
-                [Sequelize.Op.eq]: era,
+                [Op.eq]: era,
               },
             },
           }),

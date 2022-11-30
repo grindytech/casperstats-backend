@@ -87,10 +87,10 @@ router
 // router for transaction
 router.route("/count-transfers").get(chain_controller.countTransfers);
 router
-  .route("/get-latest-txs/")
+  .route("/get-range-txs/")
   .get(
-    validateInput(schemas.startToCount, PROPERTY_TYPE.query),
-    chain_controller.getLatestTx
+    validateInput(schemas.pagination, PROPERTY_TYPE.query),
+    chain_controller.getRangeTx
   );
 
 // blocks

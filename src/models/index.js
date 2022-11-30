@@ -1,8 +1,10 @@
+const { re } = require("mathjs");
 var mysql = require("mysql");
 require("dotenv").config();
 const { db_config, sequelize, casper_sequelize } = require("../service/common");
 const { Blockchain } = require("./blockchain");
 const { Block } = require("./block_model");
+const { Transfer } = require("./transfer");
 
 var db = mysql.createConnection({
   host: db_config.host || "localhost",
