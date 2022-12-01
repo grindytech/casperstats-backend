@@ -1,5 +1,8 @@
 const mysql = require("mysql");
 const { db_config } = require("../service/common");
+const { casper_sequelize } = require("../service/common");
+const Sequelize = require("sequelize");
+const { Op } = Sequelize;
 
 const pool = mysql.createPool({
   connectionLimit: 100, //important
@@ -9,6 +12,26 @@ const pool = mysql.createPool({
   database: db_config.database,
   debug: false,
 });
+
+const Account = casper_sequelize.define(
+  "account",
+  {
+    account_hash: {
+      type: Sequelize.STRING(64),
+      primaryKey: true,
+    },
+    public_key_hex: {
+      type: Sequelize.STRING(68),
+    },
+    balance: {
+      type: Sequelize.STRING(25),
+    },
+    active_date: {
+      type: Sequelize.STRING(25),
+    },
+  },
+  { timestamps: false }
+);
 
 async function GetAccounts() {
   return new Promise((resolve, reject) => {
@@ -22,15 +45,24 @@ async function GetAccounts() {
   });
 }
 
+// `SELECT * FROM account WHERE account_hash = '${account}' OR public_key_hex = '${account}' LIMIT 1`
 async function getHolder(account) {
-  return new Promise((resolve, reject) => {
-    var sql = `SELECT * FROM account WHERE account_hash = '${account}' OR public_key_hex = '${account}' LIMIT 1`;
-    pool.query(sql, function (err, result) {
-      if (err) {
-        reject(err);
-      }
-      resolve(result);
-    });
+  return await Account.findAll({
+    where: {
+      [Op.or]: [
+        {
+          account_hash: {
+            [Op.eq]: account,
+          },
+        },
+        {
+          public_key_hex: {
+            [Op.eq]: account,
+          },
+        },
+      ],
+    },
+    limit: 1,
   });
 }
 
@@ -97,6 +129,7 @@ async function getPublicKeyByAccountHash(account_hash) {
 }
 
 module.exports = {
+  Account,
   getHolder,
   GetRichAccounts,
   getTotalNumberOfAccount,

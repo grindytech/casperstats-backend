@@ -20,7 +20,7 @@ router
 router
   .route("/get-deploys/")
   .get(
-    validateInput(schemas.startToCountWithAccount, PROPERTY_TYPE.query),
+    validateInput(schemas.paginationWithAccount, PROPERTY_TYPE.query),
     account_controller.getAccountDeploys
   );
 router.route("/get-balance/:public_key").get(account_controller.getBalance);

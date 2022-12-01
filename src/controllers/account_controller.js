@@ -23,6 +23,7 @@ const {
   getDeploysByPublicKey,
   getDeployOfPublicKeyByType,
   countDeployByType,
+  getTotalDeployByPublicKey,
 } = require("../models/deploy");
 const {
   getAccountHash,
@@ -290,7 +291,7 @@ module.exports = {
       data.hasPrevious = check.hasPrevious;
 
       // get range transfers by account
-      let start = Number(size * (page - 1));
+      const start = Number(size * (page - 1));
       const transfers = await getTransfersByAccountHash(
         account_hash,
         start,
@@ -320,28 +321,48 @@ module.exports = {
 
   getAccountDeploys: async function (req, res) {
     const account = req.query.account;
-    const start = req.query.start;
-    const count = req.query.count;
+    const page = Number(req.query.page);
+    const size = Number(req.query.size);
 
-    let public_key_hex = "";
-    {
-      try {
-        let account_hash = account;
-        const get_holder = await getHolder(account_hash);
-        const holder = get_holder[0];
-        public_key_hex = holder.public_key_hex;
-      } catch (err) {
-        public_key_hex = account;
+    try {
+      const data = pagination;
+      data.currentPage = page;
+      data.size = size;
+
+      // try to get public key if possible
+      let public_key_hex = "";
+      {
+        try {
+          let account_hash = account;
+          const get_holder = await getHolder(account_hash);
+          public_key_hex = get_holder[0].public_key_hex;
+        } catch (err) {
+          public_key_hex = account;
+        }
       }
+      // get total number of deploys by account
+      const totalDeployTxs = await getTotalDeployByPublicKey(public_key_hex);
+      data.total = totalDeployTxs;
+
+      // get total pages
+      const totalPages = Math.ceil(totalDeployTxs / size);
+      data.pages = totalPages;
+
+      // check if current page has next page and previous page
+      const check = checkNextAndPreviousPage(page, totalPages);
+      data.hasNext = check.hasNext;
+      data.hasPrevious = check.hasPrevious;
+
+      // get range of deploy by public key
+      const start = Number(size * (page - 1));
+      const deploys = await getDeploysByPublicKey(public_key_hex, start, size);
+      data.items = deploys;
+
+      res.status(200).json(data);
+    } catch (err) {
+      console.log(err);
+      res.status(500).send("Can not get deploy history");
     }
-    getDeploysByPublicKey(public_key_hex, start, count)
-      .then((value) => {
-        res.json(value);
-      })
-      .catch((err) => {
-        console.log(err);
-        res.status(500).send("Can not get deploy history");
-      });
   },
 
   getBalance: async function (req, res) {

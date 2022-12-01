@@ -5,6 +5,8 @@ const { db_config, sequelize, casper_sequelize } = require("../service/common");
 const { Blockchain } = require("./blockchain");
 const { Block } = require("./block_model");
 const { Transfer } = require("./transfer");
+const { Account } = require("./account");
+const { Deploy } = require("./deploy");
 
 var db = mysql.createConnection({
   host: db_config.host || "localhost",
