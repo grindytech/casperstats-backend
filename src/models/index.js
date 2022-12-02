@@ -8,6 +8,7 @@ const { Transfer } = require("./transfer");
 const { Account } = require("./account");
 const { Deploy } = require("./deploy");
 const { Validator, validatorInfo } = require("./validator");
+const { Timestamp } = require("./timestamp");
 
 var db = mysql.createConnection({
   host: db_config.host || "localhost",

@@ -11,6 +11,7 @@ const { getLatestEra, getTotalRewardByEra } = require("../models/era");
 const {
   getValidator,
   getCurrentEraValidator,
+  getRangeNextEraValidator,
   getNextEraValidator,
   getTotalStakeNextEra,
   getTotalStakeCurrentEra,
@@ -19,6 +20,7 @@ const {
   getTotalActiveValidator,
   getRangeBidsWithSort,
   getValidatorInfo,
+  getTotalNextEraValidators,
 } = require("../models/validator");
 const { getDelegatorsOfValidator } = require("../models/delegator");
 const { getStats } = require("../models/stats");
@@ -33,14 +35,11 @@ const { getStats } = require("../models/stats");
 async function getTopValidators(number_of_validator) {
   let validators = await getNextEraValidator();
   let top_validators = [];
-  validators.sort((first, second) => {
-    return math.compare(second.total_stake, first.total_stake);
-  });
 
   top_validators = validators.slice(0, number_of_validator);
   for (let i = 0; i < top_validators.length; i++) {
-    top_validators[i].information = await getValidatorInformation(
-      top_validators[i].public_key_hex
+    top_validators[i].dataValues.information = await getValidatorInformation(
+      top_validators[i].dataValues.public_key_hex
     );
   }
   const result = {
@@ -158,33 +157,31 @@ const getCurrentEraValidators = async (url) => {
   return result;
 };
 
-const getNextEraValidators = async (url) => {
-  let result = {
-    era_id: 0,
-    total_stake: "",
-    validators: {},
-  };
+const getNextEraValidators = async (page, size, total_stake) => {
+  let result = pagination;
+  result.currentPage = page;
+  result.size = size;
 
-  const block_info = (await requestRPC(url, RpcApiName.get_block, [])).result;
+  // get total of validator
+  let totalValidators = await getTotalNextEraValidators();
+  result.total = totalValidators;
 
-  const era_id = block_info.block.header.era_id;
+  // get total pages
+  const totalPages = Math.ceil(totalValidators / size);
+  result.pages = totalPages;
 
-  // Get total staking in next era
-  const total_stake = await getTotalStakeNextEra();
+  // check if current page has next page and previous page
+  const check = checkNextAndPreviousPage(page, totalPages);
+  result.hasNext = check.hasNext;
+  result.hasPrevious = check.hasPrevious;
 
-  // Get all validators in next era and then sort by total stake
-  let auction_info = await getNextEraValidator();
-  auction_info.sort((first, second) => {
-    return math.compare(Number(second.total_stake), Number(first.total_stake));
-  });
+  // get range of validator next era
+  const start = Number(size * (page - 1));
+  const validators = await getRangeNextEraValidator(start, size);
 
-  result.era_id = math.add(Number(era_id), 1);
-  result.total_stake = total_stake.toString();
-  result.validators = auction_info;
-
-  // Get percentage of staking of each validator on network in next era
-  for (let i = 0; i < auction_info.length; i++) {
-    const total_weight = auction_info[i].total_stake;
+  // Get percentage of staking of each validator on network
+  for (let i = 0; i < validators.length; i++) {
+    const total_weight = validators[i].dataValues.total_stake;
     const percentage_of_network = (
       (Number(total_weight) * 100) /
       Number(total_stake)
@@ -192,21 +189,22 @@ const getNextEraValidators = async (url) => {
       .toFixed(2)
       .toString();
 
-    result.validators[i].percentage_of_network = percentage_of_network;
+    validators[i].dataValues.percentage_of_network = percentage_of_network;
 
     // Get information of validators if exists
     try {
       const validator_info = await getValidatorInfo(
-        auction_info[i].public_key_hex
+        validators[i].public_key_hex
       );
       if (validator_info != null) {
-        result.validators[i].name = validator_info[0].name;
+        validators[i].dataValues.name = validator_info[0].name;
         if (validator_info[0].icon) {
-          result.validators[i].icon = validator_info[0].icon;
+          validators[i].dataValues.icon = validator_info[0].icon;
         }
       }
     } catch {}
   }
+  result.items = validators;
 
   return result;
 };

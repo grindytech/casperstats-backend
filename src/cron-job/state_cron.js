@@ -36,7 +36,7 @@ async function cronJobGetCurrentEra() {
 async function cronJobGetNextEra() {
   cron.schedule(CRONJOB_TIME.EVERY_10_MINUTES, async function () {
     try {
-      await getNextEraValidatorsCache();
+      await getNextEraValidatorsCache(1, 10);
     } catch (err) {
       console.log(err);
     }

@@ -248,16 +248,65 @@ async function getCurrentEraValidator() {
   });
 }
 
-async function getNextEraValidator() {
-  return new Promise((resolve, reject) => {
-    var sql = `SELECT public_key_hex, total_stake_next_era as total_stake, delegation_rate, number_of_delegators FROM validator WHERE next_era_flag = 1`;
-    pool.query(sql, function (err, result) {
-      if (err) {
-        reject(err);
-      }
-      resolve(result);
-    });
+//`SELECT public_key_hex, total_stake_next_era as total_stake, delegation_rate, number_of_delegators FROM validator WHERE next_era_flag = 1`
+async function getRangeNextEraValidator(start, size) {
+  return await Validator.findAll({
+    attributes: [
+      "public_key_hex",
+      ["total_stake_next_era", "total_stake"],
+      "delegation_rate",
+      "number_of_delegators",
+    ],
+    where: {
+      next_era_flag: {
+        [Op.eq]: 1,
+      },
+    },
+    order: [
+      [
+        Sequelize.cast(Sequelize.col("total_stake_next_era"), "UNSIGNED"),
+        "DESC",
+      ],
+    ],
+    offset: start,
+    limit: size,
   });
+}
+
+async function getNextEraValidator() {
+  return await Validator.findAll({
+    attributes: [
+      "public_key_hex",
+      ["total_stake_next_era", "total_stake"],
+      "delegation_rate",
+      "number_of_delegators",
+    ],
+    where: {
+      next_era_flag: {
+        [Op.eq]: 1,
+      },
+    },
+    order: [
+      [
+        Sequelize.cast(Sequelize.col("total_stake_next_era"), "UNSIGNED"),
+        "DESC",
+      ],
+    ],
+  });
+}
+
+async function getTotalNextEraValidators() {
+  const total = await Validator.findAll({
+    attributes: [
+      [Sequelize.fn("COUNT", Sequelize.col("*")), "total_validator"],
+    ],
+    where: {
+      next_era_flag: {
+        [Op.eq]: 1,
+      },
+    },
+  });
+  return total[0].dataValues.total_validator;
 }
 
 async function getTotalActiveValidator() {
@@ -327,21 +376,28 @@ async function getTotalStakeCurrentEra() {
   });
 }
 
+// `SELECT SUM(total_stake_next_era) as total_stake_next FROM validator WHERE next_era_flag = 1`;
 async function getTotalStakeNextEra() {
-  return new Promise((resolve, reject) => {
-    var sql = `SELECT SUM(total_stake_next_era) as total_stake_next FROM validator WHERE next_era_flag = 1`;
-    pool.query(sql, function (err, result) {
-      if (err) {
-        reject(err);
-      }
-      resolve(result[0].total_stake_next);
-    });
+  const totalStake = await Validator.findAll({
+    attributes: [
+      [
+        Sequelize.fn("SUM", Sequelize.col("total_stake_next_era")),
+        "total_stake_next",
+      ],
+    ],
+    where: {
+      next_era_flag: {
+        [Op.eq]: 1,
+      },
+    },
   });
+  return totalStake[0].dataValues.total_stake_next;
 }
 
 module.exports = {
   Validator,
   validatorInfo,
+  getNextEraValidator,
   createValidatorInfoTable,
   insertValidatorInfo,
   getValidator,
@@ -359,8 +415,9 @@ module.exports = {
   getAllValidator,
   getTotalBids,
   getTotalActiveValidator,
-  getNextEraValidator,
+  getRangeNextEraValidator,
   getRangeBidsWithSort,
   getValidatorInfo,
   getTotalActiveBids,
+  getTotalNextEraValidators,
 };

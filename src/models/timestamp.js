@@ -1,75 +1,64 @@
-const mysql = require("mysql");
-const { db_config } = require("../service/common");
+const { casper_sequelize } = require("../service/common");
+const Sequelize = require("sequelize");
 
-const pool = mysql.createPool({
-  connectionLimit: 100, //important
-  host: db_config.host || "localhost",
-  user: db_config.user || "root",
-  password: db_config.password,
-  database: db_config.database,
-  debug: false,
-});
+const Timestamp = casper_sequelize.define(
+  "timestamp",
+  {
+    block: {
+      type: Sequelize.STRING(25),
+    },
+    deploy: {
+      type: Sequelize.STRING(25),
+    },
+    era: {
+      type: Sequelize.STRING(25),
+    },
+    account: {
+      type: Sequelize.STRING(25),
+    },
+    validator: {
+      type: Sequelize.STRING(25),
+    },
+  },
+  { timestamps: false }
+);
 
 async function getBlockUpdateTime() {
-  return new Promise((resolve, reject) => {
-    var sql = `SELECT block FROM timestamp`;
-    pool.query(sql, function (err, result) {
-      if (err) {
-        reject(err);
-      }
-      resolve(result[0].block);
-    });
+  const timestamp = await Timestamp.findAll({
+    attributes: ["block"],
   });
+  return timestamp[0].block;
 }
 
 async function getDeployUpdateTime() {
-  return new Promise((resolve, reject) => {
-    var sql = `SELECT deploy FROM timestamp`;
-    pool.query(sql, function (err, result) {
-      if (err) {
-        reject(err);
-      }
-      resolve(result[0].deploy);
-    });
+  const timestamp = await Timestamp.findAll({
+    attributes: ["deploy"],
   });
+  return timestamp[0].deploy;
 }
 
 async function getEraUpdateTime() {
-  return new Promise((resolve, reject) => {
-    var sql = `SELECT era FROM timestamp`;
-    pool.query(sql, function (err, result) {
-      if (err) {
-        reject(err);
-      }
-      resolve(result[0].era);
-    });
+  const timestamp = await Timestamp.findAll({
+    attributes: ["era"],
   });
+  return timestamp[0].era;
 }
 async function getAccountUpdateTime() {
-  return new Promise((resolve, reject) => {
-    var sql = `SELECT account FROM timestamp`;
-    pool.query(sql, function (err, result) {
-      if (err) {
-        reject(err);
-      }
-      resolve(result[0].account);
-    });
+  const timestamp = await Timestamp.findAll({
+    attributes: ["account"],
   });
+  return timestamp[0].account;
 }
 
 async function getValidatorUpdateTime() {
-  return new Promise((resolve, reject) => {
-    var sql = `SELECT validator FROM timestamp`;
-    pool.query(sql, function (err, result) {
-      if (err) {
-        reject(err);
-      }
-      resolve(result[0].validator);
-    });
+  const timestamp = await Timestamp.findAll({
+    attributes: ["validator"],
   });
+  return timestamp[0].validator;
 }
 
 module.exports = {
+  Timestamp,
   getBlockUpdateTime,
   getDeployUpdateTime,
   getEraUpdateTime,
