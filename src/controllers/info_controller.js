@@ -31,7 +31,7 @@ const { getBlockHeight } = require("../models/block_model");
 const {
   getTotalStakeCurrentEra,
   getTotalActiveValidator,
-  getTotalValidator,
+  getTotalBids,
   getCurrentEraValidator,
   getTotalActiveBids,
 } = require("../models/validator");
@@ -106,7 +106,7 @@ async function getEconomicsCache() {
 
     economics.total_stake = total_stake.toString();
     economics.total_active_validators = await getTotalActiveValidator();
-    economics.total_bid_validators = await getTotalValidator();
+    economics.total_bid_validators = await getTotalBids();
     economics.total_active_bids = await getTotalActiveBids();
     economics.total_delegators = await getTotalDelegator();
 

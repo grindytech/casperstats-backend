@@ -13,7 +13,7 @@ const {
   getBids,
   getValidatorData,
   getValidatorInformation,
-  getRangeBids,
+  getRangeBidsPagination,
 } = require("../service/validator");
 const { RpcApiName } = require("../service/constant");
 require("dotenv").config();
@@ -303,10 +303,17 @@ module.exports = {
 
   getRangeBids: async function (req, res) {
     try {
-      const start = req.query.start;
-      const count = req.query.count;
-      const bids = await getRangeBids(start, count);
-      res.status(200).json(bids);
+      const page = Number(req.query.page);
+      const size = Number(req.query.size);
+      const order_by = req.query.order_by;
+      const order_direction = req.query.order_direction;
+      const data = await getRangeBidsPagination(
+        page,
+        size,
+        order_by,
+        order_direction
+      );
+      res.status(200).json(data);
     } catch (err) {
       res.send(err);
     }

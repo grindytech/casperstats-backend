@@ -7,6 +7,7 @@ const { Block } = require("./block_model");
 const { Transfer } = require("./transfer");
 const { Account } = require("./account");
 const { Deploy } = require("./deploy");
+const { Validator, validatorInfo } = require("./validator");
 
 var db = mysql.createConnection({
   host: db_config.host || "localhost",

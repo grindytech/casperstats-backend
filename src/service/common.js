@@ -25,6 +25,40 @@ const casper_config_sequelize = {
     idle: 10000,
   },
 };
+const validator_config_sequelize = {
+  host: process.env.HOST,
+  user: process.env.DB_USER,
+  password: process.env.PASSWORD,
+  database: process.env.VALIDATOR_DB_NAME,
+  dialect: "mysql",
+  pool: {
+    max: 100,
+    min: 0,
+    acquire: 30000,
+    idle: 10000,
+  },
+};
+
+const validator_sequelize = new Sequelize(
+  validator_config_sequelize.database,
+  validator_config_sequelize.user,
+  validator_config_sequelize.password,
+  {
+    host: validator_config_sequelize.host,
+    dialect: validator_config_sequelize.dialect,
+    pool: {
+      max: validator_config_sequelize.pool.max,
+      min: validator_config_sequelize.pool.min,
+      acquire: validator_config_sequelize.pool.acquire,
+      idle: validator_config_sequelize.pool.idle,
+    },
+    define: {
+      freezeTableName: true,
+      charset: "utf8mb4",
+      collate: "utf8mb4_unicode_ci",
+    },
+  }
+);
 
 const casper_sequelize = new Sequelize(
   casper_config_sequelize.database,
@@ -397,4 +431,5 @@ module.exports = {
   pagination,
   checkNextAndPreviousPage,
   casper_sequelize,
+  validator_sequelize,
 };

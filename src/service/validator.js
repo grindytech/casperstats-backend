@@ -1,7 +1,11 @@
 const dotenv = require("dotenv");
 dotenv.config();
 const { RpcApiName } = require("./constant");
-const { requestRPC } = require("./common");
+const {
+  requestRPC,
+  pagination,
+  checkNextAndPreviousPage,
+} = require("./common");
 const math = require("mathjs");
 const { getLatestEra, getTotalRewardByEra } = require("../models/era");
 const {
@@ -11,9 +15,9 @@ const {
   getTotalStakeNextEra,
   getTotalStakeCurrentEra,
   getAllValidator,
-  getTotalValidator,
+  getTotalBids,
   getTotalActiveValidator,
-  getRangeValidator,
+  getRangeBidsWithSort,
   getValidatorInfo,
 } = require("../models/validator");
 const { getDelegatorsOfValidator } = require("../models/delegator");
@@ -89,7 +93,7 @@ const getValidators = async (number_of_validator) => {
 
     result.total_stake = total_stake.toString();
     result.total_active_validators = await getTotalActiveValidator();
-    result.total_bid_validators = await getTotalValidator();
+    result.total_bid_validators = await getTotalBids();
 
     // get top 10 validators with height
     //    current era
@@ -212,7 +216,7 @@ const getBids = async () => {
     total_validator: 0,
     validators: {},
   };
-  const total_validator = await getTotalValidator();
+  const total_validator = await getTotalBids();
   result.total_validator = total_validator;
 
   // Get all bids
@@ -250,19 +254,55 @@ const getBids = async () => {
   return result;
 };
 
-const getRangeBids = async (start, count) => {
-  let result = {
-    total_validator: 0,
-    validators: {},
-  };
+const getRangeBidsPagination = async (
+  page,
+  size,
+  order_by,
+  order_direction
+) => {
+  const data = pagination;
+  data.currentPage = page;
+  data.size = size;
 
-  const total_validator = await getTotalValidator();
-  result.total_validator = total_validator;
+  // get total bids
+  const totalBids = await getTotalBids();
+  data.total = totalBids;
 
-  let auction_info = await getRangeValidator(start, count);
-  result.validators = auction_info;
+  // get total pages
+  const totalPages = Math.ceil(totalBids / size);
+  data.pages = totalPages;
 
-  return result;
+  // check if current page has next page and previous page
+  const check = checkNextAndPreviousPage(page, totalPages);
+  data.hasNext = check.hasNext;
+  data.hasPrevious = check.hasPrevious;
+
+  // get range bids
+  const start = Number(size * (page - 1));
+  const rangeBids = await getRangeBidsWithSort(
+    start,
+    size,
+    order_by,
+    order_direction
+  );
+
+  // try to get validator info
+  for (let i = 0; i < rangeBids.length; i++) {
+    try {
+      const validator_info = await getValidatorInfo(
+        rangeBids[i].public_key_hex
+      );
+      if (validator_info != null) {
+        rangeBids[i].dataValues.name = validator_info[0].name;
+        if (validator_info[0].icon) {
+          rangeBids[i].dataValues.icon = validator_info[0].icon;
+        }
+      }
+    } catch {}
+  }
+  data.items = rangeBids;
+
+  return data;
 };
 
 const getAPY = async (total_stake) => {
@@ -367,5 +407,5 @@ module.exports = {
   getTotalStake,
   getValidatorInformation,
   getNextEraValidators,
-  getRangeBids,
+  getRangeBidsPagination,
 };

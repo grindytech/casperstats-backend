@@ -28,7 +28,7 @@ router.route("/get-bids").get(state_controller.getBids);
 router
   .route("/get-range-bids")
   .get(
-    validateInput(schemas.startToCount, PROPERTY_TYPE.query),
+    validateInput(schemas.paginationWithSortType, PROPERTY_TYPE.query),
     state_controller.getRangeBids
   );
 

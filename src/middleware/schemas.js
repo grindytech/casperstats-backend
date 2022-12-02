@@ -23,6 +23,16 @@ const hex = Joi.string().alphanum().length(64).required();
 const page = Joi.number().min(1).required();
 const size = Joi.number().valid(10, 20, 30).required();
 
+const order_by = Joi.string()
+  .valid(
+    "inactive",
+    "total_stake_next_era",
+    "delegation_rate",
+    "number_of_delegators"
+  )
+  .required();
+const order_direction = Joi.string().valid("DESC", "ASC").required();
+
 // type to get blockchain data
 const blockchain_data_type = Joi.string().valid(
   "transfer",
@@ -85,6 +95,12 @@ const schemas = {
     account: account,
     page: page,
     size: size,
+  }),
+  paginationWithSortType: Joi.object().keys({
+    page: page,
+    size: size,
+    order_by: order_by,
+    order_direction: order_direction,
   }),
 };
 
