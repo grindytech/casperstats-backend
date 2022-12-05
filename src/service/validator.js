@@ -157,31 +157,33 @@ const getCurrentEraValidators = async (url) => {
   return result;
 };
 
-const getNextEraValidators = async (page, size, total_stake) => {
-  let result = pagination;
-  result.currentPage = page;
-  result.size = size;
+const getNextEraValidators = async (url) => {
+  let result = {
+    era_id: 0,
+    total_stake: "",
+    validators: {},
+  };
 
-  // get total of validator
-  let totalValidators = await getTotalNextEraValidators();
-  result.total = totalValidators;
+  const block_info = (await requestRPC(url, RpcApiName.get_block, [])).result;
 
-  // get total pages
-  const totalPages = Math.ceil(totalValidators / size);
-  result.pages = totalPages;
+  const era_id = block_info.block.header.era_id;
 
-  // check if current page has next page and previous page
-  const check = checkNextAndPreviousPage(page, totalPages);
-  result.hasNext = check.hasNext;
-  result.hasPrevious = check.hasPrevious;
+  // Get total stake
+  const total_stake = await getTotalStakeNextEra();
 
-  // get range of validator next era
-  const start = Number(size * (page - 1));
-  const validators = await getRangeNextEraValidator(start, size);
+  // Get all validators in current era and then sort by total stake
+  let auction_info = await getNextEraValidator();
+  console.log(auction_info);
+  // auction_info.sort((first, second) => {
+  //   return math.compare(Number(second.total_stake), Number(first.total_stake));
+  // });
 
-  // Get percentage of staking of each validator on network
-  for (let i = 0; i < validators.length; i++) {
-    const total_weight = validators[i].dataValues.total_stake;
+  result.era_id = math.add(era_id, 1);
+  result.total_stake = total_stake.toString();
+
+  // Get percentage of staking of each validator on network in current era
+  for (let i = 0; i < auction_info.length; i++) {
+    const total_weight = auction_info[i].dataValues.total_stake;
     const percentage_of_network = (
       (Number(total_weight) * 100) /
       Number(total_stake)
@@ -189,22 +191,23 @@ const getNextEraValidators = async (page, size, total_stake) => {
       .toFixed(2)
       .toString();
 
-    validators[i].dataValues.percentage_of_network = percentage_of_network;
+    auction_info[i].dataValues.percentage_of_network = percentage_of_network;
 
-    // Get information of validators if exists
+    // Get information of validator if exists
     try {
       const validator_info = await getValidatorInfo(
-        validators[i].public_key_hex
+        auction_info[i].public_key_hex
       );
       if (validator_info != null) {
-        validators[i].dataValues.name = validator_info[0].name;
+        auction_info[i].dataValues.name = validator_info[0].name;
         if (validator_info[0].icon) {
-          validators[i].dataValues.icon = validator_info[0].icon;
+          auction_info[i].dataValues.icon = validator_info[0].icon;
         }
       }
     } catch {}
   }
-  result.items = validators;
+
+  result.validators = auction_info;
 
   return result;
 };

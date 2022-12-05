@@ -25,7 +25,10 @@ const { getRangeDelegator } = require("../models/delegator");
 const { getRangeEraRewards } = require("../models/era");
 const { getDateByEra } = require("../models/era_id");
 const { getValidatorUpdateTime } = require("../models/timestamp");
-const { getTotalStakeNextEra } = require("../models/validator");
+const {
+  getTotalStakeNextEra,
+  getTotalNextEraValidators,
+} = require("../models/validator");
 
 const get_validators_cache = new NodeCache({
   stdTTL: process.env.CACHE_GET_BIDS || 7200,
@@ -104,34 +107,28 @@ async function getCurrentEraValidatorsCache() {
   return era_validators;
 }
 
-async function getNextEraValidatorsCache(page, size) {
-  let data;
+async function getNextEraValidatorsCache() {
+  let era_validators;
   try {
-    // check if cache already has value
     let timestamp = await getValidatorUpdateTime();
     if (
       get_next_era_validators_cache.has(
-        `next-era-'${page}'-'${size}'-'${timestamp}'`
+        `get-next-era-validators-'${timestamp}'`
       )
     ) {
       next_era_validator_timestamp = timestamp;
-      return (data = get_next_era_validators_cache.get(
-        `next-era-'${page}'-'${size}'-'${timestamp}'`
+      return (era_validators = get_next_era_validators_cache.get(
+        `get-next-era-validators-'${timestamp}'`
       ));
     }
     const url = await getNetWorkRPC();
-    // Get total staking in next era
-    const total_stake = await getTotalStakeNextEra();
-    data = await getNextEraValidators(page, size, total_stake);
-
-    // get era id
-    const block_info = (await requestRPC(url, RpcApiName.get_block, [])).result;
-    const era_id = block_info.block.header.era_id;
-    data.era_id = math.add(Number(era_id), 1);
-
+    era_validators = await getNextEraValidators(url);
     get_next_era_validators_cache.set(
-      `next-era-'${page}'-'${size}'-'${timestamp}'`,
-      data
+      `get-next-era-validators-'${timestamp}'`,
+      era_validators
+    );
+    get_next_era_validators_cache.del(
+      `get-next-era-validators-'${next_era_validator_timestamp}'`
     );
     next_era_validator_timestamp = timestamp;
     console.log("reset get-next-era-validator-cache successful");
@@ -139,7 +136,7 @@ async function getNextEraValidatorsCache(page, size) {
     console.log(err);
   }
 
-  return data;
+  return era_validators;
 }
 
 async function getValidatorsCache(number) {
@@ -274,23 +271,21 @@ module.exports = {
   },
 
   getNextEraValidators: async function (req, res) {
-    const page = Number(req.query.page);
-    const size = Number(req.query.size);
     try {
-      let result;
+      let era_validators;
       if (
         get_next_era_validators_cache.has(
-          `next-era-'${page}'-'${size}'-'${next_era_validator_timestamp}'`
+          `get-next-era-validators-'${next_era_validator_timestamp}'`
         )
       ) {
-        result = get_next_era_validators_cache.get(
-          `next-era-'${page}'-'${size}'-'${next_era_validator_timestamp}'`
+        era_validators = get_next_era_validators_cache.get(
+          `get-next-era-validators-'${next_era_validator_timestamp}'`
         );
       } else {
-        result = await getNextEraValidatorsCache(page, size);
+        era_validators = await getNextEraValidatorsCache();
       }
 
-      res.status(200).json(result);
+      res.status(200).json(era_validators);
     } catch (err) {
       res.send(err);
     }

@@ -23,10 +23,7 @@ router
   .get(state_controller.getCurrentEraValidators);
 router
   .route("/get-next-era-validators")
-  .get(
-    validateInput(schemas.pagination, PROPERTY_TYPE.query),
-    state_controller.getNextEraValidators
-  );
+  .get(state_controller.getNextEraValidators);
 router.route("/get-bids").get(state_controller.getBids);
 router
   .route("/get-range-bids")
