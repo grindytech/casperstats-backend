@@ -59,36 +59,11 @@ router
     verifyGetValidator,
     state_controller.getValidator
   );
-//cache for get-range-delegator
-const verifyGetRangeDelegator = (req, res, next) => {
-  try {
-    const validator = req.query.validator;
-    const start = Number(req.query.start);
-    const count = Number(req.query.count);
 
-    if (
-      state_controller.get_range_delegator_cache.has(
-        `validato: '${validator}' start: ${start} count: ${count}`
-      )
-    ) {
-      return res
-        .status(200)
-        .json(
-          state_controller.get_range_delegator_cache.get(
-            `validato: '${validator}' start: ${start} count: ${count}`
-          )
-        );
-    }
-    return next();
-  } catch (err) {
-    throw new Error(err);
-  }
-};
 router
-  .route("/get-range-delegator")
+  .route("/get-range-delegators")
   .get(
-    validateInput(schemas.startToCountWithValidator, PROPERTY_TYPE.query),
-    verifyGetRangeDelegator,
+    validateInput(schemas.paginationWithValidator, PROPERTY_TYPE.query),
     state_controller.getRangeDelegator
   );
 

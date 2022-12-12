@@ -41,7 +41,7 @@ const Block = casper_sequelize.define(
   }
 );
 
-async function getBlocksByValidator(validator_public_key, start, count) {
+async function getBlocksByValidator(validator_public_key, start, size) {
   return await Block.findAll({
     where: {
       validator: {
@@ -50,8 +50,20 @@ async function getBlocksByValidator(validator_public_key, start, count) {
     },
     order: [["height", "DESC"]],
     offset: start,
-    limit: count,
+    limit: size,
   });
+}
+
+async function getTotalBLocksByValidator(validator_public_key) {
+  const total = await Block.findAll({
+    attributes: [[Sequelize.fn("COUNT", Sequelize.col("*")), "total_blocks"]],
+    where: {
+      validator: {
+        [Op.eq]: validator_public_key,
+      },
+    },
+  });
+  return total[0].dataValues.total_blocks;
 }
 
 //`SELECT era , MAX(height) as height FROM block WHERE DATE(timestamp) BETWEEN '${date}' AND '${date}' GROUP BY era ORDER BY height DESC`
@@ -192,4 +204,5 @@ module.exports = {
   getBlockHeightByHash,
   getRangeBlock,
   getLatestBlock,
+  getTotalBLocksByValidator,
 };

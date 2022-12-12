@@ -338,7 +338,6 @@ const getValidatorData = async (url, address) => {
     inactive: false,
     total_stake: "",
     information: null,
-    delegators: [],
   };
 
   element.public_key = validator[0].public_key_hex;
@@ -352,14 +351,6 @@ const getValidatorData = async (url, address) => {
   }
 
   element.inactive = status;
-  const delegators = await getDelegatorsOfValidator(address);
-  delegators.sort((first, second) => {
-    return math.compare(
-      Number(second.staked_amount),
-      Number(first.staked_amount)
-    );
-  });
-  element.delegators = delegators;
 
   return element;
 };

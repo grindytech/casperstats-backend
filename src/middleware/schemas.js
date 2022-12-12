@@ -96,6 +96,11 @@ const schemas = {
     page: page,
     size: size,
   }),
+  paginationWithValidator: Joi.object().keys({
+    validator: account,
+    page: page,
+    size: size,
+  }),
   paginationWithSortType: Joi.object().keys({
     page: page,
     size: size,

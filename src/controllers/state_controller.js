@@ -5,6 +5,8 @@ const {
   getBalanceByAccountHash,
   getBalanceByState,
   getNetWorkRPC,
+  pagination,
+  checkNextAndPreviousPage,
 } = require("../service/common");
 const {
   getValidators,
@@ -21,7 +23,10 @@ require("dotenv").config();
 
 const NodeCache = require("node-cache");
 const { getLatestDeployCostByType } = require("../models/deploy");
-const { getRangeDelegator } = require("../models/delegator");
+const {
+  getRangeDelegator,
+  getTotalDelegatorByValidator,
+} = require("../models/delegator");
 const { getRangeEraRewards } = require("../models/era");
 const { getDateByEra } = require("../models/era_id");
 const { getValidatorUpdateTime } = require("../models/timestamp");
@@ -348,15 +353,32 @@ module.exports = {
   getRangeDelegator: async function (req, res) {
     try {
       const validator = req.query.validator;
-      const start = Number(req.query.start);
-      const count = Number(req.query.count);
-      const data = await getRangeDelegator(validator, start, count);
-      get_range_delegator_cache.set(
-        `validator: '${validator}' start: ${start} count: ${count}`,
-        data
-      );
+      const page = Number(req.query.page);
+      const size = Number(req.query.size);
+
+      const result = pagination;
+      result.currentPage = page;
+      result.size = size;
+
+      // get total Delegators
+      const totalDelegators = await getTotalDelegatorByValidator(validator);
+      result.total = totalDelegators;
+
+      // get total pages
+      const totalPages = Math.ceil(totalDelegators / size);
+      result.pages = totalPages;
+
+      //check if current page has next page and previous page
+      const check = checkNextAndPreviousPage(page, totalPages);
+      result.hasNext = check.hasNext;
+      result.hasPrevious = check.hasPrevious;
+
+      // get range delegators
+      const start = Number(size * (page - 1));
+      result.items = await getRangeDelegator(validator, start, size);
+
       res.status(200);
-      res.json(data);
+      res.json(result);
     } catch (err) {
       console.log(err);
       res.send(err);

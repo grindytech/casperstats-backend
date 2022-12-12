@@ -1,5 +1,8 @@
 const mysql = require("mysql");
 require("dotenv").config();
+const { casper_sequelize } = require("../service/common");
+const Sequelize = require("sequelize");
+const { Op } = Sequelize;
 
 const delegator_pool = mysql.createPool({
   connectionLimit: 100, //important
@@ -9,6 +12,24 @@ const delegator_pool = mysql.createPool({
   database: process.env.DATABASE_NAME,
   debug: false,
 });
+
+const Delegator = casper_sequelize.define(
+  "delegator",
+  {
+    public_key: {
+      type: Sequelize.STRING(68),
+      primaryKey: true,
+    },
+    staked_amount: {
+      type: Sequelize.STRING(25),
+    },
+    delegatee: {
+      type: Sequelize.STRING(68),
+      primaryKey: true,
+    },
+  },
+  { timestamps: false }
+);
 
 async function getDelegatorsOfValidator(address) {
   return new Promise((resolve, reject) => {
@@ -34,15 +55,33 @@ async function getTotalDelegator() {
   });
 }
 
-async function getRangeDelegator(validator, start, count) {
-  return new Promise((resolve, reject) => {
-    var sql = `SELECT * FROM delegator WHERE delegatee = '${validator}' ORDER BY CONVERT(stake_amount, UNSIGNED) DESC LIMIT ${start}, ${count}`;
-    delegator_pool.query(sql, function (err, result) {
-      if (err) {
-        reject(err);
-      }
-      resolve(result);
-    });
+async function getTotalDelegatorByValidator(account) {
+  const total = await Delegator.findAll({
+    attributes: [
+      [Sequelize.fn("COUNT", Sequelize.col("*")), "total_delegators"],
+    ],
+    where: {
+      delegatee: {
+        [Op.eq]: account,
+      },
+    },
+  });
+  return total[0].dataValues.total_delegators;
+}
+
+//`SELECT * FROM delegator WHERE delegatee = '${validator}' ORDER BY CONVERT(stake_amount, UNSIGNED) DESC LIMIT ${start}, ${count}`;
+async function getRangeDelegator(validator, start, size) {
+  return await Delegator.findAll({
+    where: {
+      delegatee: {
+        [Op.eq]: validator,
+      },
+    },
+    order: [
+      [Sequelize.cast(Sequelize.col("staked_amount"), "UNSIGNED"), "DESC"],
+    ],
+    offset: start,
+    limit: size,
   });
 }
 
@@ -71,9 +110,11 @@ async function getTotalStakeAsDelegator(public_key) {
 }
 
 module.exports = {
+  Delegator,
   getDelegatorsOfValidator,
   getTotalDelegator,
   getRangeDelegator,
   getAllDelegator,
   getTotalStakeAsDelegator,
+  getTotalDelegatorByValidator,
 };

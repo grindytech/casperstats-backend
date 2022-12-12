@@ -97,7 +97,7 @@ router
 router
   .route("/get-proposer-blocks")
   .get(
-    validateInput(schemas.startToCountWithValidator, PROPERTY_TYPE.query),
+    validateInput(schemas.paginationWithValidator, PROPERTY_TYPE.query),
     chain_controller.getBlocksByProposer
   );
 

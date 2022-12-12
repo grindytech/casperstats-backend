@@ -4,6 +4,7 @@ const {
   getBlockByHeight,
   getRangeBlock,
   getLatestBlock,
+  getTotalBLocksByValidator,
 } = require("../models/block_model");
 const {
   getTotalNumberOfTransfers,
@@ -393,23 +394,38 @@ module.exports = {
 
   getBlocksByProposer: async function (req, res) {
     const validator = req.query.validator;
-    const start = Number(req.query.start);
-    const count = Number(req.query.count);
+    const page = Number(req.query.page);
+    const size = Number(req.query.size);
 
     try {
-      //const url = await getNetWorkRPC();
-      let data = await getBlocksByValidator(validator, start, count);
+      const data = common.pagination;
+      data.currentPage = page;
+      data.size = size;
 
-      for (let i = 0; i < data.length; i++) {
-        delete data[i]["parent_hash"];
-        delete data[i]["state_root_hash"];
-        delete data[i]["validator"];
+      // get total blocks by validator
+      const totalBlocks = await getTotalBLocksByValidator(validator);
+      data.total = totalBlocks;
 
-        // const deploys = await getDeploysInBlock(url, data[i].height);
-        // const transfers = await getTransfersInBlock(url, data[i].height);
-        // data[i]["deploys"] = deploys.deploy_hashes.length + deploys.transfer_hashes.length;
-        // data[i]["transfers"] = transfers.transfers.length;
+      // get total Pages
+      const totalPages = Math.ceil(totalBlocks / size);
+      data.pages = totalPages;
+
+      // check if current page has next page and previous page
+      const check = common.checkNextAndPreviousPage(page, totalPages);
+      data.hasNext = check.hasNext;
+      data.hasPrevious = check.hasPrevious;
+
+      // get range block by Validator
+      const start = Number(size * (page - 1));
+      const items = await getBlocksByValidator(validator, start, size);
+
+      for (let i = 0; i < items.length; i++) {
+        delete items[i].dataValues["parent_hash"];
+        delete items[i].dataValues["state_root_hash"];
+        delete items[i].dataValues["validator"];
       }
+      data.items = items;
+
       res.status(200);
       res.json(data);
     } catch (err) {
